@@ -14,16 +14,57 @@
 #' @param sigma2 homoscedastic error variance of the Gaussian model (scalar,
 #'  ignored if response is not simulated from a Gaussian regression model)
 #'
-#' @returns a list with simulated data and parameters
-#' @export
+#' @returns a list of simulated data and parameters that contains the following elements:
+#' \describe{
+#'  \item{observed}{a data.frame object that contains the response variable
+#'   \code{y}, the covariates (starting with the letter \code{W}), the time index
+#'   \code{t} as well as the subject \code{id}}
+#'  \item{beta}{a T x d matrix of regression effects, i.e., each row contains
+#'   the regression effects of the corresponding timepoint}
+#'  \item{lambda}{a T x 1 matrix of factor loadings, i.e., each row contains
+#'   the factor loading of the corresponding timepoint}
+#'}
+#' @examples
+#' # Simulating data from a Gaussian panel model
+#' x <- sim_panelTVP(n = 100, t = 6,
+#'                   beta = c(4,1,0), theta = c(0,1,0),
+#'                   lambda = 1, psi = 0.2,
+#'                   model = "Gaussian", sigma2 = 1)
+#' head(x$observed, 10)
+#' x$beta
+#' x$lambda
 #'
-#' @examples 1
+#' # Simulating data from a Probit panel model
+#' x <- sim_panelTVP(n = 100, t = 6,
+#'                   beta = c(0.5,0.2,0), theta = c(0.1,0.25,0),
+#'                   lambda = 0.1, psi = 0,
+#'                   model = "Probit")
+#' head(x$observed, 10)
+#' x$beta
+#' x$lambda
 #'
+#' # Simulating data from a Logit panel model
+#' x <- sim_panelTVP(n = 100, t = 6,
+#'                   beta = c(0.5,0.2,0), theta = c(0.1,0.25,0),
+#'                   lambda = 0.5, psi = 0.04,
+#'                   model = "Logit")
+#' head(x$observed, 10)
+#' x$beta
+#' x$lambda
+#'
+#' # Simulating data from a Negative Binomial panel model
+#' x <- sim_panelTVP(n = 100, t = 6,
+#'                   beta = c(0.5,0.2,0), theta = c(0.1,0.25,0),
+#'                   lambda = 0.9, psi = 0.1,
+#'                   model = "NegBin", r = 2)
+#' head(x$observed, 10)
+#' x$beta
+#' x$lambda
 #' @description
 #' This function simulates balanced panel data, where the distribution of the
 #'  response variable is either Gaussian, binary (using a Probit or Logit link)
-#'  or Negative Binomial.
-#'
+#'  or Negative Binomial
+#' @export
 sim_panelTVP <- function(n,
                          t,
                          beta = NULL,

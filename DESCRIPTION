@@ -1,26 +1,28 @@
 Package: panelTVP
-Title: What the Package Does (One Line, Title Case)
+Title: Flexible Bayesian panel data models with time-varying parameters
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+Authors@R: c(
+    person("Roman", "Pfeiler", , "roman.pfeiler@jku.at", role = c("aut", "cre")),
+    person("Helga", "Wagner", , "helga.wagner@jku.at", role = "aut")
+  )
 Description: What the package does (one paragraph).
 License: GPL (>= 3)
+URL: https://github.com/Nemesis2196/panelTVP
+BugReports: https://github.com/Nemesis2196/panelTVP/issues
+Imports:
+    BayesLogit,
+    Bessel,
+    coda,
+    exvatools,
+    GIGrvg,
+    LaplacesDemon,
+    MASS,
+    Matrix,
+    mvtnorm,
+    pgdraw,
+    stats,
+    truncnorm,
+    utils
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Imports:
-    stats,
-    utils,
-    coda,
-    truncnorm,
-    Matrix,
-    pgdraw,
-    BayesLogit,
-    mvtnorm,
-    exvatools,
-    MASS,
-    GIGrvg,
-    Bessel,
-    LaplacesDemon
-URL: https://github.com/Nemesis2196/panelTVP
-BugReports: https://github.com/Nemesis2196/panelTVP/issues

@@ -57,10 +57,32 @@ this argument is ignored (see details)}
 (default yields 95 percent coverage)}
 }
 \value{
-nix
+The function returns an object of class \code{"panelTVP.Gaussian"},
+\code{"panelTVP.Probit"}, \code{"panelTVP.Logit"} or \code{"panelTVP.NegBin"}
+depending on whether a Gaussian, Probit, Logit or Negative Binomial model was
+fitted. The returned object contains a list of the following elements
+\describe{
+\item{data}{the data used for fitting the model and additional context information
+derived from the data}
+\item{mcmc}{Markov Chains for every parameter except for the factor scores
+(to save memory)}
+\item{posterior}{preliminary summary of posterior results}
+\item{fmean}{posterior means of random effects}
+\item{model}{the fitted model}
+\item{acceptance.rates}{the achieved acceptance rates when using Metropolis-Hastings}
+\item{HPD.coverage}{coverage probability of HPD intervals (based on input)}
+\item{runtime}{total runtime of the sampler (measured in seconds)}
+\item{WAIC}{the Widely Applicable Information Criterion for model comparison}
+\item{learning.settings}{information on which parameters have been learned}
+\item{mcmc.settings}{details on general MCMC sampler}
+}
 }
 \description{
-Fit a Bayesian panel model with time-varying parameters
+This is the main function for fitting a flexible Bayesian regression model for
+time-varying parameters in a balanced panel, i.e., when a total of n subjects are observed
+at the same T time points. By using shrinkage priors, the model makes it
+possible to identify whether an effect is time-varying, time-invariant or zero.
+This function works for Gaussian, binary and Negative Binomial response data.
 }
 \examples{
 1

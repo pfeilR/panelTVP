@@ -59,7 +59,35 @@ parameter r of the count model (see details)}
 (default yields 95 percent coverage)}
 }
 \value{
-nix nix
+The function returns an object of class \code{panelTVP.ZINB}.
+The returned object contains a list of the following elements
+\describe{
+\item{data}{the data used for fitting the model and additional context information
+derived from the data}
+\item{mcmc_logit}{Markov Chains for every parameter except for the factor scores
+(to save memory) for the Logit component of the model}
+\item{mcmc_nb}{Markov Chains for every parameter except for the factor scores
+(to save memory) for the Negative Binomial component of the model}
+\item{posterior_logit}{preliminary summary of posterior results for the
+Logit component of the model}
+\item{posterior_nb}{preliminary summary of posterior results for the
+Negative Binomial component of the model}
+\item{fmean_logit}{posterior means of random effects for the
+Logit component of the model}
+\item{fmean_nb}{posterior means of random effects for the
+Negative Binomial component of the model}
+\item{model}{the fitted model (here only Bayesian Zero-Inflated Negative Binomial possible)}
+\item{acceptance.rates}{the achieved acceptance rates when using
+Metropolis-Hastings for both components of the model}
+\item{HPD.coverage}{coverage probability of HPD intervals (based on input)}
+\item{runtime}{total runtime of the sampler (measured in seconds)}
+\item{WAIC}{the Widely Applicable Information Criterion for model comparison}
+\item{learning.settings_logit}{information on which parameters have been learned
+for the Logit component of the model}
+\item{learning.settings_nb}{information on which parameters have been learned
+for the Negative Binomial component of the model}
+\item{mcmc.settings}{details on general MCMC sampler}
+}
 }
 \description{
 Fit a Bayesian panel model with time-varying parameters for overdispersed and zero-inflated count data

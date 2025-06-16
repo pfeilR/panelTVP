@@ -3,11 +3,10 @@
 
 # panelTVP
 
-<!-- badges: start -->
+Welcome to the package !
 
-<!-- badges: end -->
-
-The goal of panelTVP is to …
+This package provides functions for fitting Bayesian regression models
+for balanced panel data with time-varying parameters.
 
 ## Installation
 
@@ -19,35 +18,50 @@ You can install the development version of panelTVP from
 pak::pak("Nemesis2196/panelTVP")
 ```
 
-## Example
+## Introduction to time-varying parameter models
 
-This is a basic example which shows you how to solve a common problem:
+We consider a balanced panel $y_{it}$ with $t = 1,\dots,T$ observations
+for $i = 1,\dots,n$ subjects, where $y_{it}$ is a binary response. The
+linear predictor of the model in its centered parameterization is given
+by
+$$\eta_{it} = \textbf{x}_{it}^\top \boldsymbol{\beta}_t + \text{f}_i\lambda_t,$$
+where $\textbf{x}_{it}$ is a $d \times 1$ vector of covariate values
+(including a $1$ for the intercept), $\boldsymbol{\beta}_t$ is a
+$d \times 1$ vector of regression effects at time $t,$ $\lambda_t$ is a
+time-specific factor loading and $\text{f}_i$ is a subject-specific
+factor score. We model variation over time smoothly via a random walk of
+order 1 $$
+    \boldsymbol{\beta}_t = \boldsymbol{\beta}_{t-1} + \textbf{w}^\beta_t, \quad \textbf{w}^\beta_t \sim \mathcal{N}(\textbf{0}, \textbf{Q}), \quad t= \{2,\dots,T\}, $$
+$$ \lambda_t = \lambda_{t-1} + \text{w}^\lambda_t, \quad \text{w}^\lambda_t \sim \mathcal{N}(0, \psi^2), \quad t= \{2,\dots,T\},  $$
 
-``` r
-library(panelTVP)
-## basic example code
-```
+where $\textbf{Q} = \text{diag}(\theta^2_1,\dots,\theta^2_d)$ and we
+assume that the process starts at $T=1$ with starting distributions
+$$ \boldsymbol{\beta}_1 \sim \mathcal{N}(\boldsymbol{\beta}, c^\beta\textbf{Q}), $$
+$$ \lambda_1 \sim \mathcal{N}(\lambda, c^\lambda \psi^2). $$
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+The model can be written in an alternative non-centered parameterization
+(Frühwirth-Schnatter and Wagner, 2010), where the linear predictor of
+Equation () is then given by
+$$  \eta_{it} = \textbf{x}_{it}^\top \boldsymbol{\beta} + \textbf{x}_{it}^\top \boldsymbol{\Theta} \boldsymbol{\tilde{\beta}}_t + \text{f}_i\lambda + \text{f}_i \psi \tilde{\lambda}_t, $$
+where $\boldsymbol{\Theta} = \text{diag}(\theta_1,\dots,\theta_d)$ and
+$\boldsymbol{\tilde{\beta}}_t$ as well as $\tilde{\lambda}_t$ follow
+standard Normal random walks
+$$     \boldsymbol{\tilde{\beta}}_t =   \boldsymbol{\tilde{\beta}}_{t-1} + \tilde{\textbf{w}}^\beta_t, \quad \tilde{\textbf{w}}^\beta_t \sim \mathcal{N}(\textbf{0},\textbf{I}), \quad \boldsymbol{\tilde{\beta}}_1 \sim \mathcal{N}(\textbf{0},c^\beta\textbf{I}), \quad t= \{2,\dots,T\}, $$
+$$     \tilde{\lambda}_t = \tilde{\lambda}_{t-1} + \tilde{\text{w}}_t^\lambda, \quad \tilde{\text{w}}^\lambda_t \sim \mathcal{N}(0,1), \quad \tilde{\lambda}_1 \sim \mathcal{N}(0,c^\lambda), \quad t= \{2,\dots,T\}. $$
+Switching to the centered parameterization can then easily be done by
+applying the transformations
+$$    \boldsymbol{\beta}_t = \boldsymbol{\beta} + \boldsymbol{\Theta}\boldsymbol{\tilde{\beta}}_t, \quad \lambda_t = \lambda + \psi \tilde{\lambda}_t. $$
 
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
-
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+Using the non-centered parameterization has the advantage that shrinkage
+priors from standard regression analysis can be used to identify whether
+an effect is time-varying, time-invariant or zero. As in Bitto and
+Frühwirth-Schnatter (2019) and Pfeiler and Wagner (2024), we consider
+Normal-Gamma shrinkage priors
+$$     \theta_j|\xi_j^2 \sim \mathcal{N}(0,\xi^2_j), \quad \xi_j^2|a^\xi, \kappa^\xi \sim \mathcal{G}\Bigl(a^\xi, \frac{a^\xi \kappa^\xi}{2}\Bigr), \; j=1,\dots,d, $$
+$$     \beta_j|\tau_j^2 \sim \mathcal{N}(0,\tau_j^2), \quad \tau_j^2|a^\tau, \kappa^\tau \sim \mathcal{G}\Bigl(a^\tau, \frac{a^\tau \kappa^\tau}{2}\Bigr),  \; j=1,\dots,d, $$
+$$   \psi|\zeta^2 \sim \mathcal{N}(0,\zeta^2), \quad \zeta^2|a^\zeta, \kappa^\zeta \sim \mathcal{G}\Bigl(a^\zeta, \frac{a^\zeta \kappa^\zeta}{2}\Bigr), $$
+$$   \lambda|\phi^2 \sim \mathcal{N}(0,\phi^2), \quad \phi^2|a^\phi, \kappa^\phi \sim \mathcal{G}\Bigl(a^\phi, \frac{a^\phi \kappa^\phi}{2}\Bigr), $$
+where the scale parameters of the stochastic processes
+$\theta_1,\dots\theta_d,\psi$ have support on $\mathbb{R}$ and are
+therefore defined as the positive and negative square root of the
+variance parameters $\theta^2_1,\dots,\theta^2_d,\psi^2.$

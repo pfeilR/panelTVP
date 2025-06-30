@@ -112,10 +112,12 @@ compute.waic <- function(model){
   }
 
   m <- model$model
+  idx.observed <- !is.na(model$data$y)
+  y <- model$data$y[idx.observed]
 
   if(m != "Zero-Inflated Negative Binomial"){
 
-    eta <- lp.model(model)
+    eta <- lp.model(model)[idx.observed,]
     S <- nrow(model$mcmc)
     y <- model$data$y
     w <- model$wmcmc
@@ -154,8 +156,8 @@ compute.waic <- function(model){
   } else{ # ZINB model
 
     etas <- lp.zinb(model)
-    eta_logit <- etas[["eta_logit"]]
-    eta_nb <- etas[["eta_nb"]]
+    eta_logit <- etas[["eta_logit"]][idx.observed,]
+    eta_nb <- etas[["eta_nb"]][idx.observed,]
     S <- nrow(model$mcmc_logit)
     y <- model$data$y
     p.risk <- pmax(pmin(plogis(eta_logit), 1 - 1e-8), 1e-08)
@@ -166,7 +168,7 @@ compute.waic <- function(model){
     ll <- matrix(NA, nrow = length(y), ncol = S)
     zeros <- y == 0
     for(s in 1:S){
-      w <- model$mcmc_risk[s,]
+      w <- model$mcmc_risk[s,idx.observed]
       # structural zero
       ll[zeros & w == 0, s] <- log(1 - p.risk[zeros & w == 0, s])
       # at-risk zero
@@ -178,6 +180,9 @@ compute.waic <- function(model){
   }
 
   waic <- LaplacesDemon::WAIC(ll)$WAIC
+  if(sum(is.na(model$data$y)) > 0){
+    warning("NAs are present in response variable. WAIC was computed based on the observed data.")
+  }
 
   return(waic)
 

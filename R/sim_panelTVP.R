@@ -177,6 +177,7 @@ sim_panelTVP <- function(n,
   if(model == "Gaussian") error <- matrix(mvtnorm::rmvnorm(n, mean = rep(0, t), sigma = Sigma))
   y <- matrix(NA,n*t)
   fi <- matrix(rnorm(n), ncol = 1)
+  fi <- fi - mean(fi)
   Fmat <- matrix(NA,n*t)
   for(tt in (1:t)){
     Fmat[((tt-1)*n+1):(n*tt),] <- fi %*% matrix(lambdat[tt,])

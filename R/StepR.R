@@ -272,13 +272,7 @@ AWOL <- function(y, X, Time, timeidx,d, alpha, sigma2, hyperpar.c, prior){
     c_v <- c(unlist(c_v))
   }
 
-  #cholesky: RP added a safer version to prevent issues arising from numerical instability
-  L <- tryCatch({
-    as.matrix(Matrix::chol(om))
-  }, error = function(e){
-    om.catch <- Matrix::forceSymmetric(om)
-    as.matrix(Matrix::chol(om.catch))
-  })
+  L <- as.matrix(Matrix::chol(om))
 
   a <- forwardsolve(t(L), c_v)
   if(prior == "rw1"){
@@ -368,14 +362,7 @@ AWOL.PG <- function(z, X, n, Time, timeidx, d, alpha, W.sparse, hyperpar.c, prio
     c_v <- c(unlist(c_v))
   }
 
-  #cholesky: RP added a safer version to prevent issues arising from numerical instability
-  L <- tryCatch({
-    as.matrix(Matrix::chol(om))
-  }, error = function(e){
-    om.catch <- Matrix::forceSymmetric(om)
-    as.matrix(Matrix::chol(om.catch))
-  })
-
+  L <- as.matrix(Matrix::chol(om))
   a <- forwardsolve(t(L), c_v)
   if(prior == "rw1"){
     e <- matrix(rnorm(d*(Time+1)))

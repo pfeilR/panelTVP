@@ -18,6 +18,7 @@ ProbitTVP <- function(df,
 
   X.t <- cbind(df$X, t = df$timeidx)
   fi.count <- 1
+  Y <- matrix(nrow = length(df$y), ncol = mcmc.opt$chain.length)
 
   #progress bar
   pb <- utils::txtProgressBar(min = 0,
@@ -46,7 +47,7 @@ ProbitTVP <- function(df,
       z <- ifelse(df$y == 1,
                   truncnorm::rtruncnorm(length(df$y), a = 0, b = Inf, mean = eta, sd = 1),
                   truncnorm::rtruncnorm(length(df$y), a = -Inf, b = 0, mean = eta, sd = 1)
-      )
+                  )
 
       # Step R
 
@@ -93,6 +94,10 @@ ProbitTVP <- function(df,
         reff <- c(t(matrix(lambda, ncol=df$n, nrow=df$Tmax)))*fv
       }
 
+      # Step Augment (only in the presence of missings)
+      df$y[miss] <- StepAugment(eta.miss = c(linpred)[miss] + reff[miss],
+                                model = "Probit")
+
       # Returning
 
       if(prior.reg$type %in% c("rw1", "rw2")){ # shrinkage
@@ -136,7 +141,7 @@ ProbitTVP <- function(df,
       }
 
       res_frame[i,] <- res.i
-
+      Y[,i] <- df$y
       utils::setTxtProgressBar(pb, i) # tracking progress
 
     } # for-loop
@@ -185,6 +190,7 @@ ProbitTVP <- function(df,
   #create return object:
   nmc <- (mcmc.opt$chain.length-mcmc.opt$burnin)/mcmc.opt$thin
   fmean <- f_sum/nmc
+  Y <- Y[,seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)]
 
   # computing acceptance rates of Metropolis-based parameters
   acceptance.rates <- matrix(nrow = 1, ncol = 2)
@@ -193,11 +199,13 @@ ProbitTVP <- function(df,
   colnames(acceptance.rates) <- c("a_xi", "a_tau")
 
   # return
-  ret <- list(data = df, mcmc = res_mcmc[,colnames(res_mcmc) != "sigma2"],
+  df$y[miss] <- NA
+  ret <- list(data = df, Y = Y, mcmc = res_mcmc[,colnames(res_mcmc) != "sigma2"],
               posterior = mcmcsummary[rownames(mcmcsummary) != "sigma2",],
               fmean = fmean,fmcmc = f_mat[,1:df$n], model = "Probit", acceptance.rates = acceptance.rates,
               HPD.coverage = HPD.coverage,
               runtime = paste("Total Runtime for Bayesian Probit Model:", round(time[3], 3), "seconds"))
+  if(sum(miss) == 0) ret$Y <- NULL
 
   return(ret)
 

@@ -111,6 +111,10 @@ panelTVP_ZINB <- function(formula,
     tv.load_logit = TRUE
   }
 
+  miss <- ifelse(is.na(data$y), TRUE, FALSE)
+  N.miss <- sum(miss)
+  data$y[miss] <- MASS::rnegbin(N.miss, mu = 1, theta = 2)
+
   rhs <- formula[[3]]
   rhs_str <- paste(deparse(rhs), collapse = "")
   rhs.parts <- strsplit(rhs_str, "\\|")[[1]]
@@ -179,10 +183,6 @@ panelTVP_ZINB <- function(formula,
   prior.reg_logit$xi <- rep(10, df$d_logit)
   prior.load_logit$phi <- 1
   prior.load_logit$zeta <- 1
-
-  # ZINB-specifics
-
-  at.risk <- ifelse(df$y > 0, 1, 0)
 
   #-----------------------------------------------------------------------------
   # create return matrix for the MCMC samples
@@ -292,7 +292,7 @@ panelTVP_ZINB <- function(formula,
                     f_sum_logit = f_sum_logit,
                     f_mat_nb = f_mat_nb,
                     f_mat_logit = f_mat_logit,
-                    at.risk = at.risk,
+                    miss = miss,
                     HPD.coverage = HPD.coverage)
   class(result) <- "panelTVP.ZINB"
 
@@ -322,6 +322,19 @@ panelTVP_ZINB <- function(formula,
 
   # adding mcmc setting to output (incl. ASIS Boolean)
   result$mcmc.settings <- mcmc.opt
+
+  # rounding HPD lower bound to exactly 0 to cover cases that should be zero
+  # but do not include zero due to sign flip
+  index1_nb <- startsWith(rownames(result$posterior_nb), "abs(")
+  result$posterior_nb[index1_nb, "LO"] <- ifelse(result$posterior_nb[index1_nb,"LO"] < 0.01, 0,
+                                                 result$posterior_nb[index1_nb,"LO"])
+  result$posterior_nb["lambda_t1","LO"] <- ifelse(result$posterior_nb["lambda_t1","LO"] < 0.01, 0,
+                                                  result$posterior_nb["lambda_t1","LO"])
+  index1_logit <- startsWith(rownames(result$posterior_logit), "abs(")
+  result$posterior_logit[index1_logit, "LO"] <- ifelse(result$posterior_logit[index1_logit,"LO"] < 0.01, 0,
+                                                       result$posterior_logit[index1_logit,"LO"])
+  result$posterior_logit["lambda_t1","LO"] <- ifelse(result$posterior_logit["lambda_t1","LO"] < 0.01, 0,
+                                                     result$posterior_logit["lambda_t1","LO"])
 
   return(result)
 

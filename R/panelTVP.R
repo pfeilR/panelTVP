@@ -96,6 +96,12 @@ panelTVP <- function(formula,
     tv.load = TRUE
   }
 
+  miss <- ifelse(is.na(data$y), TRUE, FALSE)
+  N.miss <- sum(miss)
+  if(model == "Gaussian") data$y[miss] <- rnorm(n = N.miss)
+  if(model %in% c("Probit", "Logit")) data$y[miss] <- rbinom(n = N.miss, size = 1, prob = 0.5)
+  if(model == "NegBin") data$y[miss] <- MASS::rnegbin(n = N.miss, mu = 1, theta = 1)
+
   mf <- model.frame(formula = formula, data = data, drop.unused.levels = TRUE)
   y <- model.response(mf)
   mt <- attr(mf, "terms")
@@ -289,6 +295,14 @@ panelTVP <- function(formula,
 
   # adding mcmc setting to output (incl. ASIS Boolean)
   result$mcmc.settings <- mcmc.opt
+
+  # rounding HPD lower bound to exactly 0 to cover cases that should be zero
+  # but do not include zero due to sign flip
+  index1 <- startsWith(rownames(result$posterior), "abs(")
+  result$posterior[index1, "LO"] <- ifelse(result$posterior[index1,"LO"] < 0.01, 0,
+                                           result$posterior[index1,"LO"])
+  result$posterior["lambda_t1","LO"] <- ifelse(result$posterior["lambda_t1","LO"] < 0.01, 0,
+                                               result$posterior["lambda_t1","LO"])
 
   return(result)
 

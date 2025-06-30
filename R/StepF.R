@@ -210,7 +210,7 @@ AWOL_fac <- function(yf, fi, Time, psi, pri.type, hyp.c, sgma2){
   if(pri.type=="rw1"){
     d <- Time+1
     h <- list(rep(-1,d-1),
-              c(1/hyp.c, rep(2, d-2),1))
+              c(1+1/hyp.c, rep(2, d-2),1))
 
     L0.inv <- as.matrix(Matrix::bandSparse(d, k=(-1):0, diag=h,symm=TRUE))
     Omega <- diag(c(0,Sf))+L0.inv
@@ -229,17 +229,7 @@ AWOL_fac <- function(yf, fi, Time, psi, pri.type, hyp.c, sgma2){
   cv <- matrix(psi*crossprod(fi,matrix(yh, nrow=n, ncol=Time))/sgma2, ncol=1)
   if(pri.type=="rw1"){cv=c(0,cv)}
 
-  Oinv <- tryCatch({
-    solve(Omega)
-  }, error = function(e) {
-    Omega <- as.matrix(Matrix::forceSymmetric(Omega))
-    Omega <- Omega + diag(1e-4, nrow(Omega))
-    tryCatch({
-      solve(Omega)
-    }, error = function(e2){
-      stop("Precision Matrix in AWOL step could not be inverted despite regularization.")
-    })}
-  )
+  Oinv <- solve(Omega)
   m <- Oinv%*%cv
   lambda_tilde <- mvtnorm::rmvnorm(n=1, mean = m, sigma = Oinv)
 
@@ -363,7 +353,7 @@ AWOL_fac.PG <- function(z, fi, Time, psi, pri.type, hyp.c, W.dense){
   if(pri.type=="rw1"){
     d <- Time+1
     h <- list(rep(-1,d-1),
-              c(1/hyp.c, rep(2, d-2),1))
+              c(1+1/hyp.c, rep(2, d-2),1))
 
     L0.inv <- as.matrix(Matrix::bandSparse(d, k=(-1):0, diag=h,symm=TRUE))
     Omega <- diag(c(0,Sf))+L0.inv
@@ -383,17 +373,7 @@ AWOL_fac.PG <- function(z, fi, Time, psi, pri.type, hyp.c, W.dense){
 
   if(pri.type=="rw1"){cv=c(0,cv)}
 
-  Oinv <- tryCatch({
-    solve(Omega)
-  }, error = function(e) {
-    Omega <- as.matrix(Matrix::forceSymmetric(Omega))
-    Omega <- Omega + diag(1e-4, nrow(Omega))
-    tryCatch({
-      solve(Omega)
-    }, error = function(e2){
-      stop("Precision Matrix in AWOL step could not be inverted despite regularization.")
-    })}
-  )
+  Oinv <- solve(Omega)
   m <- Oinv%*%cv
   lambda_tilde <- mvtnorm::rmvnorm(n=1, mean = m, sigma = Oinv)
 

@@ -21,7 +21,7 @@ zinbTVP <- function(df,
                     f_sum_logit,
                     f_mat_nb,
                     f_mat_logit,
-                    at.risk,
+                    miss,
                     HPD.coverage){
 
   r <- 1
@@ -43,6 +43,7 @@ zinbTVP <- function(df,
   df.nb[["d_logit"]] <- NULL
 
   mcmc_risk <- matrix(nrow = mcmc.opt$chain.length, ncol = length(df$y))
+  Y <- matrix(nrow = length(df$y), ncol = mcmc.opt$chain.length)
 
   #progress bar
   pb <- utils::txtProgressBar(min = 0,
@@ -87,7 +88,7 @@ zinbTVP <- function(df,
 
       # Sampling of latent at-risk indicators ----------------------------------
 
-      risk <- stepRisk(eta_nb = eta_nb, eta_logit = eta_logit, at.risk = at.risk, r = r)
+      risk <- stepRisk(y = df$y, miss = miss, eta_nb = eta_nb, eta_logit = eta_logit, r = r)
       mcmc_risk[i,] <- risk
 
       # Logit Component --------------------------------------------------------
@@ -229,6 +230,12 @@ zinbTVP <- function(df,
         reff_nb <- c(t(matrix(lambda_nb, ncol=df.nb$n, nrow=df.nb$Tmax)))*fv_nb
       }
 
+      # Step Augment
+      df$y[miss] <- StepAugment(eta.miss = c(linpred_nb)[miss] + reff_nb[miss],
+                                model = "ZINB",
+                                r = r,
+                                risk.miss = risk[miss])
+
       # Returning --------------------------------------------------------------
 
       if(prior.reg_logit$type %in% c("rw1", "rw2")){ # shrinkage
@@ -310,7 +317,7 @@ zinbTVP <- function(df,
       }
 
       res_frame_nb[i,] <- c(res.i_nb, r)
-
+      Y[,i] <- df$y # important for missings and computation of WAIC
       utils::setTxtProgressBar(pb, i) # tracking progress
 
     } # for-loop
@@ -381,6 +388,7 @@ zinbTVP <- function(df,
 
   # at-risk indicators
   mcmc_risk <- mcmc_risk[seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin),]
+  Y <- Y[,seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)]
 
   # computing acceptance rates of Metropolis-based parameters
   acceptance.rates <- matrix(nrow = 1, ncol = 5)
@@ -392,7 +400,9 @@ zinbTVP <- function(df,
   colnames(acceptance.rates) <- c("a_xi (logit)", "a_tau (logit)", "a_xi (nb)", "a_tau (nb)", "r")
 
   # return
+  df$y[miss] <- NA
   ret <- list(data = df,
+              Y = Y,
               mcmc_logit = res_mcmc_logit, mcmc_nb = res_mcmc_nb,
               posterior_logit = mcmcsummary_logit, posterior_nb = mcmcsummary_nb,
               fmcmc_logit = f_mat_logit[,1:df$n], fmcmc_nb = f_mat_nb[,1:df$n],
@@ -403,6 +413,7 @@ zinbTVP <- function(df,
               HPD.coverage = HPD.coverage,
               runtime = paste("Total Runtime for Bayesian Zero-Inflated Negative Binomial Model:",
                               round(time[3], 3), "seconds"))
+  if(sum(miss) == 0) ret$Y <- NULL
 
   return(ret)
 

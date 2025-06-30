@@ -21,6 +21,8 @@ NegBinTVP <- function(df,
   r <- c()
   fi.count <- 1
 
+  Y <- matrix(nrow = length(df$y), ncol = mcmc.opt$chain.length)
+
   #progress bar
   pb <- utils::txtProgressBar(min = 0,
                        max = mcmc.opt$chain.length,
@@ -131,6 +133,11 @@ NegBinTVP <- function(df,
         reff <- c(t(matrix(lambda, ncol=df$n, nrow=df$Tmax)))*fv
       }
 
+      # Step Augment (only in the presence of missings)
+      df$y[miss] <- StepAugment(eta.miss = c(linpred)[miss] + reff[miss],
+                                model = "NegBin",
+                                r = r[i])
+
       # Returning
 
       if(prior.reg$type %in% c("rw1", "rw2")){ # shrinkage
@@ -176,7 +183,7 @@ NegBinTVP <- function(df,
       res.i <- c(res.i, r[i]) # appending dispersion parameter of NegBin dist
 
       res_frame[i,] <- res.i
-
+      Y[,i] <- df$y
       utils::setTxtProgressBar(pb, i) # tracking progress
 
     } # for-loop
@@ -225,6 +232,7 @@ NegBinTVP <- function(df,
   #create return object:
   nmc <- (mcmc.opt$chain.length-mcmc.opt$burnin)/mcmc.opt$thin
   fmean <- f_sum/nmc
+  Y <- Y[,seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)]
 
   # computing acceptance rates of Metropolis-based parameters
   acceptance.rates <- matrix(nrow = 1, ncol = 3)
@@ -234,12 +242,14 @@ NegBinTVP <- function(df,
   colnames(acceptance.rates) <- c("a_xi", "a_tau", "r")
 
   # return
+  df$y[miss] <- NA
   ret <- list(data = df, mcmc = res_mcmc[,colnames(res_mcmc) != "sigma2"],
               posterior = mcmcsummary[rownames(mcmcsummary) != "sigma2",],
               fmcmc = f_mat[,1:df$n],
               fmean = fmean, model = "Negative Binomial", acceptance.rates = acceptance.rates,
               HPD.coverage = HPD.coverage,
               runtime = paste("Total Runtime for Bayesian Negative Binomial Model:", round(time[3], 3), "seconds"))
+  if(sum(miss) == 0) ret$Y <- NULL
 
   return(ret)
 

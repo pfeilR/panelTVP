@@ -415,7 +415,8 @@ panelTVP_ZINB <- function(formula,
     tv.load_logit = TRUE
   }
 
-  miss <- ifelse(is.na(data$y), TRUE, FALSE)
+  resp <- all.vars(formula)[1]
+  miss <- ifelse(is.na(data[,resp]), TRUE, FALSE)
   N.miss <- sum(miss)
   data$y[miss] <- MASS::rnegbin(N.miss, mu = 1, theta = 2)
 

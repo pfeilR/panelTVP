@@ -326,7 +326,8 @@ panelTVP <- function(formula,
     tv.load = TRUE
   }
 
-  miss <- ifelse(is.na(data$y), TRUE, FALSE)
+  resp <- all.vars(formula)[1]
+  miss <- ifelse(is.na(data[,resp]), TRUE, FALSE)
   N.miss <- sum(miss)
   if(model == "Gaussian") data$y[miss] <- rnorm(n = N.miss)
   if(model %in% c("Probit", "Logit")) data$y[miss] <- rbinom(n = N.miss, size = 1, prob = 0.5)

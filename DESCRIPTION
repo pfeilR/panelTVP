@@ -5,16 +5,18 @@ Authors@R: c(
     person("Roman", "Pfeiler", , "roman.pfeiler@jku.at", role = c("aut", "cre")),
     person("Helga", "Wagner", , "helga.wagner@jku.at", role = "aut")
   )
-Description: This package contains functions for flexbile Bayesian inference in balanced panel studies,
- where Gaussian, binary and (zero-inflated) response variables can be analyzed in a regression setting.
- The model is flexible in the sense that parameters are allowed to vary over time. Moreoever,
- shrinkage priors are used to prevent overfitting and to identify whether an effect is time-varying
- time-invariant or zero. 
+Description: This package contains functions for flexible Bayesian inference
+ in panel studies, where Gaussian, binary and (zero-inflated) response variables
+ can be analyzed in a regression setting. The model is flexible in the sense
+ that parameters are allowed to vary over time. Moreover, shrinkage priors 
+ are used to prevent overfitting and to identify whether an effect is 
+ time-varying time-invariant or zero. Missing values in the response variable
+ are imputed during MCMC estimation. 
 License: GPL (>= 3)
 URL: https://github.com/Nemesis2196/panelTVP
 BugReports: https://github.com/Nemesis2196/panelTVP/issues
 Imports:
-    BayesLogit,
+    BayesLogit (>= 2.1),
     Bessel,
     coda,
     exvatools,
@@ -26,7 +28,8 @@ Imports:
     pgdraw,
     stats,
     truncnorm,
-    utils
+    utils,
+    ggplot2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

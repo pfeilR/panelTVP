@@ -77,59 +77,59 @@ stepR <- function(response,
 
     ### Step DR-4a: sample a_tau and a_xi (if metropolis == TRUE) --------------
 
-    if(prior.reg$learn_a_xi){
+    if(prior.reg$learn.a.xi){
 
       if(i>1){ # metropolis step starting in second iteration
 
         ## a_xi
 
-        a_xi_state <- MH_step(a = prior.reg$a_xi,
+        a_xi_state <- MH_step(a = prior.reg$a.xi,
                               alphapart = alpha[(df$d+1):(2*df$d)],
-                              iota = prior.reg$iota.reg_xi,
-                              prior_hp1 = prior.reg$nu_xi,
-                              prior_hp2 = prior.reg$b_xi*prior.reg$nu_xi,
-                              k = prior.reg$kappa_xi,
+                              iota = prior.reg$iota.xi,
+                              prior_hp1 = prior.reg$nu.xi,
+                              prior_hp2 = prior.reg$b.xi*prior.reg$nu.xi,
+                              k = prior.reg$kappa.xi,
                               accept = prior.reg$xi.accept,
-                              target.rate = prior.reg$xi.target.rate)
+                              target.rate = prior.reg$target.rate.xi)
 
-        if(a_xi_state[[1]] != prior.reg$a_xi){
+        if(a_xi_state[[1]] != prior.reg$a.xi){
           prior.reg$xi.accept[i] <- 1
         } else{
           prior.reg$xi.accept[i] <- 0
         }
-        prior.reg$a_xi <- a_xi_state[[1]]
-        prior.reg$a_xi[prior.reg$a_xi>10^11]=10^11
-        prior.reg$a_xi[prior.reg$a_xi<0.1^7]=0.1^7
-        prior.reg$iota.reg_xi <- a_xi_state[[2]]
+        prior.reg$a.xi <- a_xi_state[[1]]
+        prior.reg$a.xi[prior.reg$a.xi>10^11]=10^11
+        prior.reg$a.xi[prior.reg$a.xi<0.1^7]=0.1^7
+        prior.reg$iota.xi <- a_xi_state[[2]]
 
       }
 
     }
 
-    if(prior.reg$learn_a_tau){
+    if(prior.reg$learn.a.tau){
 
       if(i>1){ # metropolis step starting in second iteration
 
         ## a_tau
 
-        a_tau_state <- MH_step(a = prior.reg$a_tau,
+        a_tau_state <- MH_step(a = prior.reg$a.tau,
                                alphapart = alpha[1:df$d],
-                               iota = prior.reg$iota.reg_tau,
-                               prior_hp1 = prior.reg$nu_tau,
-                               prior_hp2 = prior.reg$b_tau*prior.reg$nu_tau,
-                               k = prior.reg$kappa_tau,
+                               iota = prior.reg$iota.tau,
+                               prior_hp1 = prior.reg$nu.tau,
+                               prior_hp2 = prior.reg$b.tau*prior.reg$nu.tau,
+                               k = prior.reg$kappa.tau,
                                accept = prior.reg$tau.accept,
-                               target.rate = prior.reg$tau.target.rate)
+                               target.rate = prior.reg$target.rate.tau)
 
-        if(a_tau_state[[1]] != prior.reg$a_tau){
+        if(a_tau_state[[1]] != prior.reg$a.tau){
           prior.reg$tau.accept[i] <- 1
         } else{
           prior.reg$tau.accept[i] <- 0
         }
-        prior.reg$a_tau <- a_tau_state[[1]]
-        prior.reg$a_tau[prior.reg$a_tau>10^11]=10^11
-        prior.reg$a_tau[prior.reg$a_tau<0.1^7]=0.1^7
-        prior.reg$iota.reg_tau <- a_tau_state[[2]]
+        prior.reg$a.tau <- a_tau_state[[1]]
+        prior.reg$a.tau[prior.reg$a.tau>10^11]=10^11
+        prior.reg$a.tau[prior.reg$a.tau<0.1^7]=0.1^7
+        prior.reg$iota.tau <- a_tau_state[[2]]
 
       }
 
@@ -137,36 +137,36 @@ stepR <- function(response,
 
     ### Step DR-4b: sample xi, tau ---------------------------------------------
 
-    prior.reg$xi <- sample_GIG(a = prior.reg$a_xi, l = prior.reg$kappa_xi,
+    prior.reg$xi <- sample_GIG(a = prior.reg$a.xi, l = prior.reg$kappa.xi,
                                par = alpha[(df$d+1):(2*df$d)])
     prior.reg$xi[prior.reg$xi>10^11]=10^11
     prior.reg$xi[prior.reg$xi<0.1^15]=0.1^15
 
-    prior.reg$tau <- sample_GIG(a = prior.reg$a_tau, l = prior.reg$kappa_tau,
+    prior.reg$tau <- sample_GIG(a = prior.reg$a.tau, l = prior.reg$kappa.tau,
                                 par = alpha[1:df$d])
     prior.reg$tau[prior.reg$tau>10^11]=10^11
     prior.reg$tau[prior.reg$tau<0.1^15]=0.1^15
 
     ### Step DR-4c: Sample kappa_xi, kappa_tau ---------------------------------
 
-    if(prior.reg$learn_kappa_xi){
-      prior.reg$kappa_xi <- sample_G(a = prior.reg$a_xi,
+    if(prior.reg$learn.kappa.xi){
+      prior.reg$kappa.xi <- sample_G(a = prior.reg$a.xi,
                                      d = df$d,
                                      par = prior.reg$xi,
-                                     prior_hp1 = prior.reg$d1,
-                                     prior_hp2 = prior.reg$d2)
-      prior.reg$kappa_xi[prior.reg$kappa_xi>10^11]=10^11
-      prior.reg$kappa_xi[prior.reg$kappa_xi<0.1^15]=0.1^15
+                                     prior_hp1 = prior.reg$d.xi,
+                                     prior_hp2 = prior.reg$e.xi)
+      prior.reg$kappa.xi[prior.reg$kappa.xi>10^11]=10^11
+      prior.reg$kappa.xi[prior.reg$kappa.xi<0.1^15]=0.1^15
     }
 
-    if(prior.reg$learn_kappa_tau){
-      prior.reg$kappa_tau <- sample_G(a = prior.reg$a_tau,
+    if(prior.reg$learn.kappa.tau){
+      prior.reg$kappa.tau <- sample_G(a = prior.reg$a.tau,
                                       d = df$d,
                                       par = prior.reg$tau,
-                                      prior_hp1 = prior.reg$e1,
-                                      prior_hp2 = prior.reg$e2)
-      prior.reg$kappa_tau[prior.reg$kappa_tau>10^11]=10^11
-      prior.reg$kappa_tau[prior.reg$kappa_tau<0.1^15]=0.1^15
+                                      prior_hp1 = prior.reg$d.tau,
+                                      prior_hp2 = prior.reg$e.tau)
+      prior.reg$kappa.tau[prior.reg$kappa.tau>10^11]=10^11
+      prior.reg$kappa.tau[prior.reg$kappa.tau<0.1^15]=0.1^15
     }
 
     # transform to centered parameterization for saving results

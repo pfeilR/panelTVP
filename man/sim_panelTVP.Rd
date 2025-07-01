@@ -4,32 +4,24 @@
 \alias{sim_panelTVP}
 \title{Simulate data from a time-varying parameter panel data model}
 \usage{
-sim_panelTVP(
-  n,
-  t,
-  beta = NULL,
-  theta = NULL,
-  lambda = NULL,
-  psi = NULL,
-  model,
-  r = NULL,
-  sigma2 = NULL
-)
+sim_panelTVP(n, Tmax, beta, theta, lambda, psi, model, r = NULL, sigma2 = NULL)
 }
 \arguments{
 \item{n}{number of subjects (scalar)}
 
-\item{t}{number of time points (scalar)}
+\item{Tmax}{number of time points / repeated measurements per subject (scalar)}
 
-\item{beta}{starting values of random walk prior for regression effects
+\item{beta}{fixed regression effects, with the first value representing the
+global intercept (vector of dimension d)}
+
+\item{theta}{standard deviation of random walk for regression effects, i.e.,
+larger values yield regression effects that vary stronger over time
 (vector of dimension d)}
 
-\item{theta}{standard deviation of random walk prior for regression effects
-(vector of dimension d)}
+\item{lambda}{fixed factor loading (scalar)}
 
-\item{lambda}{starting value of random walk prior for factor loading (scalar)}
-
-\item{psi}{standard deviation of random walk prior for factor loading (scalar)}
+\item{psi}{standard deviation of random walk for factor loading, i.e.,
+a larger value yields a factor loading that varies stronger over time (scalar)}
 
 \item{model}{either "Gaussian", "Probit", "Logit" or "NegBin"}
 
@@ -42,32 +34,38 @@ ignored if response is not simulated from a Gaussian regression model)}
 \value{
 a list of simulated data and parameters that contains the following elements:
 \describe{
-\item{observed}{a data.frame object that contains the response variable
-\code{y}, the covariates (starting with the letter \code{W}), the time index
-\code{t} as well as the subject \code{id}}
+\item{observed}{a data frame that contains the response variable
+\code{y} the covariates (starting with the letter \code{W}),
+the time index \code{t} and the subject index \code{id}}
 \item{beta}{a T x d matrix of regression effects, i.e., each row contains
-the regression effects of the corresponding timepoint}
+the regression effects of the corresponding time point}
 \item{lambda}{a T x 1 matrix of factor loadings, i.e., each row contains
-the factor loading of the corresponding timepoint}
+the factor loading of the corresponding time point}
+\item{sigma2}{a scalar containing the value of \eqn{\sigma^2} (only in
+Gaussian model)}
+\item{r}{a scalar containing the value of \eqn{r} (only in Negative
+Binomial model)}
 }
 }
 \description{
-This function simulates balanced panel data, where the distribution of the
+This function simulates panel data with time-varying parameters,
+where the distribution of the
 response variable is either Gaussian, binary (using a Probit or Logit link)
-or Negative Binomial
+or Negative Binomial.
 }
 \examples{
 # Simulating data from a Gaussian panel model
-x <- sim_panelTVP(n = 100, t = 6,
+x <- sim_panelTVP(n = 100, Tmax = 6,
                   beta = c(4,1,0), theta = c(0,1,0),
                   lambda = 1, psi = 0.2,
                   model = "Gaussian", sigma2 = 1)
 head(x$observed, 10)
 x$beta
 x$lambda
+x$sigma2
 
 # Simulating data from a Probit panel model
-x <- sim_panelTVP(n = 100, t = 6,
+x <- sim_panelTVP(n = 100, Tmax = 6,
                   beta = c(0.5,0.2,0), theta = c(0.1,0.25,0),
                   lambda = 0.1, psi = 0,
                   model = "Probit")
@@ -76,7 +74,7 @@ x$beta
 x$lambda
 
 # Simulating data from a Logit panel model
-x <- sim_panelTVP(n = 100, t = 6,
+x <- sim_panelTVP(n = 100, Tmax = 6,
                   beta = c(0.5,0.2,0), theta = c(0.1,0.25,0),
                   lambda = 0.5, psi = 0.04,
                   model = "Logit")
@@ -85,11 +83,12 @@ x$beta
 x$lambda
 
 # Simulating data from a Negative Binomial panel model
-x <- sim_panelTVP(n = 100, t = 6,
+x <- sim_panelTVP(n = 100, Tmax = 6,
                   beta = c(0.5,0.2,0), theta = c(0.1,0.25,0),
                   lambda = 0.9, psi = 0.1,
                   model = "NegBin", r = 2)
 head(x$observed, 10)
 x$beta
 x$lambda
+x$r
 }

@@ -1,3 +1,3 @@
 # panelTVP (development version)
 
-* Initial CRAN submission.
+* Version 1.0.0 (Initial CRAN submission)

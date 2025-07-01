@@ -3,4 +3,5 @@
 export(panelTVP)
 export(panelTVP_ZINB)
 export(sim_panelTVP)
+export(sim_panelTVP_ZINB)
 import(stats)

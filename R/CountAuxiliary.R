@@ -1,16 +1,10 @@
 NB.para <- function(y,
                     eta = NULL,
-                    iota.r = NULL,
                     r.old = NULL,
                     omega.old = NULL,
                     sample.r = FALSE,
                     sample.omega = FALSE,
                     compute.z = FALSE,
-                    r.a = NULL,
-                    r.b = NULL,
-                    r.accept = NULL,
-                    r.target.rate = NULL,
-                    slice = FALSE,
                     r.alpha = NULL,
                     r.beta = NULL,
                     expansion.steps = NULL,
@@ -22,18 +16,12 @@ NB.para <- function(y,
 
   if(sample.r){
 
-    psi <- 1 / (1 + exp(-eta)) # DON'T USE exp(eta)/(1+exp(eta)) as this is instable!!!
-    # psi should not be exactly 0 or 1
+    psi <- 1 / (1 + exp(-eta))
     psi <- ifelse(psi == 0, psi + 0.00001, psi)
     psi <- ifelse(psi == 1, psi - 0.00001, psi)
-    if(!slice){ # Metropolis-Hastings update
-      r.next <- MH.r(y = y, psi = psi, r = r.old, iota.r = iota.r, r.a = r.a, r.b = r.b,
-                     r.target.rate = r.target.rate, r.accept = r.accept)
-    } else{ # Slice-Sampler update
-      r.next <- slice.r(y = y, psi = psi, r = r.old, a = r.alpha, b = r.beta,
-                        steps = expansion.steps, w = width, p.overrelax = p.overrelax,
-                        acc = accuracy.overrelax)
-    }
+    r.next <- slice.r(y = y, psi = psi, r = r.old, a = r.alpha, b = r.beta,
+                      steps = expansion.steps, w = width, p.overrelax = p.overrelax,
+                      acc = accuracy.overrelax)
     return(r.next)
 
   }
@@ -60,33 +48,6 @@ ll.nb <- function(y, r, psi){
     r * log(1 - psi) + y * log(psi)
   log_likelihood <- sum(log_likelihood_i)
   return(log_likelihood)
-
-}
-
-MH.r <- function(y, r, psi, iota.r, r.a, r.b, r.target.rate = NULL, r.accept = NULL){
-
-  # optional: adaptive proposal choice
-  if(!is.null(r.accept)){
-    r.accept.rate <- sum(r.accept) / length(r.accept) # computing acceptance rate
-    adapt.factor <- exp(0.01 * (r.accept.rate - r.target.rate))
-    iota.r <- iota.r * adapt.factor
-  }
-
-  # optional part ends here ---
-  r.star <- truncnorm::rtruncnorm(n = 1, a = r.a, b = r.b, mean = r, sd = iota.r)
-  num <- ll.nb(y = y, psi = psi, r = r.star) + log(truncnorm::dtruncnorm(r, a = r.a, b = r.b, mean = r.star, sd = iota.r))
-  den <- ll.nb(y = y, psi = psi, r = r) + log(truncnorm::dtruncnorm(r.star, a = r.a, b = r.b, mean = r, sd = iota.r))
-  log.alpha <- num - den
-  if(is.nan(log.alpha)){ # reject if results are very unusual to prevent error
-    return(list(r = r, iota.r = iota.r))
-  }
-  alpha <- exp(min(0, log.alpha))
-  u <- runif(1)
-  if(alpha > u){
-    return(list(r = r.star, iota.r = iota.r))
-  } else{
-    return(list(r = r, iota.r = iota.r))
-  }
 
 }
 

@@ -1,13 +1,15 @@
 #' Simulate data from a time-varying parameter panel data model
 #'
 #' @param n number of subjects (scalar)
-#' @param t number of time points (scalar)
-#' @param beta starting values of random walk prior for regression effects
+#' @param Tmax number of time points / repeated measurements per subject (scalar)
+#' @param beta fixed regression effects, with the first value representing the
+#'  global intercept (vector of dimension d)
+#' @param theta standard deviation of random walk for regression effects, i.e.,
+#'  larger values yield regression effects that vary stronger over time
 #'  (vector of dimension d)
-#' @param theta standard deviation of random walk prior for regression effects
-#'  (vector of dimension d)
-#' @param lambda starting value of random walk prior for factor loading (scalar)
-#' @param psi standard deviation of random walk prior for factor loading (scalar)
+#' @param lambda fixed factor loading (scalar)
+#' @param psi standard deviation of random walk for factor loading, i.e.,
+#'  a larger value yields a factor loading that varies stronger over time (scalar)
 #' @param model either "Gaussian", "Probit", "Logit" or "NegBin"
 #' @param r dispersion parameter of the Negative Binomial model (scalar, ignored
 #'  if response is not simulated from a Negative Binomial regression model)
@@ -16,26 +18,38 @@
 #'
 #' @returns a list of simulated data and parameters that contains the following elements:
 #' \describe{
-#'  \item{observed}{a data.frame object that contains the response variable
-#'   \code{y}, the covariates (starting with the letter \code{W}), the time index
-#'   \code{t} as well as the subject \code{id}}
+#'  \item{observed}{a data frame that contains the response variable
+#'   \code{y} the covariates (starting with the letter \code{W}),
+#'   the time index \code{t} and the subject index \code{id}}
 #'  \item{beta}{a T x d matrix of regression effects, i.e., each row contains
-#'   the regression effects of the corresponding timepoint}
+#'   the regression effects of the corresponding time point}
 #'  \item{lambda}{a T x 1 matrix of factor loadings, i.e., each row contains
-#'   the factor loading of the corresponding timepoint}
-#'}
+#'   the factor loading of the corresponding time point}
+#'   \item{sigma2}{a scalar containing the value of \eqn{\sigma^2} (only in
+#'   Gaussian model)}
+#'   \item{r}{a scalar containing the value of \eqn{r} (only in Negative
+#'   Binomial model)}
+#' }
+#'
+#' @description
+#' This function simulates panel data with time-varying parameters,
+#'  where the distribution of the
+#'  response variable is either Gaussian, binary (using a Probit or Logit link)
+#'  or Negative Binomial.
+#'
 #' @examples
 #' # Simulating data from a Gaussian panel model
-#' x <- sim_panelTVP(n = 100, t = 6,
+#' x <- sim_panelTVP(n = 100, Tmax = 6,
 #'                   beta = c(4,1,0), theta = c(0,1,0),
 #'                   lambda = 1, psi = 0.2,
 #'                   model = "Gaussian", sigma2 = 1)
 #' head(x$observed, 10)
 #' x$beta
 #' x$lambda
+#' x$sigma2
 #'
 #' # Simulating data from a Probit panel model
-#' x <- sim_panelTVP(n = 100, t = 6,
+#' x <- sim_panelTVP(n = 100, Tmax = 6,
 #'                   beta = c(0.5,0.2,0), theta = c(0.1,0.25,0),
 #'                   lambda = 0.1, psi = 0,
 #'                   model = "Probit")
@@ -44,7 +58,7 @@
 #' x$lambda
 #'
 #' # Simulating data from a Logit panel model
-#' x <- sim_panelTVP(n = 100, t = 6,
+#' x <- sim_panelTVP(n = 100, Tmax = 6,
 #'                   beta = c(0.5,0.2,0), theta = c(0.1,0.25,0),
 #'                   lambda = 0.5, psi = 0.04,
 #'                   model = "Logit")
@@ -53,101 +67,26 @@
 #' x$lambda
 #'
 #' # Simulating data from a Negative Binomial panel model
-#' x <- sim_panelTVP(n = 100, t = 6,
+#' x <- sim_panelTVP(n = 100, Tmax = 6,
 #'                   beta = c(0.5,0.2,0), theta = c(0.1,0.25,0),
 #'                   lambda = 0.9, psi = 0.1,
 #'                   model = "NegBin", r = 2)
 #' head(x$observed, 10)
 #' x$beta
 #' x$lambda
-#' @description
-#' This function simulates balanced panel data, where the distribution of the
-#'  response variable is either Gaussian, binary (using a Probit or Logit link)
-#'  or Negative Binomial
+#' x$r
 #' @export
 sim_panelTVP <- function(n,
-                         t,
-                         beta = NULL,
-                         theta = NULL,
-                         lambda = NULL,
-                         psi = NULL,
+                         Tmax,
+                         beta,
+                         theta,
+                         lambda,
+                         psi,
                          model,
                          r = NULL,
                          sigma2 = NULL){
 
-  # input checks -> To-Do!
-
-  # if(!is.numeric(n) | length(n)>1){
-  #   stop("n needs to be a numeric of length 1")
-  # }
-  # if(!is.numeric(t) | length(t)>1){
-  #   stop("t needs to be a numeric of length 1")
-  # }
-  # if(is.null(beta) & is.null(betat)){
-  #   stop("you need to specify either (beta and theta) or betat")
-  # }
-  # if(is.null(theta) & is.null(betat)){
-  #   stop("you need to specify either (beta and theta) or betat")
-  # }
-  # if(!is.vector(beta) | !is.vector(theta)){
-  #   stop("beta and theta have to be of vectors")
-  # }
-  # if(!is.null(betat)){
-  #   if(!is.matrix(betat)){
-  #     stop("betat has to be a matrix of dimension t x d")
-  #   }
-  #   if(nrow(betat)!=t){
-  #     stop("betat has to be a matrix of dimension t x d")
-  #   }
-  # }
-  # if(is.null(lambda) & is.null(lambdat)){
-  #   stop("you need to specify either (lambda and psi) or lambdat")
-  # }
-  # if(is.null(psi) & is.null(lambdat)){
-  #   stop("you need to specify either (lambda and psi) or lambdat")
-  # }
-  # if(!is.vector(lambda) | !is.vector(psi)){
-  #   stop("lambda and psi have to be numerics each of length 1")
-  # }
-  # if(!is.null(lambdat)){
-  #   if(!is.matrix(lambdat)){
-  #     stop("lambdat has to be a matrix of dimension t x 1")
-  #   }
-  #   if(nrow(lambdat)!=t){
-  #     stop("lambdat has to be a matrix of dimension t x 1")
-  #   }
-  #   if(ncol(lambdat)!=1){
-  #     stop("lambdat has to be a matrix of dimension t x 1")
-  #   }
-  # }
-  # if(!(model %in% c("Gaussian", "Probit", "Logit", "NegBin"))){
-  #   stop("model needs to be either Gaussian, Probit, Logit or NegBin - no default!")
-  # }
-  # if(model == "NegBin" & is.null(r)){
-  #   stop("r needs to be specified when simulating from a Negative Binomial model")
-  # }
-  # if(!is.null(sigma2) & (!is.numeric(sigma2) | length(sigma2)>1)){
-  #   stop("sigma2 needs to be a numeric of length 1")
-  # }
-  # if(model != "Gaussian" & !is.null(sigma2)){
-  #   warning("sigma2 is ignored as data from a non-Gaussian model are simulated")
-  # }
-  # if(model == "Gaussian" & is.null(sigma2)){
-  #   stop("sigma2 needs to be specified when simulating from a Gaussian model")
-  # }
-  # if(!is.null(betat)){
-  #   if(ncol(betat) < 2) stop("we need at least 2 covariates (intercept + feature)")
-  # }
-  # if(!is.null(beta)){
-  #   if(length(beta) != length(theta)){
-  #     stop("beta and theta need to be of the same length")
-  #   }
-  #   if(length(beta) < 2) stop("we need at least 2 covariates (intercept + feature)")
-  # }
-  # if(!is.null(lambda)){
-  #   if(length(lambda) != 1) stop("lambda has to be a scalar")
-  #   if(length(psi) != 1) stop("psi has to be a scalar")
-  # }
+  t <- Tmax
 
   # regression effects ---------------------------------------------------------
 
@@ -219,19 +158,41 @@ sim_panelTVP <- function(n,
   colnames(W) <- namess
   observed <- data.frame(y = y, W, t = rep(1:t, each = n), id = indivID)
 
+  if(model == "Gaussian"){
+
+    ret <- list(observed = observed,
+                beta = betat,
+                lambda = lambdat,
+                sigma2 = sigma2,
+                model = "Gaussian")
+
+  }
+
+  if(model == "Probit"){
+
+    ret <- list(observed = observed,
+                beta = betat,
+                lambda = lambdat,
+                model = "Probit")
+
+  }
+
+  if(model == "Logit"){
+
+    ret <- list(observed = observed,
+                beta = betat,
+                lambda = lambdat,
+                model = "Logit")
+
+  }
 
   if(model == "NegBin"){
 
     ret <- list(observed = observed,
                 beta = betat,
                 lambda = lambdat,
-                r = r)
-
-  } else{
-
-    ret <- list(observed = observed,
-                beta = betat,
-                lambda = lambdat)
+                r = r,
+                model = "Negative Binomial")
 
   }
 

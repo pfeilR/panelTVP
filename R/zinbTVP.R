@@ -152,27 +152,17 @@ zinbTVP <- function(df,
       n.risk <- sum(risk)
 
       r.prev <- r
-      sample.r.list <- NB.para(y = y.risk, eta = matrix(eta_nb[risk,]),
-                               iota.r = settings.NegBin$iota.r,
-                               r.old = r.prev, sample.r = TRUE,
-                               r.a = settings.NegBin$r.a,
-                               r.b = settings.NegBin$r.b,
-                               r.accept = settings.NegBin$r.accept,
-                               r.target.rate = settings.NegBin$r.target.rate,
-                               slice = settings.NegBin$slice,
-                               r.alpha = settings.NegBin$r.alpha,
-                               r.beta = settings.NegBin$r.beta,
+      sample.r.list <- NB.para(y = y.risk,
+                               eta = matrix(eta_nb[risk,]),
+                               r.old = r.prev,
+                               sample.r = TRUE,
+                               r.alpha = settings.NegBin$alpha.r,
+                               r.beta = settings.NegBin$beta.r,
                                expansion.steps = settings.NegBin$expansion.steps,
                                width = settings.NegBin$width,
                                p.overrelax = settings.NegBin$p.overrelax,
                                accuracy.overrelax = settings.NegBin$accuracy.overrelax)
       r <- sample.r.list$r
-      settings.NegBin$iota.r <- sample.r.list$iota.r
-      if(r != r.prev){
-        settings.NegBin$r.accept[i] <- 1
-      } else{
-        settings.NegBin$r.accept[i] <- 0
-      }
 
       # Negative Binomial Component --------------------------------------------
 
@@ -246,10 +236,10 @@ zinbTVP <- function(df,
                          alpha_logit[(df.logit$d+1):(2*df.logit$d)],
                          prior.reg_logit$tau,
                          prior.reg_logit$xi,
-                         prior.reg_logit$a_tau,
-                         prior.reg_logit$kappa_tau,
-                         prior.reg_logit$a_xi,
-                         prior.reg_logit$kappa_xi,
+                         prior.reg_logit$a.tau,
+                         prior.reg_logit$kappa.tau,
+                         prior.reg_logit$a.xi,
+                         prior.reg_logit$kappa.xi,
                          lambda_logit
         )
 
@@ -267,12 +257,12 @@ zinbTVP <- function(df,
         res.i_logit <- c(res.i_logit,
                          m_lambda = alpha_lambda_logit[1],
                          psi = alpha_lambda_logit[2],
-                         phi_lambda = prior.load_logit$phi,
-                         zeta_lambda = prior.load_logit$zeta,
-                         a_phi = prior.load_logit$a_phi,
-                         kappa_phi = prior.load_logit$kappa_phi,
-                         a_zeta = prior.load_logit$a_zeta,
-                         kappa_zeta = prior.load_logit$kappa_zeta)
+                         phi = prior.load_logit$phi,
+                         zeta = prior.load_logit$zeta,
+                         a.phi = prior.load_logit$a.phi,
+                         kappa.phi = prior.load_logit$kappa.phi,
+                         a.zeta = prior.load_logit$a.zeta,
+                         kappa.zeta = prior.load_logit$kappa.zeta)
 
       }
 
@@ -286,10 +276,10 @@ zinbTVP <- function(df,
                       alpha_nb[(df.nb$d+1):(2*df.nb$d)],
                       prior.reg_nb$tau,
                       prior.reg_nb$xi,
-                      prior.reg_nb$a_tau,
-                      prior.reg_nb$kappa_tau,
-                      prior.reg_nb$a_xi,
-                      prior.reg_nb$kappa_xi,
+                      prior.reg_nb$a.tau,
+                      prior.reg_nb$kappa.tau,
+                      prior.reg_nb$a.xi,
+                      prior.reg_nb$kappa.xi,
                       lambda_nb
         )
 
@@ -307,12 +297,12 @@ zinbTVP <- function(df,
         res.i_nb <- c(res.i_nb,
                       m_lambda = alpha_lambda_nb[1],
                       psi = alpha_lambda_nb[2],
-                      phi_lambda = prior.load_nb$phi,
-                      zeta_lambda = prior.load_nb$zeta,
-                      a_phi = prior.load_nb$a_phi,
-                      kappa_phi = prior.load_nb$kappa_phi,
-                      a_zeta = prior.load_nb$a_zeta,
-                      kappa_zeta = prior.load_nb$kappa_zeta)
+                      phi = prior.load_nb$phi,
+                      zeta = prior.load_nb$zeta,
+                      a.phi = prior.load_nb$a.phi,
+                      kappa.phi = prior.load_nb$kappa.phi,
+                      a.zeta = prior.load_nb$a.zeta,
+                      kappa.zeta = prior.load_nb$kappa.zeta)
 
       }
 
@@ -391,13 +381,12 @@ zinbTVP <- function(df,
   Y <- Y[,seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)]
 
   # computing acceptance rates of Metropolis-based parameters
-  acceptance.rates <- matrix(nrow = 1, ncol = 5)
+  acceptance.rates <- matrix(nrow = 1, ncol = 4)
   acceptance.rates[,1] <- accept.rate(accept = prior.reg_logit$xi.accept, mcmc.opt = mcmc.opt)
   acceptance.rates[,2] <- accept.rate(accept = prior.reg_logit$tau.accept, mcmc.opt = mcmc.opt)
   acceptance.rates[,3] <- accept.rate(accept = prior.reg_nb$xi.accept, mcmc.opt = mcmc.opt)
   acceptance.rates[,4] <- accept.rate(accept = prior.reg_nb$tau.accept, mcmc.opt = mcmc.opt)
-  acceptance.rates[,5] <- accept.rate(accept = settings.NegBin$r.accept, mcmc.opt = mcmc.opt)
-  colnames(acceptance.rates) <- c("a_xi (logit)", "a_tau (logit)", "a_xi (nb)", "a_tau (nb)", "r")
+  colnames(acceptance.rates) <- c("a.xi (logit)", "a.tau (logit)", "a.xi (nb)", "a.tau (nb)")
 
   # return
   df$y[miss] <- NA

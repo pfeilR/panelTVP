@@ -15,6 +15,7 @@ NegBinTVP <- function(df,
                       res_frame,
                       f_sum,
                       f_mat,
+                      miss,
                       HPD.coverage){
 
   X.t <- cbind(df$X, t = df$timeidx)
@@ -52,27 +53,17 @@ NegBinTVP <- function(df,
       if(i == 1){
         r[i] <- 1
       } else{
-        sample.r.list <- NB.para(y = df$y, eta = eta,
-                                 iota.r = settings.NegBin$iota.r,
-                                 r.old = r[i-1], sample.r = TRUE,
-                                 r.a = settings.NegBin$r.a,
-                                 r.b = settings.NegBin$r.b,
-                                 r.accept = settings.NegBin$r.accept,
-                                 r.target.rate = settings.NegBin$r.target.rate,
-                                 slice = settings.NegBin$slice,
-                                 r.alpha = settings.NegBin$r.alpha,
-                                 r.beta = settings.NegBin$r.beta,
+        sample.r.list <- NB.para(y = df$y,
+                                 eta = eta,
+                                 r.old = r[i-1],
+                                 sample.r = TRUE,
+                                 r.alpha = settings.NegBin$alpha.r,
+                                 r.beta = settings.NegBin$beta.r,
                                  expansion.steps = settings.NegBin$expansion.steps,
                                  width = settings.NegBin$width,
                                  p.overrelax = settings.NegBin$p.overrelax,
                                  accuracy.overrelax = settings.NegBin$accuracy.overrelax)
         r[i] <- sample.r.list$r
-        settings.NegBin$iota.r <- sample.r.list$iota.r
-        if(r[i] != r[i-1]){
-          settings.NegBin$r.accept[i] <- 1
-        } else{
-          settings.NegBin$r.accept[i] <- 0
-        }
       }
 
       # sample omega
@@ -148,10 +139,10 @@ NegBinTVP <- function(df,
                    alpha[(df$d+1):(2*df$d)],
                    prior.reg$tau,
                    prior.reg$xi,
-                   prior.reg$a_tau,
-                   prior.reg$kappa_tau,
-                   prior.reg$a_xi,
-                   prior.reg$kappa_xi,
+                   prior.reg$a.tau,
+                   prior.reg$kappa.tau,
+                   prior.reg$a.xi,
+                   prior.reg$kappa.xi,
                    0,
                    lambda
         )
@@ -171,12 +162,12 @@ NegBinTVP <- function(df,
         res.i <- c(res.i,
                    m_lambda = alpha_lambda[1],
                    psi = alpha_lambda[2],
-                   phi_lambda = prior.load$phi,
-                   zeta_lambda = prior.load$zeta,
-                   a_phi = prior.load$a_phi,
-                   kappa_phi = prior.load$kappa_phi,
-                   a_zeta = prior.load$a_zeta,
-                   kappa_zeta = prior.load$kappa_zeta)
+                   phi = prior.load$phi,
+                   zeta = prior.load$zeta,
+                   a.phi = prior.load$a.phi,
+                   kappa.phi = prior.load$kappa.phi,
+                   a.zeta = prior.load$a.zeta,
+                   kappa.zeta = prior.load$kappa.zeta)
 
       }
 
@@ -235,11 +226,10 @@ NegBinTVP <- function(df,
   Y <- Y[,seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)]
 
   # computing acceptance rates of Metropolis-based parameters
-  acceptance.rates <- matrix(nrow = 1, ncol = 3)
+  acceptance.rates <- matrix(nrow = 1, ncol = 2)
   acceptance.rates[,1] <- accept.rate(accept = prior.reg$xi.accept, mcmc.opt = mcmc.opt)
   acceptance.rates[,2] <- accept.rate(accept = prior.reg$tau.accept, mcmc.opt = mcmc.opt)
-  acceptance.rates[,3] <- accept.rate(accept = settings.NegBin$r.accept, mcmc.opt = mcmc.opt)
-  colnames(acceptance.rates) <- c("a_xi", "a_tau", "r")
+  colnames(acceptance.rates) <- c("a.xi", "a.tau")
 
   # return
   df$y[miss] <- NA

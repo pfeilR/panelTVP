@@ -158,14 +158,14 @@ sample_lambda <- function (y, fi, Time, timeidx, alpha, pri.lambda, sigma2){
 
     # sample phi_lambda and zeta_lambda
 
-    phi_lambda <- sample_GIG(a = pri.lambda$a_phi,
-                             l = pri.lambda$kappa_phi,
+    phi_lambda <- sample_GIG(a = pri.lambda$a.phi,
+                             l = pri.lambda$kappa.phi,
                              par = alpha_lambda[1])
     phi_lambda[phi_lambda>10^11]=10^11
     phi_lambda[phi_lambda<0.1^15]=0.1^15
 
-    zeta_lambda <- sample_GIG(a = pri.lambda$a_zeta,
-                              l = pri.lambda$kappa_zeta,
+    zeta_lambda <- sample_GIG(a = pri.lambda$a.zeta,
+                              l = pri.lambda$kappa.zeta,
                               par = alpha_lambda[2])
     zeta_lambda[zeta_lambda>10^11]=10^11
     zeta_lambda[zeta_lambda<0.1^15]=0.1^15
@@ -175,20 +175,20 @@ sample_lambda <- function (y, fi, Time, timeidx, alpha, pri.lambda, sigma2){
 
     # sampling of kappa_phi and kappa_zeta
 
-    if(pri.lambda$learn_kappa_phi){
-      pri.lambda$kappa_phi <- sample_G(a = pri.lambda$a_phi,
+    if(pri.lambda$learn.kappa.phi){
+      pri.lambda$kappa.phi <- sample_G(a = pri.lambda$a.phi,
                                        d = 1,
                                        par = pri.lambda$phi,
-                                       prior_hp1 = pri.lambda$e1,
-                                       prior_hp2 = pri.lambda$e2)
+                                       prior_hp1 = pri.lambda$d.phi,
+                                       prior_hp2 = pri.lambda$e.phi)
     }
 
-    if(pri.lambda$learn_kappa_zeta){
-      pri.lambda$kappa_zeta <- sample_G(a = pri.lambda$a_zeta,
+    if(pri.lambda$learn.kappa.zeta){
+      pri.lambda$kappa.zeta <- sample_G(a = pri.lambda$a.zeta,
                                         d = 1,
                                         par = pri.lambda$zeta,
-                                        prior_hp1 = pri.lambda$d1,
-                                        prior_hp2 = pri.lambda$d2)
+                                        prior_hp1 = pri.lambda$d.zeta,
+                                        prior_hp2 = pri.lambda$e.zeta)
     }
 
   }
@@ -300,14 +300,14 @@ sample_lambda.PG <- function(z, zit, fi, Time, timeidx, alpha, pri.lambda, W.spa
 
     # sample phi_lambda and zeta_lambda
 
-    phi_lambda <- sample_GIG(a = pri.lambda$a_phi,
-                             l = pri.lambda$kappa_phi,
+    phi_lambda <- sample_GIG(a = pri.lambda$a.phi,
+                             l = pri.lambda$kappa.phi,
                              par = alpha_lambda[1])
     phi_lambda[phi_lambda>10^11]=10^11
     phi_lambda[phi_lambda<0.1^15]=0.1^15
 
-    zeta_lambda <- sample_GIG(a = pri.lambda$a_zeta,
-                              l = pri.lambda$kappa_zeta,
+    zeta_lambda <- sample_GIG(a = pri.lambda$a.zeta,
+                              l = pri.lambda$kappa.zeta,
                               par = alpha_lambda[2])
     zeta_lambda[zeta_lambda>10^11]=10^11
     zeta_lambda[zeta_lambda<0.1^11]=0.1^11
@@ -317,20 +317,20 @@ sample_lambda.PG <- function(z, zit, fi, Time, timeidx, alpha, pri.lambda, W.spa
 
     # sampling of kappa_phi and kappa_zeta
 
-    if(pri.lambda$learn_kappa_phi){
-      pri.lambda$kappa_phi <- sample_G(a = pri.lambda$a_phi,
+    if(pri.lambda$learn.kappa.phi){
+      pri.lambda$kappa.phi <- sample_G(a = pri.lambda$a.phi,
                                        d = 1,
                                        par = pri.lambda$phi,
-                                       prior_hp1 = pri.lambda$e1,
-                                       prior_hp2 = pri.lambda$e2)
+                                       prior_hp1 = pri.lambda$d.phi,
+                                       prior_hp2 = pri.lambda$e.phi)
     }
 
-    if(pri.lambda$learn_kappa_zeta){
-      pri.lambda$kappa_zeta <- sample_G(a = pri.lambda$a_zeta,
+    if(pri.lambda$learn.kappa.zeta){
+      pri.lambda$kappa.zeta <- sample_G(a = pri.lambda$a.zeta,
                                         d = 1,
                                         par = pri.lambda$zeta,
-                                        prior_hp1 = pri.lambda$d1,
-                                        prior_hp2 = pri.lambda$d2)
+                                        prior_hp1 = pri.lambda$d.zeta,
+                                        prior_hp2 = pri.lambda$e.zeta)
     }
 
   }

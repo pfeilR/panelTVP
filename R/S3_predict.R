@@ -1,4 +1,4 @@
-#' @title Get predictions for new subjects
+#' @title Get predictions for new subjects based on a \code{panelTVP.Gaussian} object
 #'
 #' @description
 #'  This \code{predict} function simulates data and computes summary statistics based on the
@@ -6,7 +6,8 @@
 #'
 #' @param object an object of class \code{panelTVP.Gaussian}
 #' @param X.new a matrix or data frame consisting of new data for the same variables
-#'  that were used for fitting the model.
+#'  that were used for fitting the model. The first column must contain a 1, when
+#'  the fitted model contains an intercept.
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
@@ -28,6 +29,33 @@
 #' }
 #'
 #' @exportS3Method predict panelTVP.Gaussian
+#' @examples
+#' # Predictions based on an object of class panelTVP.Gaussian
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.gaussian <- sim_panelTVP(n = 100,
+#'                              Tmax = 4,
+#'                              beta = c(4,1,0,0),
+#'                              theta = c(1,0.5,0,0),
+#'                              lambda = 1,
+#'                              psi = 0.2,
+#'                              model = "Gaussian",
+#'                              sigma2 = 0.7)
+#' res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
+#'                          data = sim.gaussian$observed,
+#'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                          model = "Gaussian")
+#' # setting up design matrix for predicting two new observations
+#' X.new <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+#'                           c(2,0),
+#'                           c(4,3),
+#'                           c(0,0)))
+#' colnames(X.new) <- colnames(res.gaussian$data$X)
+#' # prediction for the 2nd panel wave
+#' pp <- predict(res.gaussian, X.new = X.new, timepoint = 2)
+#' plot(density(pp$predictive.distribution[1,]))
+#' plot(density(pp$predictive.distribution[2,]))
+#' pp$predictive.summary
 predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
                                       coverage = 0.95, pop.pred = FALSE, ...){
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
@@ -36,7 +64,7 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
                  coverage = coverage, pop.pred = pop.pred)
 }
 
-#' @title Get predictions for new subjects
+#' @title Get predictions for new subjects based on a \code{panelTVP.Probit} object
 #'
 #' @description
 #'  This \code{predict} function simulates data and computes summary statistics based on the
@@ -45,7 +73,8 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #'
 #' @param object an object of class \code{panelTVP.Probit}
 #' @param X.new a matrix or data frame consisting of new data for the same variables
-#'  that were used for fitting the model.
+#'  that were used for fitting the model. The first column must contain a 1, when
+#'  the fitted model contains an intercept.
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
@@ -66,6 +95,32 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #'    posterior predictive distribution, i.e., the most basic summary statistics
 #' }
 #' @exportS3Method predict panelTVP.Probit
+#' @examples
+#' # Predictions based on an object of class panelTVP.Probit
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.probit <- sim_panelTVP(n = 100,
+#'                            Tmax = 4,
+#'                            beta = c(1,0.5,0,0),
+#'                            theta = c(0.8,0.5,0,0),
+#'                            lambda = 1,
+#'                            psi = 0.2,
+#'                            model = "Probit")
+#' res.probit <- panelTVP(y ~ W1 + W2 + W3,
+#'                        data = sim.probit$observed,
+#'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                        model = "Probit")
+#' # setting up design matrix for predicting two new observations
+#' X.new <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+#'                           c(2,0),
+#'                           c(4,3),
+#'                           c(0,0)))
+#' colnames(X.new) <- colnames(res.probit$data$X)
+#' # prediction for the 2nd panel wave
+#' pp <- predict(res.probit, X.new = X.new, timepoint = 2)
+#' plot(density(pp$predictive.distribution[1,]))
+#' plot(density(pp$predictive.distribution[2,]))
+#' pp$predictive.summary
 predict.panelTVP.Probit <- function(object, X.new, timepoint,
                                     coverage = 0.95, pop.pred = FALSE, ...){
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
@@ -74,7 +129,7 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
                  coverage = coverage, pop.pred = pop.pred)
 }
 
-#' @title Get predictions for new subjects
+#' @title Get predictions for new subjects based on a \code{panelTVP.Logit} object
 #'
 #' @description
 #'  This \code{predict} function simulates data and computes summary statistics based on the
@@ -83,7 +138,8 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #'
 #' @param object an object of class \code{panelTVP.Logit}
 #' @param X.new a matrix or data frame consisting of new data for the same variables
-#'  that were used for fitting the model.
+#'  that were used for fitting the model. The first column must contain a 1, when
+#'  the fitted model contains an intercept.
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
@@ -104,6 +160,32 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #'    posterior predictive distribution, i.e., the most basic summary statistics
 #' }
 #' @exportS3Method predict panelTVP.Logit
+#' @examples
+#' # Predictions based on an object of class panelTVP.Logit
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.logit <- sim_panelTVP(n = 100,
+#'                           Tmax = 4,
+#'                           beta = c(1,0.5,0,0),
+#'                           theta = c(0.8,0.5,0,0),
+#'                           lambda = 1,
+#'                           psi = 0.2,
+#'                           model = "Logit")
+#' res.logit <- panelTVP(y ~ W1 + W2 + W3,
+#'                       data = sim.logit$observed,
+#'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                       model = "Logit")
+#' # setting up design matrix for predicting two new observations
+#' X.new <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+#'                           c(2,0),
+#'                           c(4,3),
+#'                           c(0,0)))
+#' colnames(X.new) <- colnames(res.logit$data$X)
+#' # prediction for the 2nd panel wave
+#' pp <- predict(res.logit, X.new = X.new, timepoint = 2)
+#' plot(density(pp$predictive.distribution[1,]))
+#' plot(density(pp$predictive.distribution[2,]))
+#' pp$predictive.summary
 predict.panelTVP.Logit <- function(object, X.new, timepoint,
                                    coverage = 0.95, pop.pred = FALSE, ...){
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
@@ -112,7 +194,7 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
                  coverage = coverage, pop.pred = pop.pred)
 }
 
-#' @title Get predictions for new subjects
+#' @title Get predictions for new subjects based on a \code{panelTVP.NegBin} object
 #'
 #' @description
 #'  This \code{predict} function simulates data and computes summary statistics based on the
@@ -120,7 +202,8 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #'
 #' @param object an object of class \code{panelTVP.NegBin}
 #' @param X.new a matrix or data frame consisting of new data for the same variables
-#'  that were used for fitting the model.
+#'  that were used for fitting the model. The first column must contain a 1, when
+#'  the fitted model contains an intercept.
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
@@ -141,6 +224,33 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #'    posterior predictive distribution, i.e., the most basic summary statistics
 #' }
 #' @exportS3Method predict panelTVP.NegBin
+#' @examples
+#' # Predictions based on an object of class panelTVP.NegBin
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.negbin <- sim_panelTVP(n = 100,
+#'                            Tmax = 4,
+#'                            beta = c(1,0.5,0,0),
+#'                            theta = c(0.8,0.5,0,0),
+#'                            lambda = 1,
+#'                            psi = 0.2,
+#'                            r = 2,
+#'                            model = "NegBin")
+#' res.negbin <- panelTVP(y ~ W1 + W2 + W3,
+#'                        data = sim.negbin$observed,
+#'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                        model = "NegBin")
+#' # setting up design matrix for predicting two new observations
+#' X.new <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+#'                           c(2,0),
+#'                           c(4,3),
+#'                           c(0,0)))
+#' colnames(X.new) <- colnames(res.negbin$data$X)
+#' # prediction for the 2nd panel wave
+#' pp <- predict(res.negbin, X.new = X.new, timepoint = 2)
+#' plot(density(pp$predictive.distribution[1,]))
+#' plot(density(pp$predictive.distribution[2,]))
+#' pp$predictive.summary
 predict.panelTVP.NegBin <- function(object, X.new, timepoint,
                                     coverage = 0.95, pop.pred = FALSE, ...){
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
@@ -149,7 +259,7 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
                  coverage = coverage, pop.pred = pop.pred)
 }
 
-#' @title Get predictions for new subjects
+#' @title Get predictions for new subjects based on a \code{panelTVP.ZINB} object
 #'
 #' @description
 #'  This \code{predict} function simulates data and computes summary statistics based on the
@@ -158,9 +268,11 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #'
 #' @param object an object of class \code{panelTVP.ZINB}
 #' @param X_nb.new a matrix or data frame consisting of new data for the same variables
-#'  that were used for fitting the model (count component)
+#'  that were used for fitting the model. The first column must contain a 1, when
+#'  the fitted model contains an intercept in the Negative Binomial part (count component)
 #' @param X_logit.new a matrix or data frame consisting of new data for the same variables
-#'  that were used for fitting the model (zero-inflation component)
+#'  that were used for fitting the model. The first column must contain a 1, when
+#'  the fitted model contains an intercept in the zero-inflated part (zero-inflation component)
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
@@ -181,6 +293,42 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #'    posterior predictive distribution, i.e., the most basic summary statistics
 #' }
 #' @exportS3Method predict panelTVP.ZINB
+#' @examples
+#' # Predictions based on an object of class panelTVP.ZINB
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.zinb <- sim_panelTVP(n = 100,
+#'                          Tmax = 4,
+#'                          beta.nb = c(0.5,-0.7,0,0),
+#'                          theta.nb = c(0.05,0.5,0,0),
+#'                          lambda.nb = 0.5,
+#'                          psi.nb = 0.02,
+#'                          beta.logit = c(-1,0.6,0,0),
+#'                          theta.logit = c(0,1,0,0),
+#'                          lambda.logit = 0.7,
+#'                          psi.logit = 0,
+#'                          r = 2,
+#'                          model = "ZINB")
+#' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
+#'                      data = sim.zinb$observed,
+#'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                      model = "ZINB")
+#' # setting up design matrix for predicting two new observations
+#' X.new_nb <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+#'                              c(2,0),
+#'                              c(4,3),
+#'                              c(0,0)))
+#' colnames(X.new_nb) <- colnames(res.zinb$data$X_nb)
+#' X.new_logit <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+#'                                 c(0.1,-0.5),
+#'                                 c(1,2),
+#'                                 c(4,3)))
+#' colnames(X.new_logit) <- colnames(res.zinb$data$X_logit)
+#' # prediction for the 2nd panel wave
+#' pp <- predict(res.zinb, X.new_nb = X.new_nb, X.new_logit = X.new_logit, timepoint = 2)
+#' plot(density(pp$predictive.distribution[1,]))
+#' plot(density(pp$predictive.distribution[2,]))
+#' pp$predictive.summary
 predict.panelTVP.ZINB <- function(object, X_nb.new, X_logit.new, timepoint,
                                   coverage = 0.95, pop.pred = FALSE, ...){
   check.predict_ZINB(model = object, X_nb.new = X_nb.new, X_logit.new = X_logit.new,

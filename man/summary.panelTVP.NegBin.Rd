@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3_summary.R
 \name{summary.panelTVP.NegBin}
 \alias{summary.panelTVP.NegBin}
-\title{Summary output for a Negative Binomial TVP model}
+\title{Summary output for a \code{panelTVP.NegBin} object}
 \usage{
 \method{summary}{panelTVP.NegBin}(object, by = "covariate", ...)
 }
@@ -20,6 +20,25 @@ posterior means and standard deviations based on the posterior distributions of 
 time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
 \eqn{\lambda_1,\dots,\lambda_T}. The results are presented either sorted by covariate
 (default) or by time point.
+}
+\examples{
+# Computing summary table for object of class panelTVP.NegBin
+# NB: To reduces computational effort, we have drastically reduced the length
+# of the Markov Chain. You should use a much longer chain in your applications.
+sim.negbin <- sim_panelTVP(n = 100,
+                           Tmax = 4,
+                           beta = c(1,0.5,0,0),
+                           theta = c(0.8,0.5,0,0),
+                           lambda = 1,
+                           psi = 0.2,
+                           r = 2,
+                           model = "NegBin")
+res.negbin <- panelTVP(y ~ W1 + W2 + W3,
+                       data = sim.negbin$observed,
+                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                       model = "NegBin")
+summary(res.negbin) # default = ordering by covariate
+summary(res.negbin, by = "timepoint") # ordering by time point
 }
 \author{
 Roman Pfeiler

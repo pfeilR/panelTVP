@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3_summary.R
 \name{summary.panelTVP.Probit}
 \alias{summary.panelTVP.Probit}
-\title{Summary output for a Probit TVP model}
+\title{Summary output for a \code{panelTVP.Probit} object}
 \usage{
 \method{summary}{panelTVP.Probit}(object, by = "covariate", ...)
 }
@@ -20,6 +20,24 @@ posterior means and standard deviations based on the posterior distributions of 
 time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
 \eqn{\lambda_1,\dots,\lambda_T}. The results are presented either sorted by covariate
 (default) or by time point.
+}
+\examples{
+# Computing summary table for object of class panelTVP.Probit
+# NB: To reduces computational effort, we have drastically reduced the length
+# of the Markov Chain. You should use a much longer chain in your applications.
+sim.probit <- sim_panelTVP(n = 100,
+                           Tmax = 4,
+                           beta = c(1,0.5,0,0),
+                           theta = c(0.8,0.5,0,0),
+                           lambda = 1,
+                           psi = 0.2,
+                           model = "Probit")
+res.probit <- panelTVP(y ~ W1 + W2 + W3,
+                       data = sim.probit$observed,
+                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                       model = "Probit")
+summary(res.probit) # default = ordering by covariate
+summary(res.probit, by = "timepoint") # ordering by time point
 }
 \author{
 Roman Pfeiler

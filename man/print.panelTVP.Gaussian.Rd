@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3_print.R
 \name{print.panelTVP.Gaussian}
 \alias{print.panelTVP.Gaussian}
-\title{Print basic model information output}
+\title{Print basic model information output for a \code{panelTVP.Gaussian} object}
 \usage{
 \method{print}{panelTVP.Gaussian}(x, ...)
 }
@@ -29,7 +29,7 @@ sim.gaussian <- sim_panelTVP(n = 100,
                              sigma2 = 0.7)
 res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
                          data = sim.gaussian$observed,
-                         mcmc.opt = list(chain.length = 500, burnin = 100, thin = 1, asis = TRUE),
+                         mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                          model = "Gaussian")
 print(res.gaussian)
 }

@@ -1,4 +1,4 @@
-#' @title Summary output for a Gaussian TVP model
+#' @title Summary output for a \code{panelTVP.Gaussian} object
 #'
 #' @description
 #'   This \code{summary} function prints out a table that contains HPD-intervals,
@@ -14,6 +14,24 @@
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method summary panelTVP.Gaussian
+#' @examples
+#' # Computing summary table for object of class panelTVP.Gaussian
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.gaussian <- sim_panelTVP(n = 100,
+#'                              Tmax = 4,
+#'                              beta = c(4,1,0,0),
+#'                              theta = c(1,0.5,0,0),
+#'                              lambda = 1,
+#'                              psi = 0.2,
+#'                              model = "Gaussian",
+#'                              sigma2 = 0.7)
+#' res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
+#'                          data = sim.gaussian$observed,
+#'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                          model = "Gaussian")
+#' summary(res.gaussian) # default = ordering by covariate
+#' summary(res.gaussian, by = "timepoint") # ordering by time point
 summary.panelTVP.Gaussian <- function(object, by = "covariate", ...){
   if(length(by)>1 | !is.character(by)){
     stop("by is a scalar character")
@@ -27,7 +45,7 @@ Posterior Summary of the Bayesian Normal Model with Time-Varying Coefficients:
   cat(craft.summary(object, by = by))
 }
 
-#' @title Summary output for a Probit TVP model
+#' @title Summary output for a \code{panelTVP.Probit} object
 #'
 #' @description
 #'   This \code{summary} function prints out a table that contains HPD-intervals,
@@ -43,6 +61,23 @@ Posterior Summary of the Bayesian Normal Model with Time-Varying Coefficients:
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method summary panelTVP.Probit
+#' @examples
+#' # Computing summary table for object of class panelTVP.Probit
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.probit <- sim_panelTVP(n = 100,
+#'                            Tmax = 4,
+#'                            beta = c(1,0.5,0,0),
+#'                            theta = c(0.8,0.5,0,0),
+#'                            lambda = 1,
+#'                            psi = 0.2,
+#'                            model = "Probit")
+#' res.probit <- panelTVP(y ~ W1 + W2 + W3,
+#'                        data = sim.probit$observed,
+#'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                        model = "Probit")
+#' summary(res.probit) # default = ordering by covariate
+#' summary(res.probit, by = "timepoint") # ordering by time point
 summary.panelTVP.Probit <- function(object, by = "covariate", ...){
   if(length(by)>1 | !is.character(by)){
     stop("by is a scalar character")
@@ -56,7 +91,7 @@ Posterior Summary of the Bayesian Probit Model with Time-Varying Coefficients:
   cat(craft.summary(object, by = by))
 }
 
-#' @title Summary output for a Logit TVP model
+#' @title Summary output for a \code{panelTVP.Logit} object
 #'
 #' @description
 #'   This \code{summary} function prints out a table that contains HPD-intervals,
@@ -72,6 +107,23 @@ Posterior Summary of the Bayesian Probit Model with Time-Varying Coefficients:
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method summary panelTVP.Logit
+#' @examples
+#' # Computing summary table for object of class panelTVP.Logit
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.logit <- sim_panelTVP(n = 100,
+#'                           Tmax = 4,
+#'                           beta = c(1,0.5,0,0),
+#'                           theta = c(0.8,0.5,0,0),
+#'                           lambda = 1,
+#'                           psi = 0.2,
+#'                           model = "Logit")
+#' res.logit <- panelTVP(y ~ W1 + W2 + W3,
+#'                       data = sim.logit$observed,
+#'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                       model = "Logit")
+#' summary(res.logit) # default = ordering by covariate
+#' summary(res.logit, by = "timepoint") # ordering by time point
 summary.panelTVP.Logit <- function(object, by = "covariate", ...){
   if(length(by)>1 | !is.character(by)){
     stop("by is a scalar character")
@@ -85,7 +137,7 @@ Posterior Summary of the Bayesian Logit Model with Time-Varying Coefficients:
   cat(craft.summary(object, by = by))
 }
 
-#' @title Summary output for a Negative Binomial TVP model
+#' @title Summary output for a \code{panelTVP.NegBin} object
 #'
 #' @description
 #'   This \code{summary} function prints out a table that contains HPD-intervals,
@@ -101,6 +153,24 @@ Posterior Summary of the Bayesian Logit Model with Time-Varying Coefficients:
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method summary panelTVP.NegBin
+#' @examples
+#' # Computing summary table for object of class panelTVP.NegBin
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.negbin <- sim_panelTVP(n = 100,
+#'                            Tmax = 4,
+#'                            beta = c(1,0.5,0,0),
+#'                            theta = c(0.8,0.5,0,0),
+#'                            lambda = 1,
+#'                            psi = 0.2,
+#'                            r = 2,
+#'                            model = "NegBin")
+#' res.negbin <- panelTVP(y ~ W1 + W2 + W3,
+#'                        data = sim.negbin$observed,
+#'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                        model = "NegBin")
+#' summary(res.negbin) # default = ordering by covariate
+#' summary(res.negbin, by = "timepoint") # ordering by time point
 summary.panelTVP.NegBin <- function(object, by = "covariate", ...){
   if(length(by)>1 | !is.character(by)){
     stop("by is a scalar character")
@@ -114,14 +184,15 @@ Posterior Summary of the Bayesian Negative Binomial Model with Time-Varying Coef
   cat(craft.summary(object, by = by))
 }
 
-#' @title Summary output for a Zero-Inflated Negative Binomial TVP model
+#' @title Summary output for a \code{panelTVP.ZINB} object
 #'
 #' @description
 #'   This \code{summary} function prints out a table that contains HPD-intervals,
 #'   posterior means and standard deviations based on the posterior distributions of the
 #'   time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
-#'   \eqn{\lambda_1,\dots,\lambda_T}. The results are presented either sorted by covariate
-#'   (default) or by time point.
+#'   \eqn{\lambda_1,\dots,\lambda_T}. The user can choose whether to show the results
+#'   of the Negative Binomial (count) model or the zer-inflation (Logit) model.
+#'   The results are presented either sorted by covariate (default) or by time point.
 #'
 #' @param object an object of class \code{panelTVP.ZINB}
 #' @param by a single character that is either 'timepoint' or 'covariate'
@@ -130,6 +201,32 @@ Posterior Summary of the Bayesian Negative Binomial Model with Time-Varying Coef
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method summary panelTVP.ZINB
+#' @examples
+#' # Computing summary table for object of class panelTVP.ZINB
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.zinb <- sim_panelTVP(n = 100,
+#'                          Tmax = 4,
+#'                          beta.nb = c(0.5,-0.7,0,0),
+#'                          theta.nb = c(0.05,0.5,0,0),
+#'                          lambda.nb = 0.5,
+#'                          psi.nb = 0.02,
+#'                          beta.logit = c(-1,0.6,0,0),
+#'                          theta.logit = c(0,1,0,0),
+#'                          lambda.logit = 0.7,
+#'                          psi.logit = 0,
+#'                          r = 2,
+#'                          model = "ZINB")
+#' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
+#'                      data = sim.zinb$observed,
+#'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                      model = "ZINB")
+#' # plots for count / Negative Binomial component
+#' summary(res.zinb, component = "NegBin") # default = ordering by covariate
+#' summary(res.zinb, by = "timepoint", component = "NegBin") # ordering by time point
+#' # plots for zero-inflation / Logit component
+#' summary(res.zinb, component = "Logit") # default = ordering by covariate
+#' summary(res.zinb, by = "timepoint", component = "Logit") # ordering by time point
 summary.panelTVP.ZINB <- function(object, by = "covariate", ...){
   if(length(by)>1 | !is.character(by)){
     stop("by is a scalar character")

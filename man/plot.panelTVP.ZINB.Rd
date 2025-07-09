@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3_plot.R
 \name{plot.panelTVP.ZINB}
 \alias{plot.panelTVP.ZINB}
-\title{Get plots of time-varying parameters for an object of class \code{panelTVP.ZINB}}
+\title{Get plots of time-varying parameters based on a \code{panelTVP.ZINB} object}
 \usage{
 \method{plot}{panelTVP.ZINB}(x, component = NULL, nplots = 4, ...)
 }
@@ -23,6 +23,29 @@ i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
 using the \code{ggplot2} library. Note that this
 function either plots the effects of the Negative Binomial (or count) model, or
 the Logit (or zero-inflation) model.
+}
+\examples{
+# Plot results from an object of class panelTVP.NegBin
+# NB: To reduces computational effort, we have drastically reduced the length
+# of the Markov Chain. You should use a much longer chain in your applications.
+sim.zinb <- sim_panelTVP(n = 100,
+                         Tmax = 4,
+                         beta.nb = c(0.5,-0.7,0,0),
+                         theta.nb = c(0.05,0.5,0,0),
+                         lambda.nb = 0.5,
+                         psi.nb = 0.02,
+                         beta.logit = c(-1,0.6,0,0),
+                         theta.logit = c(0,1,0,0),
+                         lambda.logit = 0.7,
+                         psi.logit = 0,
+                         r = 2,
+                         model = "ZINB")
+res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
+                     data = sim.zinb$observed,
+                     mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                     model = "ZINB")
+plot(res.zinb, nplots = 5, component = "NegBin") # effects that belong to count component
+plot(res.zinb, nplots = 5, component = "Logit") # effects that belong to zero-inflation component
 }
 \author{
 Roman Pfeiler

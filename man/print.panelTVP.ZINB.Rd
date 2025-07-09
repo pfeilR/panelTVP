@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3_print.R
 \name{print.panelTVP.ZINB}
 \alias{print.panelTVP.ZINB}
-\title{Print basic model information output}
+\title{Print basic model information output for a \code{panelTVP.ZINB} object}
 \usage{
 \method{print}{panelTVP.ZINB}(x, ...)
 }
@@ -14,6 +14,28 @@
 \description{
 This basic \code{print} method gives a general overview
 of the information that is contained in an object of class \code{panelTVP.ZINB}.
+}
+\examples{
+# Printing object of class panelTVP.ZINB
+# NB: To reduces computational effort, we have drastically reduced the length
+# of the Markov Chain. You should use a much longer chain in your applications.
+sim.zinb <- sim_panelTVP(n = 100,
+                         Tmax = 4,
+                         beta.nb = c(0.5,-0.7,0,0),
+                         theta.nb = c(0.05,0.5,0,0),
+                         lambda.nb = 0.5,
+                         psi.nb = 0.02,
+                         beta.logit = c(-1,0.6,0,0),
+                         theta.logit = c(0,1,0,0),
+                         lambda.logit = 0.7,
+                         psi.logit = 0,
+                         r = 2,
+                         model = "ZINB")
+res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
+                     data = sim.zinb$observed,
+                     mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                     model = "ZINB")
+print(res.zinb)
 }
 \author{
 Roman Pfeiler

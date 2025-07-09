@@ -1,4 +1,4 @@
-#' @title Get plots of time-varying parameters for an object of class \code{panelTVP.Gaussian}
+#' @title Get plots of time-varying parameters based on a \code{panelTVP.Gaussian} object
 #'
 #' @description
 #'  This \code{plot} function produces effect plots for the time-varying parameters,
@@ -12,11 +12,28 @@
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method plot panelTVP.Gaussian
+#' @examples
+#' # Plot results from an object of class panelTVP.Gaussian
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.gaussian <- sim_panelTVP(n = 100,
+#'                              Tmax = 4,
+#'                              beta = c(4,1,0,0),
+#'                              theta = c(1,0.5,0,0),
+#'                              lambda = 1,
+#'                              psi = 0.2,
+#'                              model = "Gaussian",
+#'                              sigma2 = 0.7)
+#' res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
+#'                          data = sim.gaussian$observed,
+#'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                          model = "Gaussian")
+#' plot(res.gaussian, nplots = 5)
 plot.panelTVP.Gaussian <- function(x, nplots = 4, ...){
   plot_effects(summary_table = x$posterior, Tmax = x$data$Tmax, X = x$data$X, nplots = nplots)
 }
 
-#' @title Get plots of time-varying parameters for an object of class \code{panelTVP.Probit}
+#' @title Get plots of time-varying parameters for a \code{panelTVP.Probit} object
 #'
 #' @description
 #'  This \code{plot} function produces effect plots for the time-varying parameters,
@@ -30,11 +47,27 @@ plot.panelTVP.Gaussian <- function(x, nplots = 4, ...){
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method plot panelTVP.Probit
+#' @examples
+#' # Plot results from an object of class panelTVP.Probit
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.probit <- sim_panelTVP(n = 100,
+#'                            Tmax = 4,
+#'                            beta = c(1,0.5,0,0),
+#'                            theta = c(0.8,0.5,0,0),
+#'                            lambda = 1,
+#'                            psi = 0.2,
+#'                            model = "Probit")
+#' res.probit <- panelTVP(y ~ W1 + W2 + W3,
+#'                        data = sim.probit$observed,
+#'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                        model = "Probit")
+#' plot(res.probit, nplots = 5)
 plot.panelTVP.Probit <- function(x, nplots = 4, ...){
   plot_effects(summary_table = x$posterior, Tmax = x$data$Tmax, X = x$data$X, nplots = nplots)
 }
 
-#' @title Get plots of time-varying parameters for an object of class \code{panelTVP.Logit}
+#' @title Get plots of time-varying parameters based on a \code{panelTVP.Logit} object
 #'
 #' @description
 #'  This \code{plot} function produces effect plots for the time-varying parameters,
@@ -48,11 +81,27 @@ plot.panelTVP.Probit <- function(x, nplots = 4, ...){
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method plot panelTVP.Logit
+#' @examples
+#' # Plot results from an object of class panelTVP.Logit
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.logit <- sim_panelTVP(n = 100,
+#'                           Tmax = 4,
+#'                           beta = c(1,0.5,0,0),
+#'                           theta = c(0.8,0.5,0,0),
+#'                           lambda = 1,
+#'                           psi = 0.2,
+#'                           model = "Logit")
+#' res.logit <- panelTVP(y ~ W1 + W2 + W3,
+#'                       data = sim.logit$observed,
+#'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                       model = "Logit")
+#' plot(res.logit, nplots = 5)
 plot.panelTVP.Logit <- function(x, nplots = 4, ...){
   plot_effects(summary_table = x$posterior, Tmax = x$data$Tmax, X = x$data$X, nplots = nplots)
 }
 
-#' @title Get plots of time-varying parameters for an object of class \code{panelTVP.NegBin}
+#' @title Get plots of time-varying parameters based on a \code{panelTVP.NegBin} object
 #'
 #' @description
 #'  This \code{plot} function produces effect plots for the time-varying parameters,
@@ -66,11 +115,28 @@ plot.panelTVP.Logit <- function(x, nplots = 4, ...){
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method plot panelTVP.NegBin
+#' @examples
+#' # Plot results from an object of class panelTVP.NegBin
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.negbin <- sim_panelTVP(n = 100,
+#'                            Tmax = 4,
+#'                            beta = c(1,0.5,0,0),
+#'                            theta = c(0.8,0.5,0,0),
+#'                            lambda = 1,
+#'                            psi = 0.2,
+#'                            r = 2,
+#'                            model = "NegBin")
+#' res.negbin <- panelTVP(y ~ W1 + W2 + W3,
+#'                        data = sim.negbin$observed,
+#'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                        model = "NegBin")
+#' plot(res.negbin, nplots = 5)
 plot.panelTVP.NegBin <- function(x, nplots = 4, ...){
   plot_effects(summary_table = x$posterior, Tmax = x$data$Tmax, X = x$data$X, nplots = nplots)
 }
 
-#' @title Get plots of time-varying parameters for an object of class \code{panelTVP.ZINB}
+#' @title Get plots of time-varying parameters based on a \code{panelTVP.ZINB} object
 #'
 #' @description
 #'  This \code{plot} function produces effect plots for the time-varying parameters,
@@ -88,6 +154,28 @@ plot.panelTVP.NegBin <- function(x, nplots = 4, ...){
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method plot panelTVP.ZINB
+#' @examples
+#' # Plot results from an object of class panelTVP.NegBin
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.zinb <- sim_panelTVP(n = 100,
+#'                          Tmax = 4,
+#'                          beta.nb = c(0.5,-0.7,0,0),
+#'                          theta.nb = c(0.05,0.5,0,0),
+#'                          lambda.nb = 0.5,
+#'                          psi.nb = 0.02,
+#'                          beta.logit = c(-1,0.6,0,0),
+#'                          theta.logit = c(0,1,0,0),
+#'                          lambda.logit = 0.7,
+#'                          psi.logit = 0,
+#'                          r = 2,
+#'                          model = "ZINB")
+#' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
+#'                      data = sim.zinb$observed,
+#'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                      model = "ZINB")
+#' plot(res.zinb, nplots = 5, component = "NegBin") # effects that belong to count component
+#' plot(res.zinb, nplots = 5, component = "Logit") # effects that belong to zero-inflation component
 plot.panelTVP.ZINB <- function(x, component = NULL, nplots = 4, ...){
   if(is.null(component) || length(component) != 1 || !(component %in% c("NegBin", "Logit"))){
     stop("Argument 'component' must be either NegBin or Logit depending on which parameters you are interested in.")

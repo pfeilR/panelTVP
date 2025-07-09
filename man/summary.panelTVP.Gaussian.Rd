@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3_summary.R
 \name{summary.panelTVP.Gaussian}
 \alias{summary.panelTVP.Gaussian}
-\title{Summary output for a Gaussian TVP model}
+\title{Summary output for a \code{panelTVP.Gaussian} object}
 \usage{
 \method{summary}{panelTVP.Gaussian}(object, by = "covariate", ...)
 }
@@ -20,6 +20,25 @@ posterior means and standard deviations based on the posterior distributions of 
 time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
 \eqn{\lambda_1,\dots,\lambda_T}. The results are presented either sorted by covariate
 (default) or by time point.
+}
+\examples{
+# Computing summary table for object of class panelTVP.Gaussian
+# NB: To reduces computational effort, we have drastically reduced the length
+# of the Markov Chain. You should use a much longer chain in your applications.
+sim.gaussian <- sim_panelTVP(n = 100,
+                             Tmax = 4,
+                             beta = c(4,1,0,0),
+                             theta = c(1,0.5,0,0),
+                             lambda = 1,
+                             psi = 0.2,
+                             model = "Gaussian",
+                             sigma2 = 0.7)
+res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
+                         data = sim.gaussian$observed,
+                         mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                         model = "Gaussian")
+summary(res.gaussian) # default = ordering by covariate
+summary(res.gaussian, by = "timepoint") # ordering by time point
 }
 \author{
 Roman Pfeiler

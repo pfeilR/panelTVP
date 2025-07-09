@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3_plot.R
 \name{plot.panelTVP.Probit}
 \alias{plot.panelTVP.Probit}
-\title{Get plots of time-varying parameters for an object of class \code{panelTVP.Probit}}
+\title{Get plots of time-varying parameters for a \code{panelTVP.Probit} object}
 \usage{
 \method{plot}{panelTVP.Probit}(x, nplots = 4, ...)
 }
@@ -18,6 +18,23 @@ This \code{plot} function produces effect plots for the time-varying parameters,
 i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
 \eqn{\lambda_1,\dots,\lambda_T} separately for each covariate Plots are produced
 using the \code{ggplot2} library.
+}
+\examples{
+# Plot results from an object of class panelTVP.Probit
+# NB: To reduces computational effort, we have drastically reduced the length
+# of the Markov Chain. You should use a much longer chain in your applications.
+sim.probit <- sim_panelTVP(n = 100,
+                           Tmax = 4,
+                           beta = c(1,0.5,0,0),
+                           theta = c(0.8,0.5,0,0),
+                           lambda = 1,
+                           psi = 0.2,
+                           model = "Probit")
+res.probit <- panelTVP(y ~ W1 + W2 + W3,
+                       data = sim.probit$observed,
+                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                       model = "Probit")
+plot(res.probit, nplots = 5)
 }
 \author{
 Roman Pfeiler

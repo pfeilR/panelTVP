@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3_predict.R
 \name{predict.panelTVP.Gaussian}
 \alias{predict.panelTVP.Gaussian}
-\title{Get predictions for new subjects}
+\title{Get predictions for new subjects based on a \code{panelTVP.Gaussian} object}
 \usage{
 \method{predict}{panelTVP.Gaussian}(object, X.new, timepoint, coverage = 0.95, pop.pred = FALSE, ...)
 }
@@ -10,7 +10,8 @@
 \item{object}{an object of class \code{panelTVP.Gaussian}}
 
 \item{X.new}{a matrix or data frame consisting of new data for the same variables
-that were used for fitting the model.}
+that were used for fitting the model. The first column must contain a 1, when
+the fitted model contains an intercept.}
 
 \item{timepoint}{a numeric scalar indicating the time point for which predictions should
 be made, i.e., predictions for a given data set are only made for one specific time point.
@@ -38,6 +39,34 @@ posterior predictive distribution, i.e., the most basic summary statistics
 \description{
 This \code{predict} function simulates data and computes summary statistics based on the
 posterior predictive distribution for new data under a Gaussian likelihood.
+}
+\examples{
+# Predictions based on an object of class panelTVP.Gaussian
+# NB: To reduces computational effort, we have drastically reduced the length
+# of the Markov Chain. You should use a much longer chain in your applications.
+sim.gaussian <- sim_panelTVP(n = 100,
+                             Tmax = 4,
+                             beta = c(4,1,0,0),
+                             theta = c(1,0.5,0,0),
+                             lambda = 1,
+                             psi = 0.2,
+                             model = "Gaussian",
+                             sigma2 = 0.7)
+res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
+                         data = sim.gaussian$observed,
+                         mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                         model = "Gaussian")
+# setting up design matrix for predicting two new observations
+X.new <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+                          c(2,0),
+                          c(4,3),
+                          c(0,0)))
+colnames(X.new) <- colnames(res.gaussian$data$X)
+# prediction for the 2nd panel wave
+pp <- predict(res.gaussian, X.new = X.new, timepoint = 2)
+plot(density(pp$predictive.distribution[1,]))
+plot(density(pp$predictive.distribution[2,]))
+pp$predictive.summary
 }
 \author{
 Roman Pfeiler

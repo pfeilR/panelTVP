@@ -1,4 +1,4 @@
-#' @title Print basic model information output
+#' @title Print basic model information output for a \code{panelTVP.Gaussian} object
 #'
 #' @description
 #'  This basic \code{print} method gives a general overview
@@ -49,7 +49,7 @@ You may use the following functions to get additional information:\n
   invisible(x)
 }
 
-#' @title Print basic model information output
+#' @title Print basic model information output for a \code{panelTVP.Probit} object
 #'
 #' @description
 #'  This basic \code{print} method gives a general overview
@@ -60,7 +60,22 @@ You may use the following functions to get additional information:\n
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method print panelTVP.Probit
-#'
+#' @examples
+#' # Printing object of class panelTVP.Probit
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.probit <- sim_panelTVP(n = 100,
+#'                            Tmax = 4,
+#'                            beta = c(1,0.5,0,0),
+#'                            theta = c(0.8,0.5,0,0),
+#'                            lambda = 1,
+#'                            psi = 0.2,
+#'                            model = "Probit")
+#' res.probit <- panelTVP(y ~ W1 + W2 + W3,
+#'                        data = sim.probit$observed,
+#'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                        model = "Probit")
+#' print(res.probit)
 print.panelTVP.Probit <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Probit. It contains:\n
   - data: Input data and additional context information derived from the data.\n
@@ -82,7 +97,7 @@ You may use the following functions to get additional information:\n
   invisible(x)
 }
 
-#' @title Print basic model information output
+#' @title Print basic model information output for a \code{panelTVP.Logit} object
 #'
 #' @description
 #'  This basic \code{print} method gives a general overview
@@ -93,7 +108,22 @@ You may use the following functions to get additional information:\n
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method print panelTVP.Logit
-#'
+#' @examples
+#' # Printing object of class panelTVP.Logit
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.logit <- sim_panelTVP(n = 100,
+#'                           Tmax = 4,
+#'                           beta = c(1,0.5,0,0),
+#'                           theta = c(0.8,0.5,0,0),
+#'                           lambda = 1,
+#'                           psi = 0.2,
+#'                           model = "Logit")
+#' res.logit <- panelTVP(y ~ W1 + W2 + W3,
+#'                       data = sim.logit$observed,
+#'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                       model = "Logit")
+#' print(res.logit)
 print.panelTVP.Logit <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Logit. It contains:\n
   - data: Input data and additional context information derived from the data.\n
@@ -115,7 +145,7 @@ You may use the following functions to get additional information:\n
   invisible(x)
 }
 
-#' @title Print basic model information output
+#' @title Print basic model information output for a \code{panelTVP.NegBin} object
 #'
 #' @description
 #'  This basic \code{print} method gives a general overview
@@ -126,7 +156,23 @@ You may use the following functions to get additional information:\n
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method print panelTVP.NegBin
-#'
+#' @examples
+#' # Printing object of class panelTVP.NegBin
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.negbin <- sim_panelTVP(n = 100,
+#'                            Tmax = 4,
+#'                            beta = c(1,0.5,0,0),
+#'                            theta = c(0.8,0.5,0,0),
+#'                            lambda = 1,
+#'                            psi = 0.2,
+#'                            r = 2,
+#'                            model = "NegBin")
+#' res.negbin <- panelTVP(y ~ W1 + W2 + W3,
+#'                        data = sim.negbin$observed,
+#'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                        model = "NegBin")
+#' print(res.negbin)
 print.panelTVP.NegBin <- function(x, ...){
   cat("\nThis is an object of class panelTVP.NegBin. It contains:\n
   - data: Input data and additional context information derived from the data.\n
@@ -148,7 +194,7 @@ You may use the following functions to get additional information:\n
   invisible(x)
 }
 
-#' @title Print basic model information output
+#' @title Print basic model information output for a \code{panelTVP.ZINB} object
 #'
 #' @description
 #'  This basic \code{print} method gives a general overview
@@ -159,7 +205,27 @@ You may use the following functions to get additional information:\n
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method print panelTVP.ZINB
-#'
+#' @examples
+#' # Printing object of class panelTVP.ZINB
+#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.zinb <- sim_panelTVP(n = 100,
+#'                          Tmax = 4,
+#'                          beta.nb = c(0.5,-0.7,0,0),
+#'                          theta.nb = c(0.05,0.5,0,0),
+#'                          lambda.nb = 0.5,
+#'                          psi.nb = 0.02,
+#'                          beta.logit = c(-1,0.6,0,0),
+#'                          theta.logit = c(0,1,0,0),
+#'                          lambda.logit = 0.7,
+#'                          psi.logit = 0,
+#'                          r = 2,
+#'                          model = "ZINB")
+#' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
+#'                      data = sim.zinb$observed,
+#'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                      model = "ZINB")
+#' print(res.zinb)
 print.panelTVP.ZINB <- function(x, ...){
   cat("\nThis is an object of class panelTVP.ZINB. It contains:\n
   - data: Input data and additional context information derived from the data.\n

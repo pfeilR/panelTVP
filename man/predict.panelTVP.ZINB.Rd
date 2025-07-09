@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3_predict.R
 \name{predict.panelTVP.ZINB}
 \alias{predict.panelTVP.ZINB}
-\title{Get predictions for new subjects}
+\title{Get predictions for new subjects based on a \code{panelTVP.ZINB} object}
 \usage{
 \method{predict}{panelTVP.ZINB}(
   object,
@@ -18,10 +18,12 @@
 \item{object}{an object of class \code{panelTVP.ZINB}}
 
 \item{X_nb.new}{a matrix or data frame consisting of new data for the same variables
-that were used for fitting the model (count component)}
+that were used for fitting the model. The first column must contain a 1, when
+the fitted model contains an intercept in the Negative Binomial part (count component)}
 
 \item{X_logit.new}{a matrix or data frame consisting of new data for the same variables
-that were used for fitting the model (zero-inflation component)}
+that were used for fitting the model. The first column must contain a 1, when
+the fitted model contains an intercept in the zero-inflated part (zero-inflation component)}
 
 \item{timepoint}{a numeric scalar indicating the time point for which predictions should
 be made, i.e., predictions for a given data set are only made for one specific time point.
@@ -50,6 +52,43 @@ posterior predictive distribution, i.e., the most basic summary statistics
 This \code{predict} function simulates data and computes summary statistics based on the
 posterior predictive distribution for new data under a Zero-Inflated Negative
 Binomial likelihood.
+}
+\examples{
+# Predictions based on an object of class panelTVP.ZINB
+# NB: To reduces computational effort, we have drastically reduced the length
+# of the Markov Chain. You should use a much longer chain in your applications.
+sim.zinb <- sim_panelTVP(n = 100,
+                         Tmax = 4,
+                         beta.nb = c(0.5,-0.7,0,0),
+                         theta.nb = c(0.05,0.5,0,0),
+                         lambda.nb = 0.5,
+                         psi.nb = 0.02,
+                         beta.logit = c(-1,0.6,0,0),
+                         theta.logit = c(0,1,0,0),
+                         lambda.logit = 0.7,
+                         psi.logit = 0,
+                         r = 2,
+                         model = "ZINB")
+res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
+                     data = sim.zinb$observed,
+                     mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                     model = "ZINB")
+# setting up design matrix for predicting two new observations
+X.new_nb <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+                             c(2,0),
+                             c(4,3),
+                             c(0,0)))
+colnames(X.new_nb) <- colnames(res.zinb$data$X_nb)
+X.new_logit <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+                                c(0.1,-0.5),
+                                c(1,2),
+                                c(4,3)))
+colnames(X.new_logit) <- colnames(res.zinb$data$X_logit)
+# prediction for the 2nd panel wave
+pp <- predict(res.zinb, X.new_nb = X.new_nb, X.new_logit = X.new_logit, timepoint = 2)
+plot(density(pp$predictive.distribution[1,]))
+plot(density(pp$predictive.distribution[2,]))
+pp$predictive.summary
 }
 \author{
 Roman Pfeiler

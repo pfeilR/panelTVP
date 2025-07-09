@@ -7,6 +7,8 @@
 #' @param x an object of class \code{panelTVP.Gaussian}
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
+#' @name print.panelTVP.Gaussian
+#' @rdname print.panelTVP.Gaussian
 #' @author Roman Pfeiler
 #' @exportS3Method print panelTVP.Gaussian
 #' @examples
@@ -23,7 +25,7 @@
 #'                              sigma2 = 0.7)
 #' res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
 #'                          data = sim.gaussian$observed,
-#'                          mcmc.opt = list(chain.length = 500, burnin = 100, thin = 1, asis = TRUE),
+#'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                          model = "Gaussian")
 #' print(res.gaussian)
 print.panelTVP.Gaussian <- function(x, ...){

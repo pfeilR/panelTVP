@@ -259,6 +259,8 @@
 #'  }
 #' @export
 #'
+#' @author Roman Pfeiler, Helga Wagner
+#'
 #' @references
 #'
 #'  Bitto, A. and Frühwirth-Schnatter, S. (2019). Achieving Shrinkage in a
@@ -508,12 +510,13 @@ panelTVP <- function(formula,
                         res_frame = res_frame,
                         f_sum = f_sum,
                         f_mat = f_mat,
+                        miss = miss,
                         HPD.coverage = HPD.coverage)
     class(result) <- "panelTVP.NegBin"
   }
 
   # add WAIC and remove chain of factor scores to save memory
-  result$WAIC <- compute.waic(result)
+  result$WAIC <- compute_waic(result)
   result[["fmcmc"]] <- NULL
 
   # adding learning settings to output

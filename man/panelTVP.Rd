@@ -315,3 +315,6 @@ Pfeiler, R. and Wagner, H. (2024). Shrinkage in a Bayesian Panel Data Model
 with Time-Varying Coefficients. In: Einbeck, J. Maeng, H., Ogundium, E. and
 Perrakis, K. (Editors): Developments in Statistical Modelling, Springer, 109-115.
 }
+\author{
+Roman Pfeiler, Helga Wagner
+}

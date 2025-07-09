@@ -88,7 +88,7 @@ zinbTVP <- function(df,
 
       # Sampling of latent at-risk indicators ----------------------------------
 
-      risk <- stepRisk(y = df$y, miss = miss, eta_nb = eta_nb, eta_logit = eta_logit, r = r)
+      risk <- stepRisk(y = df$y, miss = miss, eta_nb = c(eta_nb), eta_logit = c(eta_logit), r = r)
       mcmc_risk[i,] <- risk
 
       # Logit Component --------------------------------------------------------
@@ -397,7 +397,7 @@ zinbTVP <- function(df,
               fmcmc_logit = f_mat_logit[,1:df$n], fmcmc_nb = f_mat_nb[,1:df$n],
               fmean_logit = fmean_logit, fmean_nb = fmean_nb,
               mcmc_risk = mcmc_risk,
-              model = "Zero-Inflated Negative Binomial",
+              model = "ZINB",
               acceptance.rates = acceptance.rates,
               HPD.coverage = HPD.coverage,
               runtime = paste("Total Runtime for Bayesian Zero-Inflated Negative Binomial Model:",

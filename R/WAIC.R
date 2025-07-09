@@ -1,10 +1,15 @@
 # In this file, the WAIC is computed under 6 different likelihoods.
 
+library(LaplacesDemon)
+
 # compute linear predictor based on model output
 # this will return a matrix of dimension (nT x S),
 # where S = (chain.length - burnin)/thin, i.e., the remaining draws of model output
 
-# Last update: 11.06.2025 (code adapted to allow for cps priori)
+# Update: 12.06.2025 (code adapted to allow for cps priori)
+# Last update: 24.06.25 (omitting all rows with NAs in response)
+# this is important as WAIC is based soley on likelihoods of observables!!!
+# (see also how brms handles this!)
 
 lp.model <- function(model){
 
@@ -15,11 +20,8 @@ lp.model <- function(model){
   mc <- model$mcmc
   S <- nrow(mc)
   N <- nrow(X)
-  if(sum(startsWith(colnames(mc), "lambda_t")) == 1){
-    cps <- TRUE
-  }  else{
-    cps <- FALSE
-  }
+  if(sum(startsWith(colnames(mc), "lambda_t")) == 1) cps <- TRUE
+  else cps <- FALSE
   eta <- matrix(NA, nrow = N, ncol = S)
   X_split <- split(as.data.frame(X), X[,"t"])
   for(s in 1:S){
@@ -49,11 +51,8 @@ lp.zinb <- function(model){
   mc_logit <- model$mcmc_logit
   S <- nrow(mc_logit)
   N <- nrow(X_logit)
-  if(sum(startsWith(colnames(mc_logit), "lambda_t")) == 1){
-    cps_logit <- TRUE
-  } else{
-    cps_logit <- FALSE
-  }
+  if(sum(startsWith(colnames(mc_logit), "lambda_t")) == 1) cps_logit <- TRUE
+  else cps_logit <- FALSE
   if(cps_logit) lambda_col_logit <- "lambda_t"
   eta_logit <- matrix(NA, nrow = N, ncol = S)
   X_split_logit <- split(as.data.frame(X_logit), X_logit[,"t"])
@@ -76,11 +75,8 @@ lp.zinb <- function(model){
   mc_nb <- model$mcmc_nb
   S <- nrow(mc_nb)
   N <- nrow(X_nb)
-  if(sum(startsWith(colnames(mc_nb), "lambda_t")) == 1){
-    cps_nb <- TRUE
-  } else{
-    cps_nb <- FALSE
-  }
+  if(sum(startsWith(colnames(mc_nb), "lambda_t")) == 1) cps_nb <- TRUE
+  else cps_nb <- FALSE
   if(cps_nb) lambda_col_nb <- "lambda_t"
   eta_nb <- matrix(NA, nrow = N, ncol = S)
   X_split_nb <- split(as.data.frame(X_nb), X_nb[,"t"])
@@ -102,65 +98,55 @@ lp.zinb <- function(model){
 
 }
 
-compute.waic <- function(model){
-
-  valid_classes <- c("panelTVP.Gaussian", "panelTVP.Probit",
-                     "panelTVP.Logit", "panelTVP.NegBin", "panelTVP.ZINB")
-
-  if (!inherits(model, valid_classes)) {
-    stop("Model class must be one of: ", paste(valid_classes, collapse = ", "))
-  }
+compute_waic <- function(model){
 
   m <- model$model
   idx.observed <- !is.na(model$data$y)
   y <- model$data$y[idx.observed]
 
-  if(m != "Zero-Inflated Negative Binomial"){
+  if(m != "ZINB"){
 
-    eta <- lp.model(model)[idx.observed,]
-    S <- nrow(model$mcmc)
-    y <- model$data$y
-    w <- model$wmcmc
-    ll <- matrix(NA, nrow = length(y), ncol = S)
+  eta <- lp.model(model)[idx.observed,]
+  S <- ncol(eta)
+  ll <- matrix(NA, nrow = length(y), ncol = S)
 
-    if(m == "Gaussian"){
-      sigma2 <- model$mcmc[,"sigma2"]
-      for(s in 1:S){
-        ll[,s] <- dnorm(y, mean = eta[,s], sd = sqrt(sigma2[s]), log = TRUE)
-      }
+  if(m == "Gaussian"){
+    sigma2 <- model$mcmc[,"sigma2"]
+    for(s in 1:S){
+      ll[,s] <- dnorm(y, mean = eta[,s], sd = sqrt(sigma2[s]), log = TRUE)
     }
+  }
 
-    if(m == "Probit"){
-      p <- pnorm(eta)
-      p <- pmax(pmin(p, 1 - 1e-8), 1e-8)
-      for(s in 1:S){
-        ll[,s] <- dbinom(y, size = 1, prob = p[,s], log = TRUE)
-      }
+  if(m == "Probit"){
+    p <- pnorm(eta)
+    p <- pmax(pmin(p, 1 - 1e-4), 1e-4)
+    for(s in 1:S){
+      ll[,s] <- dbinom(y, size = 1, prob = p[,s], log = TRUE)
     }
+  }
 
-    if(m == "Logit"){
-      p <- plogis(eta)
-      p <- pmax(pmin(p, 1 - 1e-8), 1e-8)
-      for(s in 1:S){
-        ll[,s] <- dbinom(y, size = 1, prob = p[,s], log = TRUE)
-      }
+  if(m == "Logit"){
+    p <- plogis(eta)
+    p <- pmax(pmin(p, 1 - 1e-4), 1e-4)
+    for(s in 1:S){
+      ll[,s] <- dbinom(y, size = 1, prob = p[,s], log = TRUE)
     }
+  }
 
-    if(m == "NegBin"){
-      r <- model$mcmc[,"r"]
-      for(s in 1:S){
-        ll[,s] <- dnbinom(y, size = r[s], mu = r[s] * exp(eta[,s]), log = TRUE)
-      }
+  if(m == "NegBin"){
+    r <- model$mcmc[,"r"]
+    for(s in 1:S){
+      ll[,s] <- dnbinom(y, size = r[s], mu = r[s] * exp(eta[,s]), log = TRUE)
     }
+  }
 
   } else{ # ZINB model
 
     etas <- lp.zinb(model)
     eta_logit <- etas[["eta_logit"]][idx.observed,]
     eta_nb <- etas[["eta_nb"]][idx.observed,]
-    S <- nrow(model$mcmc_logit)
-    y <- model$data$y
-    p.risk <- pmax(pmin(plogis(eta_logit), 1 - 1e-8), 1e-08)
+    S <- ncol(eta_logit)
+    p.risk <- pmax(pmin(plogis(eta_logit), 1 - 1e-4), 1e-4)
     r <- model$mcmc_nb[,"r"]
     yS <- matrix(rep(y, S), ncol = S)
     rS <- matrix(r, nrow = length(y), ncol = S, byrow = TRUE)
@@ -180,6 +166,7 @@ compute.waic <- function(model){
   }
 
   waic <- LaplacesDemon::WAIC(ll)$WAIC
+
   if(sum(is.na(model$data$y)) > 0){
     warning("NAs are present in response variable. WAIC was computed based on the observed data.")
   }

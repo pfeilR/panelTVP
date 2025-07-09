@@ -29,6 +29,8 @@ Imports:
     stats,
     truncnorm,
     utils,
+    dplyr,
+    gridExtra,
     ggplot2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

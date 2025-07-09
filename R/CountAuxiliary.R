@@ -19,7 +19,7 @@ NB.para <- function(y,
     psi <- 1 / (1 + exp(-eta))
     psi <- ifelse(psi == 0, psi + 0.00001, psi)
     psi <- ifelse(psi == 1, psi - 0.00001, psi)
-    r.next <- slice.r(y = y, psi = psi, r = r.old, a = r.alpha, b = r.beta,
+    r.next <- slice_r(y = y, psi = psi, r = r.old, a = r.alpha, b = r.beta,
                       steps = expansion.steps, w = width, p.overrelax = p.overrelax,
                       acc = accuracy.overrelax)
     return(r.next)
@@ -51,7 +51,7 @@ ll.nb <- function(y, r, psi){
 
 }
 
-slice.r <- function(y, psi, r, a, b, steps, w, p.overrelax, acc){
+slice_r <- function(y, psi, r, a, b, steps, w, p.overrelax, acc){
 
   # auxiliary function to compute (un-normalized) log-posterior under a G(a,b) prior
   log.post.r <- function(log.r.val){
@@ -146,11 +146,16 @@ slice.r <- function(y, psi, r, a, b, steps, w, p.overrelax, acc){
 
 stepRisk <- function(y, miss, eta_nb, eta_logit, r){
 
-  p.risk <- plogis(eta_logit)
-  v <- 1 - plogis(eta_nb)
-  risk <- as.logical(ifelse(y == 0 | miss,
-                            rbinom(nrow(eta_logit), size = 1, prob =
-                                     pmax(0, pmin(1, (p.risk * v^r) / (1 - p.risk * (1 - v^r))))), 1))
+  relevant.obs <- (y == 0 | miss)
+  p.risk <- pmax(1e-4, pmin(1-1e-4, plogis(eta_logit[relevant.obs])))
+  v <- pmax(1e-4, pmin(1-1e-4, 1 - plogis(eta_nb[relevant.obs])))
+  risk <- as.logical(ifelse(relevant.obs,
+                            rbinom(length(eta_logit[relevant.obs]),
+                                   size = 1,
+                                   prob = (p.risk * v^r) / (1 - p.risk * (1 - v^r))
+                                   ),
+                            1)
+                     )
 
   return(risk)
 

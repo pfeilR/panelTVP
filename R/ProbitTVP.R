@@ -58,9 +58,11 @@ ProbitTVP <- function(df,
                          prior.reg = prior.reg,
                          sigma2v = 1,
                          alpha = alpha,
-                         estimation = "PG",
+                         estimation = "Normal",
                          mcmc.opt = mcmc.opt,
                          i = i)
+      # estimation = 'Normal' is correct for Probit as we set sigma2 = 1
+      # such that we can then treat it as Normal with error variance 1
       betat <- stepR.out$betat
       alpha <- stepR.out$alpha
       prior.reg <- stepR.out$prior.reg
@@ -78,7 +80,7 @@ ProbitTVP <- function(df,
                          lambda = lambda,
                          alpha_lambda = alpha_lambda,
                          prior.load = prior.load,
-                         estimation = "PG")
+                         estimation = "Normal")
       fi <- stepF.out$fi
       lambda <- stepF.out$lambda
       alpha_lambda <- stepF.out$alpha_lambda

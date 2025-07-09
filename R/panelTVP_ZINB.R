@@ -602,7 +602,7 @@ panelTVP_ZINB <- function(formula,
   class(result) <- "panelTVP.ZINB"
 
   # add WAIC and remove chain of factor scores and risk-indicators to save memory
-  result$WAIC <- compute.waic(result)
+  result$WAIC <- compute_waic(result)
   result[["fmcmc_logit"]] <- NULL
   result[["fmcmc_nb"]] <- NULL
   result[["mcmc_risk"]] <- NULL

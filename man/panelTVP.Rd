@@ -551,7 +551,45 @@ res.gaussian1 <- panelTVP(y ~ W1 + W2 + W3,
                          data = sim.gaussian$observed,
                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                          model = "Gaussian")
+# Example 2: Gaussian Response, Bayesian Lasso
+prior.reg <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg),
+                               list(learn.a.tau = FALSE, learn.a.xi = FALSE))
+res.gaussian2 <- panelTVP(y ~ W1 + W2 + W3,
+                         data = sim.gaussian$observed,
+                         prior.reg = prior.reg,
+                         mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                         model = "Gaussian")
 
+# Example 3: Logit Response, learn all possible parameters
+sim.logit <- sim_panelTVP(n = 100,
+                          Tmax = 4,
+                          beta = c(1,0.5,0,0),
+                          theta = c(0.8,0.5,0,0),
+                          lambda = 1,
+                          psi = 0.2,
+                          model = "Logit")
+res.logit <- panelTVP(y ~ W1 + W2 + W3,
+                      data = sim.logit$observed,
+                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                      model = "Logit")
+
+# Example 4: ZINB, learn all possible parameters
+sim.zinb <- sim_panelTVP(n = 100,
+                         Tmax = 4,
+                         beta.nb = c(0.5,-0.7,0,0),
+                         theta.nb = c(0.05,0.5,0,0),
+                         lambda.nb = 0.5,
+                         psi.nb = 0.02,
+                         beta.logit = c(-1,0.6,0,0),
+                         theta.logit = c(0,1,0,0),
+                         lambda.logit = 0.7,
+                         psi.logit = 0,
+                         r = 2,
+                         model = "ZINB")
+res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
+                     data = sim.zinb$observed,
+                     mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                     model = "ZINB")
 
 }
 \references{

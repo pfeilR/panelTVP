@@ -12,9 +12,12 @@
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method plot panelTVP.Gaussian
+#' @references
+#'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
+#'  Springer Verlag, New York.
 #' @examples
 #' # Plot results from an object of class panelTVP.Gaussian
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.gaussian <- sim_panelTVP(n = 100,
 #'                              Tmax = 4,
@@ -38,7 +41,7 @@ plot.panelTVP.Gaussian <- function(x, nplots = 4, ...){
 #' @description
 #'  This \code{plot} function produces effect plots for the time-varying parameters,
 #'  i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
-#'   \eqn{\lambda_1,\dots,\lambda_T} separately for each covariate Plots are produced
+#'   \eqn{\lambda_1,\dots,\lambda_T} separately for each covariate. Plots are produced
 #'   using the \code{ggplot2} library.
 #'
 #' @param x an object of class \code{panelTVP.Probit}
@@ -47,9 +50,12 @@ plot.panelTVP.Gaussian <- function(x, nplots = 4, ...){
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method plot panelTVP.Probit
+#' @references
+#'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
+#'  Springer Verlag, New York.
 #' @examples
 #' # Plot results from an object of class panelTVP.Probit
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.probit <- sim_panelTVP(n = 100,
 #'                            Tmax = 4,
@@ -81,9 +87,12 @@ plot.panelTVP.Probit <- function(x, nplots = 4, ...){
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method plot panelTVP.Logit
+#' @references
+#'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
+#'  Springer Verlag, New York.
 #' @examples
 #' # Plot results from an object of class panelTVP.Logit
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.logit <- sim_panelTVP(n = 100,
 #'                           Tmax = 4,
@@ -115,9 +124,12 @@ plot.panelTVP.Logit <- function(x, nplots = 4, ...){
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method plot panelTVP.NegBin
+#' @references
+#'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
+#'  Springer Verlag, New York.
 #' @examples
 #' # Plot results from an object of class panelTVP.NegBin
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.negbin <- sim_panelTVP(n = 100,
 #'                            Tmax = 4,
@@ -148,15 +160,18 @@ plot.panelTVP.NegBin <- function(x, nplots = 4, ...){
 #'
 #' @param x an object of class \code{panelTVP.ZINB}
 #' @param component either 'NegBin' or 'Logit' to create plots for either the count or the
-#'  zero-inflation component, respectively - must be specified!
+#'  zero-inflation component (no default)
 #' @param nplots indicates how many plots should be printed on one page
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler
 #' @exportS3Method plot panelTVP.ZINB
+#' @references
+#'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
+#'  Springer Verlag, New York.
 #' @examples
-#' # Plot results from an object of class panelTVP.NegBin
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # Plot results from an object of class panelTVP.ZINB
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.zinb <- sim_panelTVP(n = 100,
 #'                          Tmax = 4,

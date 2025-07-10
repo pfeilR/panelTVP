@@ -21,7 +21,7 @@ using the \code{ggplot2} library.
 }
 \examples{
 # Plot results from an object of class panelTVP.NegBin
-# NB: To reduces computational effort, we have drastically reduced the length
+# NB: To reduce computational effort, we have drastically reduced the length
 # of the Markov Chain. You should use a much longer chain in your applications.
 sim.negbin <- sim_panelTVP(n = 100,
                            Tmax = 4,
@@ -36,6 +36,10 @@ res.negbin <- panelTVP(y ~ W1 + W2 + W3,
                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                        model = "NegBin")
 plot(res.negbin, nplots = 5)
+}
+\references{
+Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
+Springer Verlag, New York.
 }
 \author{
 Roman Pfeiler

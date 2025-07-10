@@ -18,13 +18,12 @@ to sort the output either by time point or covariate, respectively (default is c
 This \code{summary} function prints out a table that contains HPD-intervals,
 posterior means and standard deviations based on the posterior distributions of the
 time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
-\eqn{\lambda_1,\dots,\lambda_T}. The user can choose whether to show the results
-of the Negative Binomial (count) model or the zer-inflation (Logit) model.
-The results are presented either sorted by covariate (default) or by time point.
+\eqn{\lambda_1,\dots,\lambda_T}. The results are sorted either by covariate (default)
+or by time point.
 }
 \examples{
 # Computing summary table for object of class panelTVP.ZINB
-# NB: To reduces computational effort, we have drastically reduced the length
+# NB: To reduce computational effort, we have drastically reduced the length
 # of the Markov Chain. You should use a much longer chain in your applications.
 sim.zinb <- sim_panelTVP(n = 100,
                          Tmax = 4,

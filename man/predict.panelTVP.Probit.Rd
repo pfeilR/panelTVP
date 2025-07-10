@@ -18,7 +18,7 @@ be made, i.e., predictions for a given data set are only made for one specific t
 In case you want predictions for additional time points you need to repeatedly call this
 function.}
 
-\item{coverage}{coverage probability for prediction intervals - defaults to 95 \% coverage}
+\item{coverage}{coverage probability for prediction intervals - defaults to 95 percent coverage}
 
 \item{pop.pred}{logical value, if TRUE population-based predictions are made,
 that ignore the random effects structure, if FALSE the random effects structure
@@ -33,7 +33,7 @@ a list containing the following elements
 \item \code{predictive.distribution}: a matrix where each row contains draws
 from the posterior predictive distribution for the corresponding observation
 \item \code{predictive.summary}: posterior mean as well as HPD interval based on
-posterior predictive distribution, i.e., the most basic summary statistics
+posterior predictive distribution for each new observation
 }
 }
 \description{
@@ -43,7 +43,7 @@ Probit link.
 }
 \examples{
 # Predictions based on an object of class panelTVP.Probit
-# NB: To reduces computational effort, we have drastically reduced the length
+# NB: To reduce computational effort, we have drastically reduced the length
 # of the Markov Chain. You should use a much longer chain in your applications.
 sim.probit <- sim_panelTVP(n = 100,
                            Tmax = 4,

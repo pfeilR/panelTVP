@@ -6,7 +6,7 @@ Authors@R: c(
     person("Helga", "Wagner", , "helga.wagner@jku.at", role = "aut")
   )
 Description: This package contains functions for flexible Bayesian inference
- in panel studies, where Gaussian, binary and (zero-inflated) response variables
+ in panel studies, where Gaussian, binary and (zero-inflated) count variables
  can be analyzed in a regression setting. The model is flexible in the sense
  that parameters are allowed to vary over time. Moreover, shrinkage priors 
  are used to prevent overfitting and to identify whether an effect is 
@@ -30,6 +30,7 @@ Imports:
     truncnorm,
     utils,
     dplyr,
+    rlang,
     gridExtra,
     ggplot2
 Encoding: UTF-8

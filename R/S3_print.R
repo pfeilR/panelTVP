@@ -13,7 +13,7 @@
 #' @exportS3Method print panelTVP.Gaussian
 #' @examples
 #' # Printing object of class panelTVP.Gaussian
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.gaussian <- sim_panelTVP(n = 100,
 #'                              Tmax = 4,
@@ -62,7 +62,7 @@ You may use the following functions to get additional information:\n
 #' @exportS3Method print panelTVP.Probit
 #' @examples
 #' # Printing object of class panelTVP.Probit
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.probit <- sim_panelTVP(n = 100,
 #'                            Tmax = 4,
@@ -110,7 +110,7 @@ You may use the following functions to get additional information:\n
 #' @exportS3Method print panelTVP.Logit
 #' @examples
 #' # Printing object of class panelTVP.Logit
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.logit <- sim_panelTVP(n = 100,
 #'                           Tmax = 4,
@@ -158,7 +158,7 @@ You may use the following functions to get additional information:\n
 #' @exportS3Method print panelTVP.NegBin
 #' @examples
 #' # Printing object of class panelTVP.NegBin
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.negbin <- sim_panelTVP(n = 100,
 #'                            Tmax = 4,
@@ -207,7 +207,7 @@ You may use the following functions to get additional information:\n
 #' @exportS3Method print panelTVP.ZINB
 #' @examples
 #' # Printing object of class panelTVP.ZINB
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.zinb <- sim_panelTVP(n = 100,
 #'                          Tmax = 4,

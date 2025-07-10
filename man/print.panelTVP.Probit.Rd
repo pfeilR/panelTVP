@@ -17,7 +17,7 @@ of the information that is contained in an object of class \code{panelTVP.Probit
 }
 \examples{
 # Printing object of class panelTVP.Probit
-# NB: To reduces computational effort, we have drastically reduced the length
+# NB: To reduce computational effort, we have drastically reduced the length
 # of the Markov Chain. You should use a much longer chain in your applications.
 sim.probit <- sim_panelTVP(n = 100,
                            Tmax = 4,

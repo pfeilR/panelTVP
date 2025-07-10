@@ -10,7 +10,7 @@
 \item{x}{an object of class \code{panelTVP.ZINB}}
 
 \item{component}{either 'NegBin' or 'Logit' to create plots for either the count or the
-zero-inflation component, respectively - must be specified!}
+zero-inflation component (no default)}
 
 \item{nplots}{indicates how many plots should be printed on one page}
 
@@ -25,8 +25,8 @@ function either plots the effects of the Negative Binomial (or count) model, or
 the Logit (or zero-inflation) model.
 }
 \examples{
-# Plot results from an object of class panelTVP.NegBin
-# NB: To reduces computational effort, we have drastically reduced the length
+# Plot results from an object of class panelTVP.ZINB
+# NB: To reduce computational effort, we have drastically reduced the length
 # of the Markov Chain. You should use a much longer chain in your applications.
 sim.zinb <- sim_panelTVP(n = 100,
                          Tmax = 4,
@@ -46,6 +46,10 @@ res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
                      model = "ZINB")
 plot(res.zinb, nplots = 5, component = "NegBin") # effects that belong to count component
 plot(res.zinb, nplots = 5, component = "Logit") # effects that belong to zero-inflation component
+}
+\references{
+Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
+Springer Verlag, New York.
 }
 \author{
 Roman Pfeiler

@@ -18,12 +18,12 @@ to sort the output either by time point or covariate, respectively (default is c
 This \code{summary} function prints out a table that contains HPD-intervals,
 posterior means and standard deviations based on the posterior distributions of the
 time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
-\eqn{\lambda_1,\dots,\lambda_T}. The results are presented either sorted by covariate
+\eqn{\lambda_1,\dots,\lambda_T}. The results are sorted either by covariate
 (default) or by time point.
 }
 \examples{
 # Computing summary table for object of class panelTVP.Probit
-# NB: To reduces computational effort, we have drastically reduced the length
+# NB: To reduce computational effort, we have drastically reduced the length
 # of the Markov Chain. You should use a much longer chain in your applications.
 sim.probit <- sim_panelTVP(n = 100,
                            Tmax = 4,

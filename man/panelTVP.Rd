@@ -17,6 +17,22 @@ panelTVP(
   prior.load = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001, a.phi =
     1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi = TRUE,
     learn.kappa.zeta = TRUE, type = "rw2", c = 1, L0 = 1),
+  prior.reg_nb = list(d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001, b.tau =
+    10, nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi =
+    10, iota.tau = 1, iota.xi = 1, learn.a.tau = TRUE, learn.a.xi = TRUE, target.rate.tau
+    = 0.44, target.rate.xi = 0.44, learn.kappa.tau = TRUE, learn.kappa.xi = TRUE, type =
+    "rw2", c = 1, B0 = 1),
+  prior.load_nb = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
+    a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi = TRUE,
+    learn.kappa.zeta = TRUE, type = "rw2", c = 1, L0 = 1),
+  prior.reg_logit = list(d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001, b.tau
+    = 10, nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi
+    = 10, iota.tau = 1, iota.xi = 1, learn.a.tau = TRUE, learn.a.xi = TRUE,
+    target.rate.tau = 0.44, target.rate.xi = 0.44, learn.kappa.tau = TRUE, learn.kappa.xi
+    = TRUE, type = "rw2", c = 1, B0 = 1),
+  prior.load_logit = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
+    a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi = TRUE,
+    learn.kappa.zeta = TRUE, type = "rw2", c = 1, L0 = 1),
   mcmc.opt = list(chain.length = 12000, burnin = 2000, thin = 10, asis = TRUE),
   settings.NegBin = list(alpha.r = 2, beta.r = 1, expansion.steps = 10, width = 1,
     p.overrelax = 0, accuracy.overrelax = 10),
@@ -24,21 +40,23 @@ panelTVP(
 )
 }
 \arguments{
-\item{formula}{the usual formula argument in regression methods, e.g., as in \code{\link[=lm]{lm()}}
+\item{formula}{the usual formula argument in regression methods, e.g., as in \code{\link[=lm]{lm()}}.
+When fitting a Zero-Inflated Negative Binomial model, the covariates for the
+Negative Binomial (count) component and the Logit (zero-inflation) component are
+separated, e.g., \code{y ~ W1.nb | W1.logit + W2.logit} will consider the variable \code{W1.nb}
+for the count component and the variables \code{W1.logit} as well as \code{W2.logit} for the
+zero-inflation component of the model (no default)}
+
+\item{data}{a data frame that contains the variables of the formula argument
 (no default)}
 
-\item{data}{a data.frame containing the variables specified in the formula argument
-(no default)}
-
-\item{model}{a character indicating which model you want to estimate
-This parameter is either 'Gaussian', 'Probit', 'Logit' or 'NegBin' depending on
-whether you want to fit a model for Gaussian, Probit, Logit or Negative Binomial
-response data. In case you want to estimate a Zero-Inflated Negative Binomial
-model, please use the function \code{\link[=panelTVP_ZINB]{panelTVP_ZINB()}}, which was designed for
-this purpose}
+\item{model}{a character indicating which model should be estimated.
+This parameter is either 'Gaussian', 'Probit', 'Logit', 'NegBin' or 'ZINB' depending on
+whether a model for Gaussian, Probit, Logit, Negative Binomial or
+Zero-Inflated Negative Binomial response data should be fitted (no default)}
 
 \item{prior.reg}{a list of arguments for estimating the parameters of the regression
-part of the model. The arguments are:
+part of the model. This argument is ignored when \code{model = 'ZINB'}. The arguments are:
 \itemize{
 \item \code{d.tau}: shape parameter of Gamma prior for \eqn{\kappa^\tau}
 \item \code{e.tau}: rate parameter of Gamma prior for \eqn{\kappa^\tau}
@@ -67,7 +85,7 @@ with the value of argument \code{a.xi} used as starting value, if FALSE
 \code{learn.a.tau = FALSE})
 \item \code{xi.target.rate}: desired acceptance rate when updating
 \eqn{a^\xi} using Metropolis-Hastings (argument is ignored when
-\code{learn.a.xi = FALSE}
+\code{learn.a.xi = FALSE})
 \item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
 Gibbs-step with the value of argument \code{kappa.tau} used as starting value,
 if FALSE \eqn{\kappa^\tau = } \code{kappa.tau}
@@ -77,49 +95,204 @@ if FALSE \eqn{\kappa^\xi = } \code{kappa.xi}
 \item \code{type}: the type of prior you want on your regression effects;
 this argument is either "rw1" (RW1 shrinkage prior), "rw2" (RW2 shrinkage prior)
 or "ind" (independence prior)
-\item \code{c}: prior parameter that scales the variance when using the
-random walk shrinkage prior (ignored when using independence prior)
-\item \code{B0}: prior variance on the regression parameters when using the
+\item \code{c}: prior parameter that scales the variance when using
+shrinkage prior (ignored when using independence prior)
+\item \code{B0}: prior variance on the regression parameters when using
 independence prior (ignored when using shrinkage prior)
 }}
 
 \item{prior.var}{a list of arguments for estimating the homoscedastic error variance
-in a Gaussian/Normal model. For other models, this argument is ignored.
+in a Gaussian / Normal model. For other models, this argument is ignored.
 The arguments are:
 \itemize{
 \item \code{learn.C0.hyp}: this argument is a list containing the prior
-parameters for the prior variance \eqn{C_0} of \eqn{\sigma^2}
-\item \code{c0}: variance parameter of the Inverse-Gamma prior on \eqn{\sigma^2}
+parameters for the prior rate \eqn{C_0} of \eqn{\sigma^2}. The parameters are:
+\itemize{
+\item \code{g0}: shape parameter of Gamma prior on \eqn{C_0}
+\item \code{G0}: rate parameter of Gamma prior on \eqn{C_0}
+}
+\item \code{c0}: shape parameter of Inverse-Gamma prior on \eqn{\sigma^2}
 }}
 
 \item{prior.load}{a list of arguments for estimating the parameters of the factor
-part of the model. The arguments are:
+part of the model. This argument is ignored when \code{model = 'ZINB'}. The arguments are:
 \itemize{
 \item \code{d.phi}: shape parameter of Gamma prior for \eqn{\kappa^\phi}
 \item \code{e.phi}: rate parameter of Gamma prior for \eqn{\kappa^\phi}
 \item \code{d.zeta}: shape parameter of Gamma prior for \eqn{\kappa^\zeta}
 \item \code{e.zeta}: rate parameter of Gamma prior for \eqn{\kappa^\zeta}
-\item \code{a.phi}: shape parameter of the Gamma prior for \eqn{\phi^2_j}
-\item \code{kappa.phi}: part of the rate parameter of the Gamma prior for \eqn{\phi^2_j}
-\item \code{a.zeta}: shape parameter of the Gamma prior for \eqn{\zeta^2_j}
-\item \code{kappa.zeta}: part of the rate parameter of the Gamma prior for \eqn{\zeta^2_j}
+\item \code{a.phi}: shape parameter of the Gamma prior for \eqn{\phi^2}
+\item \code{kappa.phi}: part of the rate parameter of the Gamma prior for \eqn{\phi^2}
+\item \code{a.zeta}: shape parameter of the Gamma prior for \eqn{\zeta^2}
+\item \code{kappa.zeta}: part of the rate parameter of the Gamma prior for \eqn{\zeta^2}
 \item \code{learn.kappa.phi}: if TRUE \eqn{\kappa^\phi} is sampled in a
 Gibbs-step with the value of argument \code{kappa.phi} used as starting value,
 if FALSE \eqn{\kappa^\phi = } \code{kappa.phi}
-\item \code{learn.kappa_zeta}: if TRUE \eqn{\kappa^\zeta} is sampled in a
+\item \code{learn.kappa.zeta}: if TRUE \eqn{\kappa^\zeta} is sampled in a
 Gibbs-step with the value of argument \code{kappa.zeta} used as starting value,
 if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta}
 \item \code{type}: the type of prior you want on your regression effects;
 this argument is either "cps" (compound symmetric), "rw1" (RW1 shrinkage prior),
 "rw2" (RW2 shrinkage prior) or "ind" (independence prior)
-\item \code{c}: prior parameter that scales the variance when using the
-random walk shrinkage prior (ignored when using cps or independence prior)
-\item \code{L0}: prior variance on the factor loading (ignored when using shrinkage prior)
+\item \code{c}: prior parameter that scales the variance when using shrinkage prior
+(ignored when using cps or independence prior)
+\item \code{L0}: prior variance on the factor loading when using either cps or independence
+prior (ignored when using shrinkage prior)
 }
-Note that for the factor model, the hyperparameters \code{a_phi} and
-\code{a_zeta} have to be fixed and are not sampled using Metropolis-Hastings}
+Note that for the factor model, the hyperparameters \code{a.phi} and
+\code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings}
 
-\item{mcmc.opt}{a list containing information for the overall sampler.
+\item{prior.reg_nb}{A list of arguments for estimating the parameters of the regression
+part of the count model. This argument is only used when \code{model = 'ZINB'} and
+otherwise ignored. The arguments are:
+\itemize{
+\item \code{d.tau}: shape parameter of Gamma prior for \eqn{\kappa^\tau} (count model)
+\item \code{e.tau}: rate parameter of Gamma prior for \eqn{\kappa^\tau} (count model)
+\item \code{d.xi}: shape parameter of Gamma prior for \eqn{\kappa^\xi} (count model)
+\item \code{e.xi}: rate parameter of Gamma prior for \eqn{\kappa^\xi} (count model)
+\item \code{b.tau}: part of the rate parameter of the Gamma prior for \eqn{a^\tau} (count model)
+\item \code{nu.tau}: shape parameter of the Gamma prior for \eqn{a^\tau} (count model)
+\item \code{b.xi}: part of the rate parameter of the Gamma prior for \eqn{a^\xi} (count model)
+\item \code{nu.xi}: shape parameter of the Gamma prior for \eqn{a^\xi} (count model)
+\item \code{a.tau}: shape parameter of the Gamma prior for \eqn{\tau^2_j} (count model)
+\item \code{kappa.tau}: part of the rate parameter of the Gamma prior for \eqn{\tau^2_j} (count model)
+\item \code{a.xi}: shape parameter of the Gamma prior for \eqn{\xi^2_j} (count model)
+\item \code{kappa.xi}: part of the rate parameter of the Gamma prior for \eqn{\xi^2_j} (count model)
+\item \code{iota.tau}: proposal standard deviation for Metropolis-Hastings
+updating of \eqn{a^\tau} (count model)
+\item \code{iota.xi}: proposal standard deviation for Metropolis-Hastings
+updating of \eqn{a^\xi} (count model)
+\item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
+with the value of argument \code{a.tau} used as starting value, if FALSE
+\eqn{a^\tau =} \code{a.tau} (count model)
+\item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
+with the value of argument \code{a.xi} used as starting value, if FALSE
+\eqn{a^\xi =} \code{a.xi} (count model)
+\item \code{tau.target.rate}: desired acceptance rate when updating
+\eqn{a^\tau} using Metropolis-Hastings (argument is ignored when
+\code{learn.a.tau = FALSE}) (count model)
+\item \code{xi.target.rate}: desired acceptance rate when updating
+\eqn{a^\xi} using Metropolis-Hastings (argument is ignored when
+\code{learn.a.xi = FALSE}) (count model)
+\item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
+Gibbs-step with the value of argument \code{kappa.tau} used as starting value,
+if FALSE \eqn{\kappa^\tau = } \code{kappa.tau} (count model)
+\item \code{learn.kappa.xi}: if TRUE \eqn{\kappa^\xi} is sampled in a
+Gibbs-step with the value of argument \code{kappa.xi} used as starting value,
+if FALSE \eqn{\kappa^\xi = } \code{kappa.xi} (count model)
+\item \code{type}: the type of prior you want on your regression effects;
+this argument is either "rw1" (RW1 shrinkage prior), "rw2" (RW2 shrinkage prior)
+or "ind" (independence prior) (count model)
+\item \code{c}: prior parameter that scales the variance when using shrinkage prior
+(ignored when using independence prior) (count model)
+\item \code{B0}: prior variance on the regression parameters when using
+independence prior (ignored when using shrinkage prior) (count model)
+}}
+
+\item{prior.load_nb}{A list of arguments for estimating the parameters of the factor
+part of the count model. This argument is only used when \code{model = 'ZINB'} and
+otherwise ignored. The arguments are:
+\itemize{
+\item \code{d.phi}: shape parameter of Gamma prior for \eqn{\kappa^\phi} (count model)
+\item \code{e.phi}: rate parameter of Gamma prior for \eqn{\kappa^\phi} (count model)
+\item \code{d.zeta}: shape parameter of Gamma prior for \eqn{\kappa^\zeta} (count model)
+\item \code{e.zeta}: rate parameter of Gamma prior for \eqn{\kappa^\zeta} (count model)
+\item \code{a.phi}: shape parameter of the Gamma prior for \eqn{\phi^2} (count model)
+\item \code{kappa.phi}: part of the rate parameter of the Gamma prior for \eqn{\phi^2} (count model)
+\item \code{a.zeta}: shape parameter of the Gamma prior for \eqn{\zeta^2} (count model)
+\item \code{kappa.zeta}: part of the rate parameter of the Gamma prior for \eqn{\zeta^2} (count model)
+\item \code{learn.kappa.phi}: if TRUE \eqn{\kappa^\phi} is sampled in a
+Gibbs-step with the value of argument \code{kappa.phi} used as starting value,
+if FALSE \eqn{\kappa^\phi = } \code{kappa.phi} (count model)
+\item \code{learn.kappa.zeta}: if TRUE \eqn{\kappa^\zeta} is sampled in a
+Gibbs-step with the value of argument \code{kappa.zeta} used as starting value,
+if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta} (count model)
+\item \code{type}: the type of prior you want on your regression effects;
+this argument is either "cps" (compound symmetric), "rw1" (RW1 shrinkage prior),
+"rw2" (RW2 shrinkage prior) or "ind" (independence prior) (count model)
+\item \code{c}: prior parameter that scales the variance when using
+shrinkage prior (ignored when using cps or independence prior) (count model)
+\item \code{L0}: prior variance on the factor loading (ignored when using shrinkage prior) (count model)
+}
+Note that for the factor model, the hyperparameters \code{a.phi} and
+\code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings}
+
+\item{prior.reg_logit}{A list of arguments for estimating the parameters of the regression
+part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
+otherwise ignored. The arguments are:
+\itemize{
+\item \code{d.tau}: shape parameter of Gamma prior for \eqn{\kappa^\tau} (zero-inflation model)
+\item \code{e.tau}: rate parameter of Gamma prior for \eqn{\kappa^\tau} (zero-inflation model)
+\item \code{d.xi}: shape parameter of Gamma prior for \eqn{\kappa^\xi} (zero-inflation model)
+\item \code{e.xi}: rate parameter of Gamma prior for \eqn{\kappa^\xi} (zero-inflation model)
+\item \code{b.tau}: part of the rate parameter of the Gamma prior for \eqn{a^\tau} (zero-inflation model)
+\item \code{nu.tau}: shape parameter of the Gamma prior for \eqn{a^\tau} (zero-inflation model)
+\item \code{b.xi}: part of the rate parameter of the Gamma prior for \eqn{a^\xi} (zero-inflation model)
+\item \code{nu.xi}: shape parameter of the Gamma prior for \eqn{a^\xi} (zero-inflation model)
+\item \code{a.tau}: shape parameter of the Gamma prior for \eqn{\tau^2_j} (zero-inflation model)
+\item \code{kappa.tau}: part of the rate parameter of the Gamma prior for \eqn{\tau^2_j} (zero-inflation model)
+\item \code{a.xi}: shape parameter of the Gamma prior for \eqn{\xi^2_j} (zero-inflation model)
+\item \code{kappa.xi}: part of the rate parameter of the Gamma prior for \eqn{\xi^2_j} (zero-inflation model)
+\item \code{iota.tau}: proposal standard deviation for Metropolis-Hastings
+updating of \eqn{a^\tau} (zero-inflation model)
+\item \code{iota.xi}: proposal standard deviation for Metropolis-Hastings
+updating of \eqn{a^\xi} (zero-inflation model)
+\item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
+with the value of argument \code{a.tau} used as starting value, if FALSE
+\eqn{a^\tau =} \code{a.tau} (zero-inflation model)
+\item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
+with the value of argument \code{a.xi} used as starting value, if FALSE
+\eqn{a^\xi =} \code{a.xi} (zero-inflation model)
+\item \code{tau.target.rate}: desired acceptance rate when updating
+\eqn{a^\tau} using Metropolis-Hastings (argument is ignored when
+\code{learn.a.tau = FALSE}) (zero-inflation model)
+\item \code{xi.target.rate}: desired acceptance rate when updating
+\eqn{a^\xi} using Metropolis-Hastings (argument is ignored when
+\code{learn.a.xi = FALSE}) (zero-inflation model)
+\item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
+Gibbs-step with the value of argument \code{kappa.tau} used as starting value,
+if FALSE \eqn{\kappa^\tau = } \code{kappa.tau} (zero-inflation model)
+\item \code{learn.kappa.xi}: if TRUE \eqn{\kappa^\xi} is sampled in a
+Gibbs-step with the value of argument \code{kappa.xi} used as starting value,
+if FALSE \eqn{\kappa^\xi = } \code{kappa.xi} (zero-inflation model)
+\item \code{type}: the type of prior you want on your regression effects;
+this argument is either "rw1" (RW1 shrinkage prior), "rw2" (RW2 shrinkage prior)
+or "ind" (independence prior) (zero-inflation model)
+\item \code{c}: prior parameter that scales the variance when using
+shrinkage prior (ignored when using independence prior) (zero-inflation model)
+\item \code{B0}: prior variance on the regression parameters when using
+independence prior (ignored when using shrinkage prior) (zero-inflation model)
+}}
+
+\item{prior.load_logit}{A list of arguments for estimating the parameters of the factor
+part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
+otherwise ignored. The arguments are:
+\itemize{
+\item \code{d.phi}: shape parameter of Gamma prior for \eqn{\kappa^\phi} (zero-inflation model)
+\item \code{e.phi}: rate parameter of Gamma prior for \eqn{\kappa^\phi} (zero-inflation model)
+\item \code{d.zeta}: shape parameter of Gamma prior for \eqn{\kappa^\zeta} (zero-inflation model)
+\item \code{e.zeta}: rate parameter of Gamma prior for \eqn{\kappa^\zeta} (zero-inflation model)
+\item \code{a.phi}: shape parameter of the Gamma prior for \eqn{\phi^2} (zero-inflation model)
+\item \code{kappa.phi}: part of the rate parameter of the Gamma prior for \eqn{\phi^2} (zero-inflation model)
+\item \code{a.zeta}: shape parameter of the Gamma prior for \eqn{\zeta^2} (zero-inflation model)
+\item \code{kappa.zeta}: part of the rate parameter of the Gamma prior for \eqn{\zeta^2} (zero-inflation model)
+\item \code{learn.kappa.phi}: if TRUE \eqn{\kappa^\phi} is sampled in a
+Gibbs-step with the value of argument \code{kappa.phi} used as starting value,
+if FALSE \eqn{\kappa^\phi = } \code{kappa.phi} (zero-inflation model)
+\item \code{learn.kappa.zeta}: if TRUE \eqn{\kappa^\zeta} is sampled in a
+Gibbs-step with the value of argument \code{kappa.zeta} used as starting value,
+if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta} (zero-inflation model)
+\item \code{type}: the type of prior you want on your regression effects;
+this argument is either "cps" (compound symmetric), "rw1" (RW1 shrinkage prior),
+"rw2" (RW2 shrinkage prior) or "ind" (independence prior) (zero-inflation model)
+\item \code{c}: prior parameter that scales the variance when using
+shrinkage prior (ignored when using cps or independence prior) (zero-inflation model)
+\item \code{L0}: prior variance on the factor loading (ignored when using shrinkage prior) (zero-inflation model)
+}
+Note that for the factor model, the hyperparameters \code{a.phi} and
+\code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings}
+
+\item{mcmc.opt}{a list containing information on the overall sampler.
 The arguments are:
 \itemize{
 \item \code{chain.length}: the length of the Markov Chain (i.e., total number
@@ -134,7 +307,8 @@ Note that the final Markov Chain (after applying burn-in and thinning)
 is of length \deqn{\frac{\text{chain.length}-\text{burnin}}{\text{thin}}}}
 
 \item{settings.NegBin}{a list containing information for sampling the dispersion
-parameter r in the Negative Binomial model using univariate Slice sampling.
+parameter \eqn{r} in the Negative Binomial and Zero-Inflated Negative Binomial
+model using univariate Slice sampling.
 For other response distributions, this is ignored. The arguments are:
 \itemize{
 \item \code{alpha.r}: shape parameter of Gamma proposal
@@ -142,7 +316,7 @@ For other response distributions, this is ignored. The arguments are:
 \item \code{expansion.steps}: number of steps in stepping-out phase
 \item \code{width}: width of the slice interval
 \item \code{p.overrelax}: probability of performing an overrelaxation step;
-overrelaxation may help boosting sampling efficiency; when overrelaxation
+performing overrelaxation might increase sampling efficiency; when overrelaxation
 should not be used, set \code{p.overrelax = 0}
 \item \code{accuracy.overrelax}: accuracy in overrelaxation phase
 }
@@ -153,10 +327,13 @@ see the original paper on Slice sampling by Neal (2003)}
 (default yields 95 percent coverage)}
 }
 \value{
-The function returns an object of class \code{"panelTVP.Gaussian"},
-\code{"panelTVP.Probit"}, \code{"panelTVP.Logit"} or \code{"panelTVP.NegBin"}
-depending on whether a Gaussian, Probit, Logit or Negative Binomial model was
-fitted. The returned object contains a list of the following elements:
+The function returns an object of class \code{panelTVP.Gaussian},
+\code{panelTVP.Probit}, \code{panelTVP.Logit}, \code{panelTVP.NegBin} or
+\code{panelTVP.ZINB}
+depending on whether a Gaussian, Probit, Logit, Negative Binomial or
+Zero-Inflated Negative Binomial model was
+fitted. When either a Gaussian, Probit, Logit or Negative Binomial model was fitted,
+the returned object contains a list of the following elements:
 \describe{
 \item{data}{the data used for fitting the model and additional context information
 derived from the data}
@@ -169,15 +346,52 @@ corresponding rows contain the imputed values of every iteration.}
 \item{mcmc}{Markov Chains for every parameter except for the factor scores
 (to save memory)}
 \item{posterior}{preliminary summary of posterior results}
-\item{fmean}{posterior means of random effects}
+\item{fmean}{posterior means of factor scores}
 \item{model}{the fitted model}
 \item{acceptance.rates}{the achieved acceptance rates when using Metropolis-Hastings}
 \item{HPD.coverage}{coverage probability of HPD intervals (based on input)}
 \item{runtime}{total runtime of the sampler (measured in seconds)}
 \item{WAIC}{the Widely Applicable Information Criterion for model comparison
-(note that the WAIC is only computed by using the actually observed data,
+(note that the WAIC is only computed from the actually observed data,
 i.e., missing data are fully ignored when computing WAIC)}
 \item{learning.settings}{information on which parameters have been learned}
+\item{mcmc.settings}{details on the MCMC sampler}
+}
+When modelling a Zero-Inflated Negative Binomial response,
+the returned object contains a list of the following elements:
+\describe{
+\item{data}{the data used for fitting the model and additional context information
+derived from the data}
+\item{Y}{the \eqn{Tn \times M} response data matrix of every iteration of the chain,
+i.e., this matrix is only included in the output when missing response data
+were present and imputed via data augmentation. Each row of \code{Y} contains
+the sampled values of a specific observation. For observed data, the corresponding
+rows are essentially replicates of the same value. For missing data, the
+corresponding rows contain the imputed values of every iteration.}
+\item{mcmc_logit}{Markov Chains for every parameter except for the factor scores
+(to save memory) for the Logit component of the model}
+\item{mcmc_nb}{Markov Chains for every parameter except for the factor scores
+(to save memory) for the Negative Binomial component of the model}
+\item{posterior_logit}{preliminary summary of posterior results for the
+Logit component of the model}
+\item{posterior_nb}{preliminary summary of posterior results for the
+Negative Binomial component of the model}
+\item{fmean_logit}{posterior means of factor scores for the
+Logit component of the model}
+\item{fmean_nb}{posterior means of factor scores for the
+Negative Binomial component of the model}
+\item{model}{the fitted model}
+\item{acceptance.rates}{the achieved acceptance rates when using
+Metropolis-Hastings for both components of the model}
+\item{HPD.coverage}{coverage probability of HPD intervals (based on input)}
+\item{runtime}{total runtime of the sampler (measured in seconds)}
+\item{WAIC}{the Widely Applicable Information Criterion for model comparison
+(note that the WAIC is only computed from the actually observed data,
+i.e., missing data are fully ignored when computing WAIC)}
+\item{learning.settings_logit}{information on which parameters have been learned
+for the Logit component of the model}
+\item{learning.settings_nb}{information on which parameters have been learned
+for the Negative Binomial component of the model}
 \item{mcmc.settings}{details on the MCMC sampler}
 }
 }
@@ -185,15 +399,13 @@ i.e., missing data are fully ignored when computing WAIC)}
 This is the main function for fitting a flexible Bayesian panel data model
 in the time-varying parameter framework. By using shrinkage priors, it is
 possible to identify whether an effect is time-varying, time-invariant or zero.
-This function works for Gaussian, binary and Negative Binomial response data.
-When dealing with count data subject to zero-inflation, the function
-\code{\link[=panelTVP_ZINB]{panelTVP_ZINB()}} should be used instead.
+This function works for Gaussian, binary and (zero-inflated) Negative Binomial response data.
 }
 \details{
 This function fits a Bayesian time-varying parameter panel data model to a
 longitudinal response \eqn{y_{it}} for \eqn{i \in \{1,\dots,n\}} subjects that are observed
-at \eqn{t \in \{1,\dots,\text{T}\}}
-time point. The model is expressed in its non-centered form
+at \eqn{t \in \{1,\dots,T\}}
+time points. The model is expressed in its non-centered form
 (see Frühwirth-Schnatter and Wagner (2010) for details on this parameterization)
 as this makes it easier to place shrinkage priors on the model parameters.
 By using the non-centered parameterization, the response is linked to the
@@ -201,13 +413,13 @@ following linear predictor
 \deqn{\eta_{it} = \mathbf{x}_{it}^\top \boldsymbol{\beta} +
  \mathbf{x}_{it}^\top \boldsymbol{\Theta} \boldsymbol{\tilde{\beta}}_t +
   f_i\lambda + f_i \psi \tilde{\lambda}_t,}
-where \eqn{\mathbf{x}_{it}} is a d-dimensional column vector of covariate
+where \eqn{\mathbf{x}_{it}} is a \eqn{d}-dimensional column vector of covariate
 values for subject \eqn{i} at time \eqn{t}, \eqn{\boldsymbol{\beta}} is a d-dimensional
 column vector of fixed effects (including the intercept as first parameter),
 \eqn{\boldsymbol{\Theta} = \text{diag}(\theta_1,\dots,\theta_d)} is a
 diagonal matrix, where larger main diagonal elements indicate stronger variation
 of the regression effects over time, \eqn{\boldsymbol{\tilde{\beta}}_t}
-is a d-dimensional state vector that follows a Gaussian random walk,
+is a \eqn{d}-dimensional state vector that follows a Gaussian random walk,
 \eqn{f_i} is a subject-specific factor score, \eqn{\lambda} is the fixed loading,
 \eqn{\psi} is the standard deviation of the factor loading, where a larger value
 indicates stronger variation of the factor loading over time, and
@@ -220,9 +432,9 @@ model, standard priors from regression analysis can be used for all parameters.
 Following Bitto and Frühwirth-Schnatter (2019), we place hierarchical
 Normal-Gamma shrinkage priors on those parameters. This makes it possible to
 identify whether an effect is time-varying, time-invariant or zero and, thus,
-prevents the model from overfitting (i.e., it is reasonable to assume that not
+prevents the model from overfitting, i.e., it is reasonable to assume that not
 every covariate has a time-varying effect and without proper regularization
-estimates are likely less stable).
+estimates are likely less stable.
 The priors on the parameters are specified as
 \deqn{
  \begin{aligned}
@@ -239,8 +451,7 @@ The priors on the parameters are specified as
  \end{aligned}
  }
 The hyperparameters \eqn{a^\zeta,a^\phi} in the factor part of the model are
-held at fixed values (as in our simulations we have experienced instability issues
-when sampling those parameters of the factor model as well),
+held at fixed values,
 whereas all the other hyperparameters may either be held
 fixed or may be equipped with additional hyperpriors. In the latter case the
 following hyperpriors are considered:
@@ -257,8 +468,9 @@ Bayesian Lasso is a special case of the Normal-Gamma prior with \eqn{a = 1}.
 In our simulations we have achieved good results by using the Bayesian Lasso
 for the hyperparameters in the factor model (\eqn{a^\phi, a^\zeta}) and by sampling
 the hyperparameters in the regression model (\eqn{a^\tau, a^\xi}) using
-Metropolis-Hastings updates. However, we recommend to carry out a
-prior sensitivity analysis for the fixed hyperparameters.
+Metropolis-Hastings updates. For inference, we have adapted the MCMC sampler
+presented in Bitto and Frühwirth-Schnatter (2019) and implemented in the \code{R} package
+\code{shrinkTVP} (Knaus et al., 2021).
 
 The function \code{panelTVP} can handle the following popular regression models
 \itemize{
@@ -266,6 +478,7 @@ The function \code{panelTVP} can handle the following popular regression models
 \item Logit model (binary outcomes)
 \item Probit model (binary outcomes)
 \item Negative Binomial model (overdispersed count outcomes)
+\item Zero-Inflated Negative Binomial model (both zero-inflated and overdispersed count outcomes)
 }
 
 With a Gaussian (Normal) response, the model is given as follows
@@ -273,26 +486,113 @@ With a Gaussian (Normal) response, the model is given as follows
 where we place a hierarchical prior on the error variance
 \deqn{\sigma^2|c_0,C_0 \sim \mathcal{G}^{-1}(c_0,C_0), \quad C_0|g_0,G_0 \sim \mathcal{G}(g_0,G_0).}
 
-In the binary Logit model, the probability that \eqn{y_{it} = 1} is modelled
+In the binary Logit model, the conditional probability that \eqn{y_{it} = 1} is modelled
 via the Logit-link as
-\deqn{\mathbb{P}(y_{it} = 1) = \frac{\exp(\eta_{it})}{1+\exp(\eta_{it})},   }
+\deqn{\mathbb{P}(y_{it} = 1|\eta_{it}) = \frac{\exp(\eta_{it})}{1+\exp(\eta_{it})},   }
 whereas in the binary Probit model, this probability is modelled
 via the Probit-link as
-\deqn{\mathbb{P}(y_{it} = 1) = \Phi(\eta_{it}),}
+\deqn{\mathbb{P}(y_{it} = 1|\eta_{it}) = \Phi(\eta_{it}),}
 where \eqn{\Phi(\cdot)} denotes the standard Normal cumulative distribution function.
 
 For modelling overdispersed count data, we assume that the response is a realization
 of a Negative Binomial distribution with pmf given by
 \deqn{p(y_{it}|r,\eta_{it}) = \frac{\Gamma(y_{it}+r)}{\Gamma(r)y_{it}!}(1-q_{it})^r q_{it}^{y_{it}},
-  \quad q_{it} = \frac{\exp(\eta_{it})}{1+\exp{\eta_{it}}},}
+  \quad q_{it} = \frac{\exp(\eta_{it})}{1+\exp(\eta_{it})},}
 where we place a prior on the constant dispersion parameter
 \deqn{r|\alpha^r,\beta^r \sim \mathcal{G}(\alpha^r,\beta^r).}
-Note that we use this parameterization of the Negative Binomial distribution
-to facilitate posterior inference with Pólya-Gamma random variables
-(see Pillow and Scott, 2012).
+
+Inference in the Logit and Negative Binomial model is based on data augmentation using
+Pólya-Gamma random variables (see Pillow and Scott, 2012; Polson et al., 2013).
+
+For modelling both zero-inflated and overdispersed count
+data, we assume that there are two latent classes of zeros to account for the excess zeros:
+structural and at-risk zeros. A structural zero belongs to an observation that is not at risk of
+experiencing the event, whereas an at-risk zero belongs to an observation that is
+at-risk of experiencing the event but has for some reason a zero recorded.
+It is therefore assumed that the outcome in the Zero-Inflated Negative Binomial model
+\eqn{y_{it}} is a realization of a
+mixture distribution with a point mass at zero (for the structural zeros) and
+a standard Negative Binomial count model for observations that are at-risk,
+i.e., this includes both at-risk zeros and positive counts. The ZINB model
+can, thus, be stated as (Neelon, 2019)
+\deqn{ y_{it}|r,\mu_{it},w_{it} \sim (1-\pi_{it}) \cdot \mathbb{I}_{(w_{it} = 0)} + \pi_{it} \cdot \mathcal{NB}(\mu_{it},r) \mathbb{I}_{(w_{it}=1)},}
+where \eqn{w_{it}} is a latent at-risk indicator such that with probability
+\eqn{1-\pi_{it}, w_{it} = 0} and with probability \eqn{\pi_{it}, w_{it} = 1},
+and \eqn{\mu_{it}} is the mean of the Negative Binomial distribution.
+
+There are two separate linear predictors in the ZINB model. The first
+linear predictor \eqn{\eta_{it}^{\text{logit}}} is related to the zero-inflated
+part of the model through
+\deqn{\pi_{it} = \frac{\exp(\eta_{it}^{\text{logit}})}{1+\exp(\eta_{it}^{\text{logit}})},}
+whereas the second linear predictor \eqn{\eta_{it}^{\text{nb}}} is related to
+the count part of the model through
+\deqn{q_{it} = \frac{\exp(\eta_{it}^{\text{nb}})}{1+\exp(\eta_{it}^{\text{nb}})}.}
+Moreover, the mean of the count component is given as
+\deqn{\mu_{it} = r \exp(\eta_{it}^{\text{nb}}).}
+In every iteration of the MCMC sampler, the latent at-risk indicators \eqn{w_{it}} are updated
+and the parameters in the count model are estimated by using only the observations
+that are currently in the risk set. Note that for \eqn{y_{it} > 0} the at-risk indicators
+are fixed at \eqn{w_{it} = 1} in every iteration.
+
+If the response variable contains missing values, data augmentation is used to
+impute those values. This works for all models regardless of the distributional assumption.
 }
 \examples{
-1
+# Example 1: Gaussian Response, learn all possible parameters
+sim.gaussian <- sim_panelTVP(n = 100,
+                             Tmax = 4,
+                             beta = c(4,1,0,0),
+                             theta = c(1,0.5,0,0),
+                             lambda = 1,
+                             psi = 0.2,
+                             model = "Gaussian",
+                             sigma2 = 0.7)
+res.gaussian1 <- panelTVP(y ~ W1 + W2 + W3,
+                         data = sim.gaussian$observed,
+                         mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                         model = "Gaussian")
+
+# Example 2: Gaussian Response, Bayesian Lasso
+prior.reg <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg),
+                               list(learn.a.tau = FALSE, learn.a.xi = FALSE))
+res.gaussian2 <- panelTVP(y ~ W1 + W2 + W3,
+                         data = sim.gaussian$observed,
+                         prior.reg = prior.reg,
+                         mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                         model = "Gaussian")
+
+# Example 3: Logit Response, learn all possible parameters
+sim.logit <- sim_panelTVP(n = 100,
+                          Tmax = 4,
+                          beta = c(1,0.5,0,0),
+                          theta = c(0.8,0.5,0,0),
+                          lambda = 1,
+                          psi = 0.2,
+                          model = "Logit")
+res.logit <- panelTVP(y ~ W1 + W2 + W3,
+                      data = sim.logit$observed,
+                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                      model = "Logit")
+
+# Example 4: ZINB, learn all possible parameters
+sim.zinb <- sim_panelTVP(n = 100,
+                         Tmax = 4,
+                         beta.nb = c(0.5,-0.7,0,0),
+                         theta.nb = c(0.05,0.5,0,0),
+                         lambda.nb = 0.5,
+                         psi.nb = 0.02,
+                         beta.logit = c(-1,0.6,0,0),
+                         theta.logit = c(0,1,0,0),
+                         lambda.logit = 0.7,
+                         psi.logit = 0,
+                         r = 2,
+                         model = "ZINB")
+res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
+                     data = sim.zinb$observed,
+                     mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+                     model = "ZINB")
+
+
 }
 \references{
 Bitto, A. and Frühwirth-Schnatter, S. (2019). Achieving Shrinkage in a
@@ -302,6 +602,15 @@ Time-Varying Parameter Model Framework. In: Journal of Econometrics, 210,
 Frühwirth-Schnatter, S. and Wagner, H. (2010). Stochastic Model Specification
 Search for Gaussian and Partially Non-Gaussian State Space Models. Journal
 of Econometrics, 154, 85-100.
+
+Knaus, P., Bitto-Nemling, A., Cadonna, A. and Frühwirth-Schnatter, S. (2021).
+Shrinkage in the Time-Varying Parameter Model Framework using the R Package
+\code{shrinkTVP}. In: Journal of Statistical Software, 100, 1-32.
+
+Neal, R.M. (2003). Slice sampling. In: The Annals of Statistics, 31, 705-767.
+
+Neelon, B. (2019). Bayesian Zero-Inflated Negative Binomial Regression Based
+on Pólya-Gamma Mixtures. In: Bayesian Analysis, 14, 829-855.
 
 Pillow, J. and Scott, J. (2012). Fully Bayesian inference for neural models
 with negative-binomial spiking. In: Advances in neural information processing

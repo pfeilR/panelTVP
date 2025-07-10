@@ -12,7 +12,7 @@
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
 #'  function.
-#' @param coverage coverage probability for prediction intervals - defaults to 95 % coverage
+#' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
 #' @param pop.pred logical value, if TRUE population-based predictions are made,
 #'  that ignore the random effects structure, if FALSE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
@@ -25,13 +25,13 @@
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
 #'    from the posterior predictive distribution for the corresponding observation
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
-#'    posterior predictive distribution, i.e., the most basic summary statistics
+#'    posterior predictive distribution for each new observation
 #' }
 #'
 #' @exportS3Method predict panelTVP.Gaussian
 #' @examples
 #' # Predictions based on an object of class panelTVP.Gaussian
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.gaussian <- sim_panelTVP(n = 100,
 #'                              Tmax = 4,
@@ -79,7 +79,7 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
 #'  function.
-#' @param coverage coverage probability for prediction intervals - defaults to 95 % coverage
+#' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
 #' @param pop.pred logical value, if TRUE population-based predictions are made,
 #'  that ignore the random effects structure, if FALSE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
@@ -92,12 +92,12 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
 #'    from the posterior predictive distribution for the corresponding observation
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
-#'    posterior predictive distribution, i.e., the most basic summary statistics
+#'    posterior predictive distribution for each new observation
 #' }
 #' @exportS3Method predict panelTVP.Probit
 #' @examples
 #' # Predictions based on an object of class panelTVP.Probit
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.probit <- sim_panelTVP(n = 100,
 #'                            Tmax = 4,
@@ -144,7 +144,7 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
 #'  function.
-#' @param coverage coverage probability for prediction intervals - defaults to 95 % coverage
+#' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
 #' @param pop.pred logical value, if TRUE population-based predictions are made,
 #'  that ignore the random effects structure, if FALSE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
@@ -157,12 +157,12 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
 #'    from the posterior predictive distribution for the corresponding observation
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
-#'    posterior predictive distribution, i.e., the most basic summary statistics
+#'    posterior predictive distribution for each new observation
 #' }
 #' @exportS3Method predict panelTVP.Logit
 #' @examples
 #' # Predictions based on an object of class panelTVP.Logit
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.logit <- sim_panelTVP(n = 100,
 #'                           Tmax = 4,
@@ -208,7 +208,7 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
 #'  function.
-#' @param coverage coverage probability for prediction intervals - defaults to 95 % coverage
+#' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
 #' @param pop.pred logical value, if TRUE population-based predictions are made,
 #'  that ignore the random effects structure, if FALSE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
@@ -221,12 +221,12 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
 #'    from the posterior predictive distribution for the corresponding observation
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
-#'    posterior predictive distribution, i.e., the most basic summary statistics
+#'    posterior predictive distribution for each new observation
 #' }
 #' @exportS3Method predict panelTVP.NegBin
 #' @examples
 #' # Predictions based on an object of class panelTVP.NegBin
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.negbin <- sim_panelTVP(n = 100,
 #'                            Tmax = 4,
@@ -272,12 +272,12 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #'  the fitted model contains an intercept in the Negative Binomial part (count component)
 #' @param X_logit.new a matrix or data frame consisting of new data for the same variables
 #'  that were used for fitting the model. The first column must contain a 1, when
-#'  the fitted model contains an intercept in the zero-inflated part (zero-inflation component)
+#'  the fitted model contains an intercept in the Logit part (zero-inflation component)
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
 #'  function.
-#' @param coverage coverage probability for prediction intervals - defaults to 95 % coverage
+#' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
 #' @param pop.pred logical value, if TRUE population-based predictions are made,
 #'  that ignore the random effects structure, if FALSE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
@@ -290,12 +290,12 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
 #'    from the posterior predictive distribution for the corresponding observation
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
-#'    posterior predictive distribution, i.e., the most basic summary statistics
+#'    posterior predictive distribution for each new observation
 #' }
 #' @exportS3Method predict panelTVP.ZINB
 #' @examples
 #' # Predictions based on an object of class panelTVP.ZINB
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.zinb <- sim_panelTVP(n = 100,
 #'                          Tmax = 4,
@@ -314,18 +314,18 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                      model = "ZINB")
 #' # setting up design matrix for predicting two new observations
-#' X.new_nb <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+#' X_nb.new <- data.frame(cbind(c(1,1), # column of 1's for the intercept
 #'                              c(2,0),
 #'                              c(4,3),
 #'                              c(0,0)))
-#' colnames(X.new_nb) <- colnames(res.zinb$data$X_nb)
-#' X.new_logit <- data.frame(cbind(c(1,1), # column of 1's for the intercept
+#' colnames(X_nb.new) <- colnames(res.zinb$data$X_nb)
+#' X_logit.new <- data.frame(cbind(c(1,1), # column of 1's for the intercept
 #'                                 c(0.1,-0.5),
 #'                                 c(1,2),
 #'                                 c(4,3)))
-#' colnames(X.new_logit) <- colnames(res.zinb$data$X_logit)
+#' colnames(X_logit.new) <- colnames(res.zinb$data$X_logit)
 #' # prediction for the 2nd panel wave
-#' pp <- predict(res.zinb, X.new_nb = X.new_nb, X.new_logit = X.new_logit, timepoint = 2)
+#' pp <- predict(res.zinb, X_nb.new = X_nb.new, X_logit.new = X_logit.new, timepoint = 2)
 #' plot(density(pp$predictive.distribution[1,]))
 #' plot(density(pp$predictive.distribution[2,]))
 #' pp$predictive.summary

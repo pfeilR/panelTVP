@@ -16,12 +16,12 @@
 \description{
 This \code{plot} function produces effect plots for the time-varying parameters,
 i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
-\eqn{\lambda_1,\dots,\lambda_T} separately for each covariate Plots are produced
+\eqn{\lambda_1,\dots,\lambda_T} separately for each covariate. Plots are produced
 using the \code{ggplot2} library.
 }
 \examples{
 # Plot results from an object of class panelTVP.Probit
-# NB: To reduces computational effort, we have drastically reduced the length
+# NB: To reduce computational effort, we have drastically reduced the length
 # of the Markov Chain. You should use a much longer chain in your applications.
 sim.probit <- sim_panelTVP(n = 100,
                            Tmax = 4,
@@ -35,6 +35,10 @@ res.probit <- panelTVP(y ~ W1 + W2 + W3,
                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                        model = "Probit")
 plot(res.probit, nplots = 5)
+}
+\references{
+Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
+Springer Verlag, New York.
 }
 \author{
 Roman Pfeiler

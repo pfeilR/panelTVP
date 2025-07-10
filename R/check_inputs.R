@@ -68,11 +68,11 @@ check_sim <- function(n,
     if(!is.numeric(lambda.logit) || length(lambda.logit) > 1 || !is.finite(lambda.logit)) stop("Argument 'lambda.logit' must be finite numeric")
     if(!is.numeric(psi.logit) || length(psi.logit) > 1 || !is.finite(psi.logit)) stop("Argument 'psi.logit' must be finite numeric")
   }
-  if(!is.null(r) && (!is.numeric(r) || length(r) > 1 || !is.finite(r))){
-    stop("Argument 'r' must be a finite numeric")
+  if(!is.null(r) && (!is.numeric(r) || length(r) > 1 || r < 0 || !is.finite(r))){
+    stop("Argument 'r' must be a finite, positive numeric")
   }
-  if(!is.null(sigma2) && (!is.numeric(sigma2) || length(sigma2) > 1 || !is.finite(sigma2))){
-    stop("Argument 'sigma2' must be a finite numeric")
+  if(!is.null(sigma2) && (!is.numeric(sigma2) || length(sigma2) > 1 || sigma2 < 0 || !is.finite(sigma2))){
+    stop("Argument 'sigma2' must be a finite, positive numeric")
   }
 
 }

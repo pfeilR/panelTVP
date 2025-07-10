@@ -4,7 +4,7 @@
 #'   This \code{summary} function prints out a table that contains HPD-intervals,
 #'   posterior means and standard deviations based on the posterior distributions of the
 #'   time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
-#'   \eqn{\lambda_1,\dots,\lambda_T}. The results are presented either sorted by covariate
+#'   \eqn{\lambda_1,\dots,\lambda_T}. The results are sorted either by covariate
 #'   (default) or by time point.
 #'
 #' @param object an object of class \code{panelTVP.Gaussian}
@@ -16,7 +16,7 @@
 #' @exportS3Method summary panelTVP.Gaussian
 #' @examples
 #' # Computing summary table for object of class panelTVP.Gaussian
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.gaussian <- sim_panelTVP(n = 100,
 #'                              Tmax = 4,
@@ -51,7 +51,7 @@ Posterior Summary of the Bayesian Normal Model with Time-Varying Coefficients:
 #'   This \code{summary} function prints out a table that contains HPD-intervals,
 #'   posterior means and standard deviations based on the posterior distributions of the
 #'   time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
-#'   \eqn{\lambda_1,\dots,\lambda_T}. The results are presented either sorted by covariate
+#'   \eqn{\lambda_1,\dots,\lambda_T}. The results are sorted either by covariate
 #'   (default) or by time point.
 #'
 #' @param object an object of class \code{panelTVP.Probit}
@@ -63,7 +63,7 @@ Posterior Summary of the Bayesian Normal Model with Time-Varying Coefficients:
 #' @exportS3Method summary panelTVP.Probit
 #' @examples
 #' # Computing summary table for object of class panelTVP.Probit
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.probit <- sim_panelTVP(n = 100,
 #'                            Tmax = 4,
@@ -97,7 +97,7 @@ Posterior Summary of the Bayesian Probit Model with Time-Varying Coefficients:
 #'   This \code{summary} function prints out a table that contains HPD-intervals,
 #'   posterior means and standard deviations based on the posterior distributions of the
 #'   time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
-#'   \eqn{\lambda_1,\dots,\lambda_T}. The results are presented either sorted by covariate
+#'   \eqn{\lambda_1,\dots,\lambda_T}. The results are sorted either by covariate
 #'   (default) or by time point.
 #'
 #' @param object an object of class \code{panelTVP.Logit}
@@ -109,7 +109,7 @@ Posterior Summary of the Bayesian Probit Model with Time-Varying Coefficients:
 #' @exportS3Method summary panelTVP.Logit
 #' @examples
 #' # Computing summary table for object of class panelTVP.Logit
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.logit <- sim_panelTVP(n = 100,
 #'                           Tmax = 4,
@@ -143,7 +143,7 @@ Posterior Summary of the Bayesian Logit Model with Time-Varying Coefficients:
 #'   This \code{summary} function prints out a table that contains HPD-intervals,
 #'   posterior means and standard deviations based on the posterior distributions of the
 #'   time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
-#'   \eqn{\lambda_1,\dots,\lambda_T}. The results are presented either sorted by covariate
+#'   \eqn{\lambda_1,\dots,\lambda_T}. The results are sorted either by covariate
 #'   (default) or by time point.
 #'
 #' @param object an object of class \code{panelTVP.NegBin}
@@ -155,7 +155,7 @@ Posterior Summary of the Bayesian Logit Model with Time-Varying Coefficients:
 #' @exportS3Method summary panelTVP.NegBin
 #' @examples
 #' # Computing summary table for object of class panelTVP.NegBin
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.negbin <- sim_panelTVP(n = 100,
 #'                            Tmax = 4,
@@ -190,9 +190,8 @@ Posterior Summary of the Bayesian Negative Binomial Model with Time-Varying Coef
 #'   This \code{summary} function prints out a table that contains HPD-intervals,
 #'   posterior means and standard deviations based on the posterior distributions of the
 #'   time-varying parameters, i.e., \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and
-#'   \eqn{\lambda_1,\dots,\lambda_T}. The user can choose whether to show the results
-#'   of the Negative Binomial (count) model or the zer-inflation (Logit) model.
-#'   The results are presented either sorted by covariate (default) or by time point.
+#'   \eqn{\lambda_1,\dots,\lambda_T}. The results are sorted either by covariate (default)
+#'   or by time point.
 #'
 #' @param object an object of class \code{panelTVP.ZINB}
 #' @param by a single character that is either 'timepoint' or 'covariate'
@@ -203,7 +202,7 @@ Posterior Summary of the Bayesian Negative Binomial Model with Time-Varying Coef
 #' @exportS3Method summary panelTVP.ZINB
 #' @examples
 #' # Computing summary table for object of class panelTVP.ZINB
-#' # NB: To reduces computational effort, we have drastically reduced the length
+#' # NB: To reduce computational effort, we have drastically reduced the length
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.zinb <- sim_panelTVP(n = 100,
 #'                          Tmax = 4,

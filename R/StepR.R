@@ -604,17 +604,14 @@ sample.beta.ind <- function(y, df, sigma2, B0){
   Tmax <- df$Tmax
   d <- df$d
 
-  B0.inv <- diag(1/B0, Tmax*d)
-  X <- df$X
-  Xt <- as.data.frame(cbind(X, df$timeidx))
-  colnames(Xt)[ncol(Xt)] <- "t"
+  B0.inv <- Matrix::Diagonal(Tmax*d, 1/B0)
   X.split <- split(seq_len(nrow(df$X)), df$timeidx)
   X.split <- lapply(X.split, function(rows) df$X[rows, , drop = FALSE])
   X.big <- Matrix::bdiag(X.split)
-  Bn <- solve(crossprod(X.big) / sigma2 + B0.inv)
-  bn <- Bn %*% t(X.big) %*% y / sigma2
+  Bn <- Matrix::solve(Matrix::crossprod(X.big) / sigma2 + B0.inv)
+  bn <- Bn %*% Matrix::t(X.big) %*% y / sigma2
 
-  beta.ind <- MASS::mvrnorm(n = 1, mu = bn, Sigma = Bn)
+  beta.ind <- MASS::mvrnorm(n = 1, mu = as.numeric(bn), Sigma = as.matrix(Bn))
   beta.ind <- matrix(beta.ind, ncol = d, byrow = TRUE)
 
   return(beta.ind)
@@ -627,17 +624,14 @@ sample.beta.ind.PG <- function(z, df, W.sparse, B0){
   d <- df$d
   n <- df$n
 
-  B0.inv <- diag(1/B0, Tmax*d)
-  X <- df$X
-  Xt <- as.data.frame(cbind(X, df$timeidx))
-  colnames(Xt)[ncol(Xt)] <- "t"
+  B0.inv <- Matrix::Diagonal(Tmax*d,1/B0)
   X.split <- split(seq_len(nrow(df$X)), df$timeidx)
   X.split <- lapply(X.split, function(rows) df$X[rows, , drop = FALSE])
   X.big <- Matrix::bdiag(X.split)
-  Bn <- solve(crossprod(X.big, W.sparse) %*% X.big + B0.inv)
-  bn <- Bn %*% crossprod(X.big, W.sparse) %*% z
+  Bn <- Matrix::solve(Matrix::t(X.big) %*% W.sparse %*% X.big + B0.inv)
+  bn <- Bn %*% Matrix::t(X.big) %*% W.sparse %*% z
 
-  beta.ind <- MASS::mvrnorm(n = 1, mu = bn, Sigma = Bn)
+  beta.ind <- MASS::mvrnorm(n = 1, mu = as.numeric(bn), Sigma = as.matrix(Bn))
   beta.ind <- matrix(beta.ind, ncol = d, byrow = TRUE)
 
   return(beta.ind)

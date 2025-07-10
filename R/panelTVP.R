@@ -502,6 +502,7 @@
 #'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                          model = "Gaussian")
 #'
+#'
 #' @references
 #'
 #'  Bitto, A. and Frühwirth-Schnatter, S. (2019). Achieving Shrinkage in a

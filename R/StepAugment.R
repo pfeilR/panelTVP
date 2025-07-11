@@ -20,9 +20,9 @@ StepAugment <- function(eta.miss, model, sigma2 = NULL, r = NULL, risk.miss = NU
   }
 
   if(model == "ZINB"){
-    y.miss <- ifelse(risk.miss,
-                     MASS::rnegbin(m, mu = r * exp(eta.miss), theta = r),
-                     0)
+    risi <- risk.miss == TRUE
+    y.miss <- vector("numeric", m)
+    y.miss[risi] <- MASS::rnegbin(sum(risi), mu = r * exp(eta.miss[risi]), theta = r)
   }
 
   return(y.miss)

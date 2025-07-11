@@ -96,9 +96,10 @@ compute_fitted_ZINB <- function(result){
     f_i <- fmcmc[,i]
     eta <- rowSums(beta_t * matrix(rep(x_row, each = S), nrow = S)) +
       f_i * lambda_t
-    y.fit[o, ] <- ifelse(w[,o],
-                         MASS::rnegbin(S, mu = r * exp(eta), theta = r),
-                         0)
+    idx <- w[,o] == TRUE
+    y.draw <- vector(mode = "numeric", length = length(w[,o]))
+    y.draw[idx] <- MASS::rnegbin(sum(idx), mu = r[idx] * exp(eta[idx]), theta = r[idx])
+    y.fit[o, ] <- y.draw
   }
 
   return(y.fit)

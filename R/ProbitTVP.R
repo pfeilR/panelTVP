@@ -45,10 +45,11 @@ ProbitTVP <- function(df,
           reff.t[reff.t[,"t"]==t,-ncol(reff.t)]
       })
       eta <- do.call("rbind", eta)
-      z <- ifelse(df$y == 1,
-                  truncnorm::rtruncnorm(length(df$y), a = 0, b = Inf, mean = eta, sd = 1),
-                  truncnorm::rtruncnorm(length(df$y), a = -Inf, b = 0, mean = eta, sd = 1)
-                  )
+      z <- vector("numeric", length(df$y))
+      y1 <- df$y == 1
+      y0 <- df$y == 0
+      z[y0] <- truncnorm::rtruncnorm(sum(y0), a = -Inf, b = 0, mean = eta[y0,], sd = 1)
+      z[y1] <- truncnorm::rtruncnorm(sum(y1), a = 0, b = Inf, mean = eta[y1,], sd = 1)
 
       # Step R
 

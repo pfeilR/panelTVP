@@ -440,8 +440,10 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
       mcmc.eta_nb[, s] <- X_nb.new %*% mcmc.beta_nb[s,]
       mcmc.eta_logit[, s] <- X_logit.new %*% mcmc.beta_logit[s,]
       w <- rbinom(n, size = 1, prob = plogis(mcmc.eta_logit[,s]))
-      y.future[, s] <- ifelse(w == 1, MASS::rnegbin(n, mu = r[s] * exp(mcmc.eta_nb[,s]),
-                                              theta = r[s]), 0)
+      idx <- w == 1
+      y.draw <- vector(mode = "numeric", length = length(w))
+      y.draw[idx] <- MASS::rnegbin(sum(idx), mu = r[s] * exp(mcmc.eta_nb[idx,s]), theta = r[s])
+      y.future[, s] <- y.draw
     }
   } else{
     for(s in 1:S){
@@ -452,8 +454,10 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
       mcmc.eta_logit[, s] <- X_logit.new %*% mcmc.beta_logit[s,] +
         mcmc.lamb_logit[s] * fi_logit
       w <- rbinom(n, size = 1, prob = plogis(mcmc.eta_logit[,s]))
-      y.future[, s] <- ifelse(w == 1, MASS::rnegbin(n, mu = r[s] * exp(mcmc.eta_nb[,s]),
-                                              theta = r[s]), 0)
+      idx <- w == 1
+      y.draw <- vector(mode = "numeric", length = length(w))
+      y.draw[idx] <- MASS::rnegbin(sum(idx), mu = r[s] * exp(mcmc.eta_nb[idx,s]), theta = r[s])
+      y.future[, s] <- y.draw
     }
   }
 

@@ -41,5 +41,5 @@ summary(res.negbin) # default = ordering by covariate
 summary(res.negbin, by = "timepoint") # ordering by time point
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

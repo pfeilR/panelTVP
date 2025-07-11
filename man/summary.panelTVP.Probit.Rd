@@ -40,5 +40,5 @@ summary(res.probit) # default = ordering by covariate
 summary(res.probit, by = "timepoint") # ordering by time point
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

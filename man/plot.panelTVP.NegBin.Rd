@@ -35,12 +35,12 @@ res.negbin <- panelTVP(y ~ W1 + W2 + W3,
                        data = sim.negbin$observed,
                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                        model = "NegBin")
-plot(res.negbin, nplots = 5)
+plot(res.negbin, nplots = 1)
 }
 \references{
 Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
 Springer Verlag, New York.
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

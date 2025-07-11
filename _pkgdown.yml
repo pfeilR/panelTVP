@@ -1,4 +1,5 @@
 url: ~
 template:
   mathjax: true
-
+  params:
+    logo: man/figures/panelTVP_sticker.png

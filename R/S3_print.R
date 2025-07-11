@@ -9,7 +9,7 @@
 #'
 #' @name print.panelTVP.Gaussian
 #' @rdname print.panelTVP.Gaussian
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method print panelTVP.Gaussian
 #' @examples
 #' # Printing object of class panelTVP.Gaussian
@@ -59,7 +59,7 @@ You may use the following functions to get additional information:\n
 #' @param x an object of class \code{panelTVP.Probit}
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method print panelTVP.Probit
 #' @examples
 #' # Printing object of class panelTVP.Probit
@@ -108,7 +108,7 @@ You may use the following functions to get additional information:\n
 #' @param x an object of class \code{panelTVP.Logit}
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method print panelTVP.Logit
 #' @examples
 #' # Printing object of class panelTVP.Logit
@@ -157,7 +157,7 @@ You may use the following functions to get additional information:\n
 #' @param x an object of class \code{panelTVP.NegBin}
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method print panelTVP.NegBin
 #' @examples
 #' # Printing object of class panelTVP.NegBin
@@ -207,7 +207,7 @@ You may use the following functions to get additional information:\n
 #' @param x an object of class \code{panelTVP.ZINB}
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method print panelTVP.ZINB
 #' @examples
 #' # Printing object of class panelTVP.ZINB

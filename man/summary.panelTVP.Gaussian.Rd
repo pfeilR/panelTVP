@@ -41,5 +41,5 @@ summary(res.gaussian) # default = ordering by covariate
 summary(res.gaussian, by = "timepoint") # ordering by time point
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

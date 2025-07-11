@@ -12,7 +12,7 @@
 #'  to sort the output either by time point or covariate, respectively (default is covariate)
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method summary panelTVP.Gaussian
 #' @examples
 #' # Computing summary table for object of class panelTVP.Gaussian
@@ -59,7 +59,7 @@ Posterior Summary of the Bayesian Normal Model with Time-Varying Coefficients:
 #'  to sort the output either by time point or covariate, respectively (default is covariate)
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method summary panelTVP.Probit
 #' @examples
 #' # Computing summary table for object of class panelTVP.Probit
@@ -105,7 +105,7 @@ Posterior Summary of the Bayesian Probit Model with Time-Varying Coefficients:
 #'  to sort the output either by time point or covariate, respectively (default is covariate)
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method summary panelTVP.Logit
 #' @examples
 #' # Computing summary table for object of class panelTVP.Logit
@@ -151,7 +151,7 @@ Posterior Summary of the Bayesian Logit Model with Time-Varying Coefficients:
 #'  to sort the output either by time point or covariate, respectively (default is covariate)
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method summary panelTVP.NegBin
 #' @examples
 #' # Computing summary table for object of class panelTVP.NegBin
@@ -198,7 +198,7 @@ Posterior Summary of the Bayesian Negative Binomial Model with Time-Varying Coef
 #'  to sort the output either by time point or covariate, respectively (default is covariate)
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method summary panelTVP.ZINB
 #' @examples
 #' # Computing summary table for object of class panelTVP.ZINB

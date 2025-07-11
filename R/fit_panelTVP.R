@@ -6,7 +6,8 @@ fit_panelTVP <- function(formula,
                          prior.load,
                          mcmc.opt,
                          settings.NegBin,
-                         HPD.coverage){
+                         HPD.coverage,
+                         progress.bar){
 
   # Initialization
 
@@ -144,7 +145,8 @@ fit_panelTVP <- function(formula,
                           f_sum = f_sum,
                           f_mat = f_mat,
                           miss = miss,
-                          HPD.coverage = HPD.coverage)
+                          HPD.coverage = HPD.coverage,
+                          progress.bar = progress.bar)
     class(result) <- "panelTVP.Gaussian"
   }
 
@@ -162,7 +164,8 @@ fit_panelTVP <- function(formula,
                         f_sum = f_sum,
                         f_mat = f_mat,
                         miss = miss,
-                        HPD.coverage = HPD.coverage)
+                        HPD.coverage = HPD.coverage,
+                        progress.bar = progress.bar)
     class(result) <- "panelTVP.Probit"
   }
 
@@ -180,7 +183,8 @@ fit_panelTVP <- function(formula,
                        f_sum = f_sum,
                        f_mat = f_mat,
                        miss = miss,
-                       HPD.coverage = HPD.coverage)
+                       HPD.coverage = HPD.coverage,
+                       progress.bar = progress.bar)
     class(result) <- "panelTVP.Logit"
   }
 
@@ -199,7 +203,8 @@ fit_panelTVP <- function(formula,
                         f_sum = f_sum,
                         f_mat = f_mat,
                         miss = miss,
-                        HPD.coverage = HPD.coverage)
+                        HPD.coverage = HPD.coverage,
+                        progress.bar = progress.bar)
     class(result) <- "panelTVP.NegBin"
   }
 

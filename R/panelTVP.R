@@ -273,6 +273,7 @@
 #'  see the original paper on Slice sampling by Neal (2003)
 #' @param HPD.coverage coverage probability of highest posterior density intervals
 #'  (default yields 95 percent coverage)
+#' @param progress.bar if TRUE a progressbar is displayed, if FALSE the progress bar is omitted
 #'
 #' @description
 #' This is the main function for fitting a flexible Bayesian panel data model
@@ -637,7 +638,8 @@ panelTVP <- function(formula,
                        alpha.r = 2, beta.r = 1, expansion.steps = 10,
                        width = 1, p.overrelax = 0, accuracy.overrelax = 10
                      ),
-                     HPD.coverage = 0.95
+                     HPD.coverage = 0.95,
+                     progress.bar = FALSE
 ){
 
   # HERE COME THE CHECK FUNCTIONS ... check_panelTVP or smth like this
@@ -655,7 +657,8 @@ panelTVP <- function(formula,
                            prior.load = prior.load,
                            mcmc.opt = mcmc.opt,
                            settings.NegBin = settings.NegBin,
-                           HPD.coverage = HPD.coverage)
+                           HPD.coverage = HPD.coverage,
+                           progress.bar = progress.bar)
     # add WAIC and remove chain of factor scores to save memory
     result$WAIC <- compute_waic(result)
     result$fitted.values <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
@@ -695,7 +698,8 @@ panelTVP <- function(formula,
                                 prior.load_logit = prior.load_logit,
                                 mcmc.opt = mcmc.opt,
                                 settings.NegBin = settings.NegBin,
-                                HPD.coverage = HPD.coverage)
+                                HPD.coverage = HPD.coverage,
+                                progress.bar = progress.bar)
     # add WAIC and remove chain of factor scores and risk-indicators to save memory
     result$WAIC <- compute_waic(result)
     result$fitted.values <- compute_fitted_ZINB(result)

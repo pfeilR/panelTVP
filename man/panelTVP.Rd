@@ -36,7 +36,8 @@ panelTVP(
   mcmc.opt = list(chain.length = 12000, burnin = 2000, thin = 10, asis = TRUE),
   settings.NegBin = list(alpha.r = 2, beta.r = 1, expansion.steps = 10, width = 1,
     p.overrelax = 0, accuracy.overrelax = 10),
-  HPD.coverage = 0.95
+  HPD.coverage = 0.95,
+  progress.bar = FALSE
 )
 }
 \arguments{
@@ -325,6 +326,8 @@ see the original paper on Slice sampling by Neal (2003)}
 
 \item{HPD.coverage}{coverage probability of highest posterior density intervals
 (default yields 95 percent coverage)}
+
+\item{progress.bar}{if TRUE a progressbar is displayed, if FALSE the progress bar is omitted}
 }
 \value{
 The function returns an object of class \code{panelTVP.Gaussian},

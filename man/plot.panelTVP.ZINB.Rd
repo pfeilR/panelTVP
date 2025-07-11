@@ -44,13 +44,13 @@ res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
                      data = sim.zinb$observed,
                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                      model = "ZINB")
-plot(res.zinb, nplots = 5, component = "NegBin") # effects that belong to count component
-plot(res.zinb, nplots = 5, component = "Logit") # effects that belong to zero-inflation component
+plot(res.zinb, nplots = 1, component = "NegBin") # effects that belong to count component
+plot(res.zinb, nplots = 1, component = "Logit") # effects that belong to zero-inflation component
 }
 \references{
 Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
 Springer Verlag, New York.
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

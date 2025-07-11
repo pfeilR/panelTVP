@@ -14,14 +14,17 @@ GaussianTVP <- function(df,
                         f_sum,
                         f_mat,
                         miss,
-                        HPD.coverage){
+                        HPD.coverage,
+                        progress.bar){
 
   #progress bar
-  pb <- utils::txtProgressBar(min = 0,
-                       max = mcmc.opt$chain.length,
-                       char = "=",
-                       style = 3,
-                       width = 30)
+  if(progress.bar){
+    pb <- utils::txtProgressBar(min = 0,
+                         max = mcmc.opt$chain.length,
+                         char = "=",
+                         style = 3,
+                         width = 30)
+  }
 
   fi.count <- 1
   Y <- matrix(nrow = length(df$y), ncol = mcmc.opt$chain.length)
@@ -134,13 +137,13 @@ GaussianTVP <- function(df,
 
       res_frame[i,] <- res.i
       Y[,i] <- df$y # important for missings and computation of WAIC
-      utils::setTxtProgressBar(pb, i) # tracking progress
+      if(progress.bar) utils::setTxtProgressBar(pb, i) # tracking progress
 
     } # for-loop
 
   }) # system.time
 
-  close(pb)
+  if(progress.bar) close(pb)
   #print time
   print(paste("Algorithm took", time[3], "seconds"))
 

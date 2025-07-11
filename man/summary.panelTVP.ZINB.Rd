@@ -49,5 +49,5 @@ summary(res.zinb, component = "Logit") # default = ordering by covariate
 summary(res.zinb, by = "timepoint", component = "Logit") # ordering by time point
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

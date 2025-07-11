@@ -11,7 +11,8 @@ LogitTVP <- function(df,
                      f_sum,
                      f_mat,
                      miss,
-                     HPD.coverage){
+                     HPD.coverage,
+                     progress.bar){
 
   X.t <- cbind(df$X, t = df$timeidx)
   delta <- df$y - 1/2
@@ -20,12 +21,13 @@ LogitTVP <- function(df,
   Y <- matrix(nrow = length(df$y), ncol = mcmc.opt$chain.length)
 
   #progress bar
-  pb <- utils::txtProgressBar(min = 0,
-                       max = mcmc.opt$chain.length,
-                       char = "=",
-                       style = 3,
-                       width = 30)
-
+  if(progress.bar){
+    pb <- utils::txtProgressBar(min = 0,
+                         max = mcmc.opt$chain.length,
+                         char = "=",
+                         style = 3,
+                         width = 30)
+  }
   time <- system.time({
 
     for(i in 1:mcmc.opt$chain.length){
@@ -142,13 +144,13 @@ LogitTVP <- function(df,
 
       res_frame[i,] <- res.i
       Y[,i] <- df$y
-      utils::setTxtProgressBar(pb, i) # tracking progress
+      if(progress.bar) utils::setTxtProgressBar(pb, i) # tracking progress
 
     } # for-loop
 
   }) # system.time
 
-  close(pb)
+  if(progress.bar) close(pb)
   #print time
   print(paste("Algorithm took", time[3], "seconds"))
 

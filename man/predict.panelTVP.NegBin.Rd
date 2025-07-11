@@ -58,8 +58,8 @@ res.negbin <- panelTVP(y ~ W1 + W2 + W3,
                        model = "NegBin")
 # setting up design matrix for predicting two new observations
 X.new <- data.frame(cbind(c(1,1), # column of 1's for the intercept
-                          c(2,0),
-                          c(4,3),
+                          c(0.1,0),
+                          c(-0.5,0.4),
                           c(0,0)))
 colnames(X.new) <- colnames(res.negbin$data$X)
 # prediction for the 2nd panel wave
@@ -69,5 +69,5 @@ plot(density(pp$predictive.distribution[2,]))
 pp$predictive.summary
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

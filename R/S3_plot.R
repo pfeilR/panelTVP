@@ -10,7 +10,7 @@
 #' @param nplots indicates how many plots should be printed on one page
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method plot panelTVP.Gaussian
 #' @references
 #'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
@@ -31,7 +31,7 @@
 #'                          data = sim.gaussian$observed,
 #'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                          model = "Gaussian")
-#' plot(res.gaussian, nplots = 5)
+#' plot(res.gaussian, nplots = 1)
 plot.panelTVP.Gaussian <- function(x, nplots = 4, ...){
   plot_effects(summary_table = x$posterior, Tmax = x$data$Tmax, X = x$data$X, nplots = nplots)
 }
@@ -48,7 +48,7 @@ plot.panelTVP.Gaussian <- function(x, nplots = 4, ...){
 #' @param nplots indicates how many plots should be printed on one page
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method plot panelTVP.Probit
 #' @references
 #'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
@@ -68,7 +68,7 @@ plot.panelTVP.Gaussian <- function(x, nplots = 4, ...){
 #'                        data = sim.probit$observed,
 #'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                        model = "Probit")
-#' plot(res.probit, nplots = 5)
+#' plot(res.probit, nplots = 1)
 plot.panelTVP.Probit <- function(x, nplots = 4, ...){
   plot_effects(summary_table = x$posterior, Tmax = x$data$Tmax, X = x$data$X, nplots = nplots)
 }
@@ -85,7 +85,7 @@ plot.panelTVP.Probit <- function(x, nplots = 4, ...){
 #' @param nplots indicates how many plots should be printed on one page
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method plot panelTVP.Logit
 #' @references
 #'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
@@ -105,7 +105,7 @@ plot.panelTVP.Probit <- function(x, nplots = 4, ...){
 #'                       data = sim.logit$observed,
 #'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                       model = "Logit")
-#' plot(res.logit, nplots = 5)
+#' plot(res.logit, nplots = 1)
 plot.panelTVP.Logit <- function(x, nplots = 4, ...){
   plot_effects(summary_table = x$posterior, Tmax = x$data$Tmax, X = x$data$X, nplots = nplots)
 }
@@ -122,7 +122,7 @@ plot.panelTVP.Logit <- function(x, nplots = 4, ...){
 #' @param nplots indicates how many plots should be printed on one page
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method plot panelTVP.NegBin
 #' @references
 #'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
@@ -143,7 +143,7 @@ plot.panelTVP.Logit <- function(x, nplots = 4, ...){
 #'                        data = sim.negbin$observed,
 #'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                        model = "NegBin")
-#' plot(res.negbin, nplots = 5)
+#' plot(res.negbin, nplots = 1)
 plot.panelTVP.NegBin <- function(x, nplots = 4, ...){
   plot_effects(summary_table = x$posterior, Tmax = x$data$Tmax, X = x$data$X, nplots = nplots)
 }
@@ -164,7 +164,7 @@ plot.panelTVP.NegBin <- function(x, nplots = 4, ...){
 #' @param nplots indicates how many plots should be printed on one page
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @exportS3Method plot panelTVP.ZINB
 #' @references
 #'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
@@ -189,8 +189,8 @@ plot.panelTVP.NegBin <- function(x, nplots = 4, ...){
 #'                      data = sim.zinb$observed,
 #'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                      model = "ZINB")
-#' plot(res.zinb, nplots = 5, component = "NegBin") # effects that belong to count component
-#' plot(res.zinb, nplots = 5, component = "Logit") # effects that belong to zero-inflation component
+#' plot(res.zinb, nplots = 1, component = "NegBin") # effects that belong to count component
+#' plot(res.zinb, nplots = 1, component = "Logit") # effects that belong to zero-inflation component
 plot.panelTVP.ZINB <- function(x, component = NULL, nplots = 4, ...){
   if(is.null(component) || length(component) != 1 || !(component %in% c("NegBin", "Logit"))){
     stop("Argument 'component' must be either NegBin or Logit depending on which parameters you are interested in.")

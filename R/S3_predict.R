@@ -19,7 +19,7 @@
 #'  standard Normal prior - defaults to FALSE
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @returns a list containing the following elements
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
@@ -86,7 +86,7 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #'  standard Normal prior - defaults to FALSE
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @returns a list containing the following elements
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
@@ -151,7 +151,7 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #'  standard Normal prior - defaults to FALSE
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @returns a list containing the following elements
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
@@ -215,7 +215,7 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #'  standard Normal prior - defaults to FALSE
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @returns a list containing the following elements
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
@@ -242,8 +242,8 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #'                        model = "NegBin")
 #' # setting up design matrix for predicting two new observations
 #' X.new <- data.frame(cbind(c(1,1), # column of 1's for the intercept
-#'                           c(2,0),
-#'                           c(4,3),
+#'                           c(0.1,0),
+#'                           c(-0.5,0.4),
 #'                           c(0,0)))
 #' colnames(X.new) <- colnames(res.negbin$data$X)
 #' # prediction for the 2nd panel wave
@@ -284,7 +284,7 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #'  standard Normal prior - defaults to FALSE
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
-#' @author Roman Pfeiler
+#' @author Roman Pfeiler, Helga Wagner
 #' @returns a list containing the following elements
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws

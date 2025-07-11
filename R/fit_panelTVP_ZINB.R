@@ -6,7 +6,8 @@ fit_panelTVP_ZINB <- function(formula,
                               prior.load_logit,
                               mcmc.opt,
                               settings.NegBin,
-                              HPD.coverage){
+                              HPD.coverage,
+                              progress.bar){
 
   # Initialization
 
@@ -205,7 +206,8 @@ fit_panelTVP_ZINB <- function(formula,
                     f_mat_nb = f_mat_nb,
                     f_mat_logit = f_mat_logit,
                     miss = miss,
-                    HPD.coverage = HPD.coverage)
+                    HPD.coverage = HPD.coverage,
+                    progress.bar = progress.bar)
   class(result) <- "panelTVP.ZINB"
 
   return(result)

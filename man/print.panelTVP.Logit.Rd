@@ -33,5 +33,5 @@ res.logit <- panelTVP(y ~ W1 + W2 + W3,
 print(res.logit)
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

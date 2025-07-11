@@ -34,5 +34,5 @@ res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
 print(res.gaussian)
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

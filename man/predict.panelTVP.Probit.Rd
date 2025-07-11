@@ -69,5 +69,5 @@ plot(density(pp$predictive.distribution[2,]))
 pp$predictive.summary
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

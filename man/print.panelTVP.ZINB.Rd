@@ -38,5 +38,5 @@ res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
 print(res.zinb)
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

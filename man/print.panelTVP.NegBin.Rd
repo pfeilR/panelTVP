@@ -34,5 +34,5 @@ res.negbin <- panelTVP(y ~ W1 + W2 + W3,
 print(res.negbin)
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

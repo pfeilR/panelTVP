@@ -34,12 +34,12 @@ res.probit <- panelTVP(y ~ W1 + W2 + W3,
                        data = sim.probit$observed,
                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                        model = "Probit")
-plot(res.probit, nplots = 5)
+plot(res.probit, nplots = 1)
 }
 \references{
 Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
 Springer Verlag, New York.
 }
 \author{
-Roman Pfeiler
+Roman Pfeiler, Helga Wagner
 }

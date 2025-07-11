@@ -90,7 +90,7 @@ sim_Gaussian_Probit_Logit_NegBin <- function(n,
 
   }
 
-  if(model == "Probit"){
+  else if(model == "Probit"){
 
     ret <- list(observed = observed,
                 beta = betat,
@@ -99,7 +99,7 @@ sim_Gaussian_Probit_Logit_NegBin <- function(n,
 
   }
 
-  if(model == "Logit"){
+  else if(model == "Logit"){
 
     ret <- list(observed = observed,
                 beta = betat,
@@ -108,13 +108,13 @@ sim_Gaussian_Probit_Logit_NegBin <- function(n,
 
   }
 
-  if(model == "NegBin"){
+  else if(model == "NegBin"){
 
     ret <- list(observed = observed,
                 beta = betat,
                 lambda = lambdat,
                 r = r,
-                model = "Negative Binomial")
+                model = "NegBin")
 
   }
 
@@ -221,7 +221,8 @@ sim_ZINB <- function(n,
               beta.nb = betat.nb,
               lambda.logit = lambdat.logit,
               lambda.nb = lambdat.nb,
-              r = r)
+              r = r,
+              model = "ZINB")
   return(ret)
 
 }

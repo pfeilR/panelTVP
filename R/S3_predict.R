@@ -472,3 +472,4 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
   return(res)
 
 }
+

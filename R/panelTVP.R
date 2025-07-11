@@ -443,6 +443,8 @@
 #'    \item{WAIC}{the Widely Applicable Information Criterion for model comparison
 #'     (note that the WAIC is only computed from the actually observed data,
 #'     i.e., missing data are fully ignored when computing WAIC)}
+#'    \item{fitted.values}{the \eqn{Tn \times M} matrix that contains the posterior
+#'     predictive distribution for each observation (rows) and each MCMC draw (columns)}
 #'    \item{learning.settings}{information on which parameters have been learned}
 #'    \item{mcmc.settings}{details on the MCMC sampler}
 #'  }
@@ -477,6 +479,8 @@
 #'    \item{WAIC}{the Widely Applicable Information Criterion for model comparison
 #'     (note that the WAIC is only computed from the actually observed data,
 #'     i.e., missing data are fully ignored when computing WAIC)}
+#'    \item{fitted.values}{the \eqn{Tn \times M} matrix that contains the posterior
+#'     predictive distribution for each observation (rows) and each MCMC draw (columns)}
 #'    \item{learning.settings_logit}{information on which parameters have been learned
 #'       for the Logit component of the model}
 #'    \item{learning.settings_nb}{information on which parameters have been learned
@@ -571,9 +575,6 @@
 #'  Pfeiler, R. and Wagner, H. (2024). Shrinkage in a Bayesian Panel Data Model
 #'  with Time-Varying Coefficients. In: Einbeck, J. Maeng, H., Ogundium, E. and
 #'  Perrakis, K. (Editors): Developments in Statistical Modelling, Springer, 109-115.
-#'
-#'
-#'
 #' @import stats
 panelTVP <- function(formula,
                      data,
@@ -657,6 +658,7 @@ panelTVP <- function(formula,
                            HPD.coverage = HPD.coverage)
     # add WAIC and remove chain of factor scores to save memory
     result$WAIC <- compute_waic(result)
+    result$fitted.values <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
     result[["fmcmc"]] <- NULL
 
     # adding learning settings to output
@@ -696,6 +698,7 @@ panelTVP <- function(formula,
                                 HPD.coverage = HPD.coverage)
     # add WAIC and remove chain of factor scores and risk-indicators to save memory
     result$WAIC <- compute_waic(result)
+    result$fitted.values <- compute_fitted_ZINB(result)
     result[["fmcmc_logit"]] <- NULL
     result[["fmcmc_nb"]] <- NULL
     result[["mcmc_risk"]] <- NULL

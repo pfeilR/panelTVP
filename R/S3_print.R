@@ -39,6 +39,7 @@ print.panelTVP.Gaussian <- function(x, ...){
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
+  - fitted.values: The fitted values for each observation (rows) and each MCMC draw (columns). \n
   - learning.settings: Information on learning status of hyperparameters. \n
   - mcmc.settings: Details on MCMC sampler. \n
 You may use the following functions to get additional information:\n
@@ -87,6 +88,7 @@ print.panelTVP.Probit <- function(x, ...){
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
+  - fitted.values: The fitted values for each observation (rows) and each MCMC draw (columns). \n
   - learning.settings: Information on learning status of hyperparameters. \n
   - mcmc.settings: Details on MCMC sampler. \n
 You may use the following functions to get additional information:\n
@@ -135,6 +137,7 @@ print.panelTVP.Logit <- function(x, ...){
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
+  - fitted.values: The fitted values for each observation (rows) and each MCMC draw (columns). \n
   - learning.settings: Information on learning status of hyperparameters. \n
   - mcmc.settings: Details on MCMC sampler. \n
 You may use the following functions to get additional information:\n
@@ -184,6 +187,7 @@ print.panelTVP.NegBin <- function(x, ...){
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
+  - fitted.values: The fitted values for each observation (rows) and each MCMC draw (columns). \n
   - learning.settings: Information on learning status of hyperparameters. \n
   - mcmc.settings: Details on MCMC sampler. \n
 You may use the following functions to get additional information:\n
@@ -240,6 +244,7 @@ print.panelTVP.ZINB <- function(x, ...){
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
+  - fitted.values: The fitted values for each observation (rows) and each MCMC draw (columns). \n
   - learning.settings_logit: Information on learning status of hyperparameters. (Logit) \n
   - learning.settings_nb: Information on learning status of hyperparameters. (Negative Binomial) \n
   - mcmc.settings: Details on MCMC sampler. \n

@@ -354,6 +354,8 @@ corresponding rows contain the imputed values of every iteration.}
 \item{WAIC}{the Widely Applicable Information Criterion for model comparison
 (note that the WAIC is only computed from the actually observed data,
 i.e., missing data are fully ignored when computing WAIC)}
+\item{fitted.values}{the \eqn{Tn \times M} matrix that contains the posterior
+predictive distribution for each observation (rows) and each MCMC draw (columns)}
 \item{learning.settings}{information on which parameters have been learned}
 \item{mcmc.settings}{details on the MCMC sampler}
 }
@@ -388,6 +390,8 @@ Metropolis-Hastings for both components of the model}
 \item{WAIC}{the Widely Applicable Information Criterion for model comparison
 (note that the WAIC is only computed from the actually observed data,
 i.e., missing data are fully ignored when computing WAIC)}
+\item{fitted.values}{the \eqn{Tn \times M} matrix that contains the posterior
+predictive distribution for each observation (rows) and each MCMC draw (columns)}
 \item{learning.settings_logit}{information on which parameters have been learned
 for the Logit component of the model}
 \item{learning.settings_nb}{information on which parameters have been learned

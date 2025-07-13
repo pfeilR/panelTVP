@@ -1,0 +1,13 @@
+---
+title: "panelTVP"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{panelTVP}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup}
+library(panelTVP)
+```

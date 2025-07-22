@@ -120,12 +120,13 @@ zinbTVP <- function(df,
 
       # Step F
 
+      linpred_logit <- construct.lp(X = df.logit$X,
+                                    Time = df.logit$Tmax,
+                                    timeidx = df.logit$timeidx,
+                                    betat = betat_logit)
+
       if(random.effects){
 
-        linpred_logit <- construct.lp(X = df.logit$X,
-                                      Time = df.logit$Tmax,
-                                      timeidx = df.logit$timeidx,
-                                      betat = betat_logit)
         res.z_logit <- z_logit - linpred_logit
         stepF.out_logit <- stepF(response = res.z_logit,
                                  df = df.logit,
@@ -198,12 +199,13 @@ zinbTVP <- function(df,
 
       # Step F
 
+      linpred_nb <- construct.lp(X = df.nb$X,
+                                 Time = df.nb$Tmax,
+                                 timeidx = df.nb$timeidx,
+                                 betat = betat_nb)
+
       if(random.effects){
 
-        linpred_nb <- construct.lp(X = df.nb$X,
-                                   Time = df.nb$Tmax,
-                                   timeidx = df.nb$timeidx,
-                                   betat = betat_nb)
         res.z_nb <- z_nb - linpred_nb
         stepF.out_nb <- stepF(response = res.z_nb,
                               df = df.nb,

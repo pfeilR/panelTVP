@@ -68,12 +68,13 @@ LogitTVP <- function(df,
 
       # Step F
 
+      linpred <- construct.lp(X = df$X,
+                              Time = df$Tmax,
+                              timeidx = df$timeidx,
+                              betat = betat)
+
       if(random.effects){
 
-        linpred <- construct.lp(X = df$X,
-                                Time = df$Tmax,
-                                timeidx = df$timeidx,
-                                betat = betat)
         res.z <- z - linpred
         stepF.out <- stepF(response = res.z,
                            df = df,

@@ -1,10 +1,9 @@
 ---
-title: "panelTVP"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{panelTVP}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+title: "Titel der Vignette"
+author: "Ihr Name"
+date: "`r Sys.Date()`"
+output: rticles::jss_article
+bibliography: bibliography.bib # Optional, falls Sie Literaturverweise nutzen möchten
 ---
 
 

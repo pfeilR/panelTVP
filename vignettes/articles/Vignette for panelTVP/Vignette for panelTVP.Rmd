@@ -1,0 +1,131 @@
+---
+title: A Vignette for the \texttt{R} Package \texttt{panelTVP}
+author:
+  - name: Roman Pfeiler
+    email: roman.pfeiler@jku.at
+    correspondingauthor: true
+  - name: Helga Wagner
+    email: helga.wagner@jku.at
+address:
+  - code: Institute of Applied Statistics
+    organization: Johannes Kepler University
+    city: Linz
+    country: Austria
+abstract: |
+  In this vignette, the \texttt{R} package \texttt{panelTVP} is introduced. The package allows for the estimation of flexible Bayesian regression models for  panel data. The model is flexible in the sense that both regression effects and random intercepts are allowed to vary over time. The use of hierarchical shrinkage priors prevents 
+  overfitting and makes it possible to identify whether an effect is time-varying, time-invariant or zero. The response variable can either be Gaussian, binary or a (zero-inflated) count.
+keywords: 
+  - Bayesian statistics
+  - Panel data
+  - Time-varying parameter models
+  - Shrinkage priors
+  - Pólya-Gamma data augmentation
+journal: "An awesome journal"
+date: "`r Sys.Date()`"
+linenumbers: false
+numbersections: true
+bibliography: mybibfile.bib
+biblio-style: elsarticle-harv
+classoption: a4paper, preprint, 3p, authoryear 
+output: 
+  rticles::elsevier_article:
+    keep_tex: true
+    citation_package: natbib
+---
+
+# Introduction
+
+Panel data are commonly encountered in econometrics and the social sciences. When analyzing data from longitudinal studies, standard estimation techniques such as OLS (\textit{ordinary least squares}) are not appropriate as the repeated measurements of a subject are typically correlated. Therefore, models with random effects are used to account for the clustered data structure. 
+
+\texttt{panelTVP} makes it possible to estimate regression models with random effects and additionally allows the parameters to vary over time. To avoid overfitting, hierarchical shrinkage priors are considered. The method implemented in \texttt{panelTVP} was inspired by Bitto \& Frühwirth-Schnatter (2019) who discussed the use of shrinkage priors in time-varying parameter models for the analysis of time series data. Their method has later been implemented in the \texttt{R} package \texttt{shrinkTVP} (Knaus, Bitto-Nemling, Cadonna, Frühwirth-Schnatter, 2021), which was partly used for creating the algorithm in \texttt{panelTVP}. 
+
+The package supports Gaussian response data as well as binary (Probit and Logit link) and count outcomes. For analyzing count data, either a standard Negative Binomial or a Zero-Inflated Negative Binomial (ZINB) model can be fitted. Compared to a Poisson model, the use of the Negative Binomial distribution has the advantage that overdispersion can be handled more naturally through the overdispersion parameter of the Negative Binomial distribution.
+
+This vignette is structured as follows: Section 2 introduces the reader to the methodology. This includes the model, the prior distributions and basic information of the Markov Chain Monte Carlo (MCMC) sampler that is used in \texttt{panelTVP}. Details of the sampler are not discussed in this vignette. Section 3 provides a small case study for Gaussian response data, whereas Section 4 and 5 contain case studies for binary and count data, respectively. Section 6 concludes this vignette and provides a brief summary of the content in the package, which is followed by a discussion on the limitations of the package.
+
+# Methodology
+
+## Shrinkage in time-varying parameter panel models
+
+We consider a balanced panel $y_{it}$ with $t = 1,\dots,T$ observations for $i = 1,\dots,n$ subjects, where $y_{it}$ is either a Gaussian, binary or count response. The linear predictor of the model is given as 
+\begin{equation*}
+    \eta_{it} = \textbf{x}_{it}^\top \boldsymbol{\beta}_t + f_i\lambda_t,
+\end{equation*}
+where $\textbf{x}_{it}$ is a $d \times 1$ vector of covariate values (including a $1$ for the intercept as the first value), $\boldsymbol{\beta}_t$ is a $d \times 1$ vector of regression effects at time $t,$ $\lambda_t$ is a time-specific factor loading and $f_i$ is a subject-specific factor score. The factor model with time-specific factor loadings in $\eta_{it}$ can be interpreted as a model with a time-varying random intercept.
+
+The goal is now to identify whether an effect is time-varying, time-invariant or zero. For this, a random walk specification of the effects is considered, i.e.,
+\begin{equation*}
+\begin{aligned}
+    \boldsymbol{\beta}_t &= \boldsymbol{\beta}_{t-1} + \boldsymbol{\nu}^\beta_t, \quad &\boldsymbol{\nu}^\beta_t \sim \mathcal{N}(\textbf{0}, \textbf{Q}), \quad t= \{2,\dots,T\}, \\
+    \lambda_t &= \lambda_{t-1} + \nu^\lambda_t, \quad &\nu^\lambda_t \sim \mathcal{N}(0, \psi^2), \quad t= \{2,\dots,T\},  \\    
+\end{aligned}
+\end{equation*}
+where $\textbf{Q} = \text{diag}(\theta^2_1,\dots,\theta^2_d)$ and we assume that the process starts at $T=1$ with starting distributions
+\begin{equation*}
+    \begin{aligned}
+        \boldsymbol{\beta}_1 &\sim \mathcal{N}(\boldsymbol{\beta}, c^\beta\textbf{Q}), \\
+        \lambda_1 &\sim \mathcal{N}(\lambda, c^\lambda \psi^2).
+    \end{aligned}
+\end{equation*}
+Alternatively, it is also possible to let the processes start at $T=0.$ Simulations have shown that results are very similar when starting at $T=0$ or $T=1$.
+
+In order to place prior distributions on all model parameters, we exploit the non-centered parameterization that was used for state space models (Frühwirth-Schnatter and Wagner, 2010) 
+\begin{equation*}
+    \begin{aligned}
+        \boldsymbol{\beta}_t &= \boldsymbol{\beta} + \boldsymbol{\Theta} \tilde{\boldsymbol{\beta}}_t \\
+        \lambda_t &= \lambda + \psi \tilde{\lambda}_t.
+    \end{aligned}
+\end{equation*}
+where $\boldsymbol{\Theta} = \text{diag}(\theta_1,\dots,\theta_d).$
+
+In the non-centered representation the random processes are defined as
+\begin{equation*}
+\begin{aligned}
+    \tilde{\boldsymbol{\beta}}_t &= \tilde{\boldsymbol{\beta}}_{t-1} + \tilde{\boldsymbol{\nu}}^\beta_t, \quad \tilde{\boldsymbol{\nu}}^\beta_t \sim \mathcal{N}(\textbf{0}, \textbf{I}) \\
+    \tilde{\lambda}_t &= \tilde{\lambda}_{t-1} + \tilde{\nu}^\lambda_t, \quad \tilde{\nu}^\lambda_t \sim \mathcal{N}(0,1)
+\end{aligned}
+\end{equation*}
+with starting distributions $\tilde{\boldsymbol{\beta}}_0 \sim \mathcal{N}(\textbf{0},c^\beta \textbf{I})$ and $\tilde{\lambda}_0 \sim \mathcal{N}(0,c^\lambda)$ or $\tilde{\boldsymbol{\beta}}_1 \sim \mathcal{N}(\textbf{0},c^\beta \textbf{I})$ and $\tilde{\lambda}_1 \sim \mathcal{N}(0,c^\lambda)$ depending on the random walk specification.
+
+A major advantage when using the non-centered model representation is that the parameters of interest $\boldsymbol{\beta}, \boldsymbol{\Theta}, \lambda$ and $\psi$ are all regression coefficients and, thus, well-known prior distributions from regression analysis can be placed on those coefficients. As in Bitto and Frühwirth-Schnatter (2019) and Pfeiler and Wagner (2024), we consider Normal-Gamma shrinkage priors
+\begin{equation*}
+\begin{aligned}
+        \theta_j|\xi_j^2 &\sim \mathcal{N}(0,\xi^2_j), \quad \xi_j^2|a^\xi, \kappa^\xi \sim \mathcal{G}\Bigl(a^\xi, \frac{a^\xi \kappa^\xi}{2}\Bigr), \; j=\{1,\dots,d\}, \\
+        \beta_j|\tau_j^2 &\sim \mathcal{N}(0,\tau_j^2), \quad \tau_j^2|a^\tau, \kappa^\tau \sim \mathcal{G}\Bigl(a^\tau, \frac{a^\tau \kappa^\tau}{2}\Bigr),  \; j=\{1,\dots,d\}, \\
+        \psi|\zeta^2 &\sim \mathcal{N}(0,\zeta^2), \quad \zeta^2|a^\zeta, \kappa^\zeta \sim \mathcal{G}\Bigl(a^\zeta, \frac{a^\zeta \kappa^\zeta}{2}\Bigr), \\
+        \lambda|\phi^2 &\sim \mathcal{N}(0,\phi^2), \quad \phi^2|a^\phi, \kappa^\phi \sim \mathcal{G}\Bigl(a^\phi, \frac{a^\phi \kappa^\phi}{2}\Bigr),
+\end{aligned}
+\end{equation*}
+where the scale parameters of the stochastic processes $\theta_1,\dots\theta_d,\psi$ have support on $\mathbb{R}$ and are therefore defined as the positive and negative square root of the variance parameters $\theta^2_1,\dots,\theta^2_d,\psi^2.$ 
+
+## General MCMC sampling scheme
+
+## Data Augmentation for binary and count models
+
+## Zero-Inflated Negative Binomial model
+
+
+
+# Basic structure of \texttt{panelTVP}
+
+
+# Analyzing Gaussian response data
+
+
+# Analyzing binary response data
+
+
+# Analyzing zero-inflated and overdispersed count response data
+
+# Conclusion
+
+
+
+
+
+
+
+
+
+
+

@@ -46,8 +46,8 @@ check_sim <- function(n,
       stop("Arguments 'beta', 'theta', 'lambda', 'psi' must be of positive length")
     }
     if(length(beta) != length(theta)) stop("Argument 'beta' must be of same length as argument 'theta'")
-    if(!is.numeric(beta) || any(!is.finite(beta))) stop("Argument 'beta' must be vector of finite values")
-    if(!is.numeric(theta) || any(!is.finite(theta))) stop("Argument 'theta' must be vector of finite values")
+    if(!is.numeric(beta) || any(!is.finite(beta)) || length(beta) < 2) stop("Argument 'beta' must be vector of finite values with 2 or more elements")
+    if(!is.numeric(theta) || any(!is.finite(theta)) || length(theta) < 2) stop("Argument 'theta' must be vector of finite values with 2 or more elements")
     if(!is.numeric(lambda) || length(lambda) > 1 || !is.finite(lambda)) stop("Argument 'lambda' must be finite numeric")
     if(!is.numeric(psi) || length(psi) > 1 || !is.finite(psi)) stop("Argument 'psi' must be finite numeric")
   }
@@ -58,13 +58,13 @@ check_sim <- function(n,
       stop("Arguments 'beta.nb', 'theta.nb', 'lambda.nb', 'psi.nb', 'beta.logit', 'theta.logit', 'lambda.logit', 'psi.logit' must be of positive length")
     }
     if(length(beta.nb) != length(theta.nb)) stop("Argument 'beta.nb' must be of same length as argument 'theta.nb'")
-    if(!is.numeric(beta.nb) || any(!is.finite(beta.nb))) stop("Argument 'beta.nb' must be vector of finite values")
-    if(!is.numeric(theta.nb) || any(!is.finite(theta.nb))) stop("Argument 'theta.nb' must be vector of finite values")
+    if(!is.numeric(beta.nb) || any(!is.finite(beta.nb)) || length(beta.nb) < 2) stop("Argument 'beta.nb' must be vector of finite values with 2 or more elements")
+    if(!is.numeric(theta.nb) || any(!is.finite(theta.nb)) ||length(theta.nb) < 2) stop("Argument 'theta.nb' must be vector of finite values with 2 or more elements")
     if(!is.numeric(lambda.nb) || length(lambda.nb) > 1 || !is.finite(lambda.nb)) stop("Argument 'lambda.nb' must be finite numeric")
     if(!is.numeric(psi.nb) || length(psi.nb) > 1 || !is.finite(psi.nb)) stop("Argument 'psi.nb' must be finite numeric")
     if(length(beta.logit) != length(theta.logit)) stop("Argument 'beta.logit' must be of same length as argument 'theta.logit'")
-    if(!is.numeric(beta.logit) || any(!is.finite(beta.logit))) stop("Argument 'beta.logit' must be vector of finite values")
-    if(!is.numeric(theta.logit) || any(!is.finite(theta.logit))) stop("Argument 'theta.logit' must be vector of finite values")
+    if(!is.numeric(beta.logit) || any(!is.finite(beta.logit)) ||length(beta.logit) < 2) stop("Argument 'beta.logit' must be vector of finite values with 2 or more elements")
+    if(!is.numeric(theta.logit) || any(!is.finite(theta.logit)) ||length(theta.logit) < 2) stop("Argument 'theta.logit' must be vector of finite values with 2 or more elements")
     if(!is.numeric(lambda.logit) || length(lambda.logit) > 1 || !is.finite(lambda.logit)) stop("Argument 'lambda.logit' must be finite numeric")
     if(!is.numeric(psi.logit) || length(psi.logit) > 1 || !is.finite(psi.logit)) stop("Argument 'psi.logit' must be finite numeric")
   }

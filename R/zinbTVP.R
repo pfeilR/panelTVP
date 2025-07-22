@@ -23,6 +23,7 @@ zinbTVP <- function(df,
                     f_mat_logit,
                     miss,
                     HPD.coverage,
+                    random.effects,
                     progress.bar){
 
   r <- 1
@@ -119,33 +120,37 @@ zinbTVP <- function(df,
 
       # Step F
 
-      linpred_logit <- construct.lp(X = df.logit$X,
-                                    Time = df.logit$Tmax,
-                                    timeidx = df.logit$timeidx,
-                                    betat = betat_logit)
-      res.z_logit <- z_logit - linpred_logit
-      stepF.out_logit <- stepF(response = res.z_logit,
-                               df = df.logit,
-                               W.sparse = W.sparse_logit,
-                               W.dense = W.dense_logit,
-                               lambda = lambda_logit,
-                               alpha_lambda = alpha_lambda_logit,
-                               prior.load = prior.load_logit,
-                               estimation = "PG")
-      fi_logit <- stepF.out_logit$fi
-      lambda_logit <- stepF.out_logit$lambda
-      alpha_lambda_logit <- stepF.out_logit$alpha_lambda
-      prior.load_logit <- stepF.out_logit$prior.load
-      fv_logit <- rep(fi_logit, df.logit$Tmax)
-      if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
-        f_mat_logit[fi.count_logit,] <- fi_logit
-        fi.count_logit <- fi.count_logit+1
-        f_sum_logit <- f_sum_logit+fi_logit
-      }
-      if(!tv.load_logit){
-        reff_logit <- lambda_logit*fv_logit
-      } else{
-        reff_logit <- c(t(matrix(lambda_logit, ncol=df.logit$n, nrow=df.logit$Tmax)))*fv_logit
+      if(random.effects){
+
+        linpred_logit <- construct.lp(X = df.logit$X,
+                                      Time = df.logit$Tmax,
+                                      timeidx = df.logit$timeidx,
+                                      betat = betat_logit)
+        res.z_logit <- z_logit - linpred_logit
+        stepF.out_logit <- stepF(response = res.z_logit,
+                                 df = df.logit,
+                                 W.sparse = W.sparse_logit,
+                                 W.dense = W.dense_logit,
+                                 lambda = lambda_logit,
+                                 alpha_lambda = alpha_lambda_logit,
+                                 prior.load = prior.load_logit,
+                                 estimation = "PG")
+        fi_logit <- stepF.out_logit$fi
+        lambda_logit <- stepF.out_logit$lambda
+        alpha_lambda_logit <- stepF.out_logit$alpha_lambda
+        prior.load_logit <- stepF.out_logit$prior.load
+        fv_logit <- rep(fi_logit, df.logit$Tmax)
+        if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
+          f_mat_logit[fi.count_logit,] <- fi_logit
+          fi.count_logit <- fi.count_logit+1
+          f_sum_logit <- f_sum_logit+fi_logit
+        }
+        if(!tv.load_logit){
+          reff_logit <- lambda_logit*fv_logit
+        } else{
+          reff_logit <- c(t(matrix(lambda_logit, ncol=df.logit$n, nrow=df.logit$Tmax)))*fv_logit
+        }
+
       }
 
       # Sampling of dispersion parameter r -------------------------------------
@@ -193,33 +198,37 @@ zinbTVP <- function(df,
 
       # Step F
 
-      linpred_nb <- construct.lp(X = df.nb$X,
-                                 Time = df.nb$Tmax,
-                                 timeidx = df.nb$timeidx,
-                                 betat = betat_nb)
-      res.z_nb <- z_nb - linpred_nb
-      stepF.out_nb <- stepF(response = res.z_nb,
-                            df = df.nb,
-                            W.sparse = W.sparse_nb,
-                            W.dense = W.dense_nb,
-                            lambda = lambda_nb,
-                            alpha_lambda = alpha_lambda_nb,
-                            prior.load = prior.load_nb,
-                            estimation = "PG")
-      fi_nb <- stepF.out_nb$fi
-      lambda_nb <- stepF.out_nb$lambda
-      alpha_lambda_nb <- stepF.out_nb$alpha_lambda
-      prior.load_nb <- stepF.out_nb$prior.load
-      fv_nb <- rep(fi_nb, df.nb$Tmax)
-      if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
-        f_mat_nb[fi.count_nb,] <- fi_nb
-        fi.count_nb <- fi.count_nb+1
-        f_sum_nb <- f_sum_nb+fi_nb
-      }
-      if(!tv.load_nb){
-        reff_nb <- lambda_nb*fv_nb
-      }else{
-        reff_nb <- c(t(matrix(lambda_nb, ncol=df.nb$n, nrow=df.nb$Tmax)))*fv_nb
+      if(random.effects){
+
+        linpred_nb <- construct.lp(X = df.nb$X,
+                                   Time = df.nb$Tmax,
+                                   timeidx = df.nb$timeidx,
+                                   betat = betat_nb)
+        res.z_nb <- z_nb - linpred_nb
+        stepF.out_nb <- stepF(response = res.z_nb,
+                              df = df.nb,
+                              W.sparse = W.sparse_nb,
+                              W.dense = W.dense_nb,
+                              lambda = lambda_nb,
+                              alpha_lambda = alpha_lambda_nb,
+                              prior.load = prior.load_nb,
+                              estimation = "PG")
+        fi_nb <- stepF.out_nb$fi
+        lambda_nb <- stepF.out_nb$lambda
+        alpha_lambda_nb <- stepF.out_nb$alpha_lambda
+        prior.load_nb <- stepF.out_nb$prior.load
+        fv_nb <- rep(fi_nb, df.nb$Tmax)
+        if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
+          f_mat_nb[fi.count_nb,] <- fi_nb
+          fi.count_nb <- fi.count_nb+1
+          f_sum_nb <- f_sum_nb+fi_nb
+        }
+        if(!tv.load_nb){
+          reff_nb <- lambda_nb*fv_nb
+        }else{
+          reff_nb <- c(t(matrix(lambda_nb, ncol=df.nb$n, nrow=df.nb$Tmax)))*fv_nb
+        }
+
       }
 
       # Step Augment
@@ -318,7 +327,7 @@ zinbTVP <- function(df,
 
   if(progress.bar) close(pb)
   #print time
-  print(paste("Algorithm took", time[3], "seconds"))
+  print(paste("MCMC sampling finished in", round(time[3]), "seconds. Preparing results for final output ..."))
 
   # Setting Up Return Object ---------------------------------------------------
 

@@ -17,6 +17,7 @@ NegBinTVP <- function(df,
                       f_mat,
                       miss,
                       HPD.coverage,
+                      random.effects,
                       progress.bar){
 
   X.t <- cbind(df$X, t = df$timeidx)
@@ -97,33 +98,37 @@ NegBinTVP <- function(df,
 
       # Step F
 
-      linpred <- construct.lp(X = df$X,
-                              Time = df$Tmax,
-                              timeidx = df$timeidx,
-                              betat = betat)
-      res.z <- z - linpred
-      stepF.out <- stepF(response = res.z,
-                         df = df,
-                         W.sparse = W.sparse,
-                         W.dense = W.dense,
-                         lambda = lambda,
-                         alpha_lambda = alpha_lambda,
-                         prior.load = prior.load,
-                         estimation = "PG")
-      fi <- stepF.out$fi
-      lambda <- stepF.out$lambda
-      alpha_lambda <- stepF.out$alpha_lambda
-      prior.load <- stepF.out$prior.load
-      fv <- rep(fi, df$Tmax)
-      if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
-        f_mat[fi.count,] <- fi
-        fi.count <- fi.count+1
-        f_sum <- f_sum+fi
-      }
-      if(!tv.load){
-        reff <- lambda*fv
-      }else{
-        reff <- c(t(matrix(lambda, ncol=df$n, nrow=df$Tmax)))*fv
+      if(random.effects){
+
+        linpred <- construct.lp(X = df$X,
+                                Time = df$Tmax,
+                                timeidx = df$timeidx,
+                                betat = betat)
+        res.z <- z - linpred
+        stepF.out <- stepF(response = res.z,
+                           df = df,
+                           W.sparse = W.sparse,
+                           W.dense = W.dense,
+                           lambda = lambda,
+                           alpha_lambda = alpha_lambda,
+                           prior.load = prior.load,
+                           estimation = "PG")
+        fi <- stepF.out$fi
+        lambda <- stepF.out$lambda
+        alpha_lambda <- stepF.out$alpha_lambda
+        prior.load <- stepF.out$prior.load
+        fv <- rep(fi, df$Tmax)
+        if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
+          f_mat[fi.count,] <- fi
+          fi.count <- fi.count+1
+          f_sum <- f_sum+fi
+        }
+        if(!tv.load){
+          reff <- lambda*fv
+        }else{
+          reff <- c(t(matrix(lambda, ncol=df$n, nrow=df$Tmax)))*fv
+        }
+
       }
 
       # Step Augment (only in the presence of missings)
@@ -185,7 +190,7 @@ NegBinTVP <- function(df,
 
   if(progress.bar) close(pb)
   #print time
-  print(paste("Algorithm took", time[3], "seconds"))
+  print(paste("MCMC sampling finished in", round(time[3]), "seconds. Preparing results for final output ..."))
 
   # remove burnin
   res <- res_frame[res_frame[,"SimNr"] > mcmc.opt$burnin,]

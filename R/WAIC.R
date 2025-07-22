@@ -11,27 +11,49 @@ library(LaplacesDemon)
 # this is important as WAIC is based soley on likelihoods of observables!!!
 # (see also how brms handles this!)
 
-lp.model <- function(model){
+lp.model <- function(model, s, R){
 
   X <- cbind(model$data$X, t = model$data$timeidx)
-  fi <- model$fmcmc
+  d <- model$data$d
+  Tmax <- model$data$Tmax
+  mc <- model$mcmc
+  N <- nrow(X)
+  if(sum(startsWith(colnames(mc), "lambda_t")) == 1) cps <- TRUE else cps <- FALSE
+  X_split <- split(as.data.frame(X), X[,"t"])
+  if(cps) lambda_col <- "lambda_t"
+  eta_list <- vector("list", Tmax)
+  fi_matrix <- matrix(rnorm((N/Tmax)*R), ncol = R)
+  for(t in 1:Tmax){
+    Xt <- as.matrix(X_split[[as.character(t)]][, -ncol(X)])
+    beta_cols <- paste0("beta_t", 1:d, t)
+    if(!cps) lambda_col <- paste0("lambda_t", t)
+    lambda <- as.numeric(mc[s, lambda_col])
+    eta_fix <- Xt %*% mc[s, beta_cols]
+    eta_mat <- replicate(R, c(eta_fix)) + fi_matrix * lambda
+    eta_list[[t]] <- eta_mat
+  }
+
+  eta <- do.call(rbind, eta_list)  # gives me an (N × R) matrix
+  return(eta)
+
+}
+
+lp.model_no.fac <- function(model){
+
+  X <- cbind(model$data$X, t = model$data$timeidx)
   d <- model$data$d
   Tmax <- model$data$Tmax
   mc <- model$mcmc
   S <- nrow(mc)
   N <- nrow(X)
-  if(sum(startsWith(colnames(mc), "lambda_t")) == 1) cps <- TRUE
-  else cps <- FALSE
   eta <- matrix(NA, nrow = N, ncol = S)
   X_split <- split(as.data.frame(X), X[,"t"])
   for(s in 1:S){
     eta_s <- vector("list", Tmax)
-    if(cps) lambda_col <- "lambda_t"
     for(t in 1:Tmax){
       Xt <- as.matrix(X_split[[as.character(t)]][, -ncol(X)])
       beta_cols <- paste0("beta_t", 1:d, t)
-      if(!cps) lambda_col <- paste0("lambda_t", t)
-      eta_s[[t]] <- Xt %*% mc[s, beta_cols] + fi[s,] * mc[s, lambda_col]
+      eta_s[[t]] <- Xt %*% mc[s, beta_cols]
     }
     eta[,s] <- do.call("rbind", eta_s)
   }
@@ -98,47 +120,56 @@ lp.zinb <- function(model){
 
 }
 
-compute_waic <- function(model){
+compute_waic <- function(model, random.effects){
 
   m <- model$model
   idx.observed <- !is.na(model$data$y)
   y <- model$data$y[idx.observed]
+  R <- 100 # number of draws for Monte Carlo intergration for marginal likelihood
 
   if(m != "ZINB"){
 
-  eta <- lp.model(model)[idx.observed,]
-  S <- ncol(eta)
-  ll <- matrix(NA, nrow = length(y), ncol = S)
+    if(!random.effects) eta <- lp.model_no.fac(model)[idx.observed,]
+    S <- nrow(model$mcmc)
+    ll <- matrix(NA, nrow = length(y), ncol = S)
 
-  if(m == "Gaussian"){
-    sigma2 <- model$mcmc[,"sigma2"]
-    for(s in 1:S){
-      ll[,s] <- dnorm(y, mean = eta[,s], sd = sqrt(sigma2[s]), log = TRUE)
+    if(m == "Gaussian"){
+      sigma2 <- model$mcmc[,"sigma2"]
+      if(!random.effects){
+        for(s in 1:S){
+          ll[,s] <- dnorm(y, mean = eta[,s], sd = sqrt(sigma2[s]), log = TRUE)
+        }
+      } else{
+        for(s in 1:S){
+          eta <- lp.model(model, s = s, R = R)
+          l_r <- dnorm(y, mean = eta, sd = sqrt(sigma2[s]), log = FALSE)
+          ll[,s] <- log(rowMeans(l_r))
+        }
+      }
     }
-  }
 
-  if(m == "Probit"){
-    p <- pnorm(eta)
-    p <- pmax(pmin(p, 1 - 1e-4), 1e-4)
-    for(s in 1:S){
-      ll[,s] <- dbinom(y, size = 1, prob = p[,s], log = TRUE)
+    if(m == "Probit"){
+      p <- pnorm(eta)
+      p <- pmax(pmin(p, 1 - 1e-4), 1e-4)
+      for(s in 1:S){
+        ll[,s] <- dbinom(y, size = 1, prob = p[,s], log = TRUE)
+      }
     }
-  }
 
-  if(m == "Logit"){
-    p <- plogis(eta)
-    p <- pmax(pmin(p, 1 - 1e-4), 1e-4)
-    for(s in 1:S){
-      ll[,s] <- dbinom(y, size = 1, prob = p[,s], log = TRUE)
+    if(m == "Logit"){
+      p <- plogis(eta)
+      p <- pmax(pmin(p, 1 - 1e-4), 1e-4)
+      for(s in 1:S){
+        ll[,s] <- dbinom(y, size = 1, prob = p[,s], log = TRUE)
+      }
     }
-  }
 
-  if(m == "NegBin"){
-    r <- model$mcmc[,"r"]
-    for(s in 1:S){
-      ll[,s] <- dnbinom(y, size = r[s], mu = r[s] * exp(eta[,s]), log = TRUE)
+    if(m == "NegBin"){
+      r <- model$mcmc[,"r"]
+      for(s in 1:S){
+        ll[,s] <- dnbinom(y, size = r[s], mu = r[s] * exp(eta[,s]), log = TRUE)
+      }
     }
-  }
 
   } else{ # ZINB model
 

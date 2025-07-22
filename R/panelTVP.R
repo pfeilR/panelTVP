@@ -273,6 +273,9 @@
 #'  see the original paper on Slice sampling by Neal (2003)
 #' @param HPD.coverage coverage probability of highest posterior density intervals
 #'  (default yields 95 percent coverage)
+#' @param random.effects if TRUE (= default) a factor model is included for estimating
+#'  random effects, if FALSE the model does not contain random effects and, consequently,
+#'  priors on the parameters of the factor model are ignored
 #' @param progress.bar if TRUE a progressbar is displayed, if FALSE the progress bar is omitted
 #'
 #' @description
@@ -436,7 +439,7 @@
 #'    \item{mcmc}{Markov Chains for every parameter except for the factor scores
 #'     (to save memory)}
 #'    \item{posterior}{preliminary summary of posterior results}
-#'    \item{fmean}{posterior means of factor scores}
+#'    \item{fmean}{posterior means of factor scores (only when random effects are estimated)}
 #'    \item{model}{the fitted model}
 #'    \item{acceptance.rates}{the achieved acceptance rates when using Metropolis-Hastings}
 #'    \item{HPD.coverage}{coverage probability of HPD intervals (based on input)}
@@ -444,7 +447,7 @@
 #'    \item{WAIC}{the Widely Applicable Information Criterion for model comparison
 #'     (note that the WAIC is only computed from the actually observed data,
 #'     i.e., missing data are fully ignored when computing WAIC)}
-#'    \item{fitted.values}{the \eqn{Tn \times M} matrix that contains the posterior
+#'    \item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 #'     predictive distribution for each observation (rows) and each MCMC draw (columns)}
 #'    \item{learning.settings}{information on which parameters have been learned}
 #'    \item{mcmc.settings}{details on the MCMC sampler}
@@ -469,9 +472,9 @@
 #'    \item{posterior_nb}{preliminary summary of posterior results for the
 #'     Negative Binomial component of the model}
 #'    \item{fmean_logit}{posterior means of factor scores for the
-#'      Logit component of the model}
+#'      Logit component of the model (only when random effects are estimated)}
 #'    \item{fmean_nb}{posterior means of factor scores for the
-#'      Negative Binomial component of the model}
+#'      Negative Binomial component of the model (only when random effects are estimated)}
 #'    \item{model}{the fitted model}
 #'    \item{acceptance.rates}{the achieved acceptance rates when using
 #'       Metropolis-Hastings for both components of the model}
@@ -480,7 +483,7 @@
 #'    \item{WAIC}{the Widely Applicable Information Criterion for model comparison
 #'     (note that the WAIC is only computed from the actually observed data,
 #'     i.e., missing data are fully ignored when computing WAIC)}
-#'    \item{fitted.values}{the \eqn{Tn \times M} matrix that contains the posterior
+#'    \item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 #'     predictive distribution for each observation (rows) and each MCMC draw (columns)}
 #'    \item{learning.settings_logit}{information on which parameters have been learned
 #'       for the Logit component of the model}
@@ -639,6 +642,7 @@ panelTVP <- function(formula,
                        width = 1, p.overrelax = 0, accuracy.overrelax = 10
                      ),
                      HPD.coverage = 0.95,
+                     random.effects = TRUE,
                      progress.bar = FALSE
 ){
 
@@ -658,11 +662,31 @@ panelTVP <- function(formula,
                            mcmc.opt = mcmc.opt,
                            settings.NegBin = settings.NegBin,
                            HPD.coverage = HPD.coverage,
+                           random.effects = random.effects,
                            progress.bar = progress.bar)
+    # if not random effects structure requested, delete placeholders
+    if(!random.effects){
+      result$fmean <- NULL
+      result$mcmc <- result$mcmc[, !startsWith(colnames(result$mcmc), "lambda")]
+      result$mcmc <- result$mcmc[, !(colnames(result$mcmc) %in% c(
+        "psi", "phi2", "zeta2",
+        "a.phi", "kappa.phi",
+        "a.zeta", "kappa.zeta"))
+        ]
+      result$posterior <- result$posterior[!startsWith(rownames(result$posterior), "lambda"),]
+      result$posterior <- result$posterior[!(rownames(result$posterior) %in%
+                                             c("abs(psi)", "phi2", "zeta2",
+                                               "a.phi", "kappa.phi",
+                                               "a.zeta", "kappa.zeta")),]
+    }
     # add WAIC and remove chain of factor scores to save memory
-    result$WAIC <- compute_waic(result)
-    result$fitted.values <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
-    result[["fmcmc"]] <- NULL
+    # result$WAIC <- compute_waic(result, random.effects)
+    # if(random.effects){
+    #   result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
+    # } else{
+    #   result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin_no.fac(result)
+    # }
+    # result$fmcmc <- NULL
 
     # adding learning settings to output
     hyperpara <- c("a.xi", "a.tau", "kappa.xi", "kappa.tau", "kappa.zeta", "kappa.phi")
@@ -674,17 +698,9 @@ panelTVP <- function(formula,
     if(!(prior.load$type %in% c("rw1", "rw2"))) learn[5:6] <- NA
     result$learning.settings <- cbind(hyperpara, part, learn)
     colnames(result$learning.settings) <- c("hyperparameter", "model.part", "learned?")
-
+    if(!random.effects) result$learning.settings <- result$learning.settings[1:4,]
     # adding mcmc setting to output (incl. ASIS Boolean)
     result$mcmc.settings <- mcmc.opt
-
-    # rounding HPD lower bound to exactly 0 to cover cases that should be zero
-    # but do not include zero due to sign flip
-    index1 <- startsWith(rownames(result$posterior), "abs(")
-    result$posterior[index1, "LO"] <- ifelse(result$posterior[index1,"LO"] < 0.01, 0,
-                                             result$posterior[index1,"LO"])
-    result$posterior["lambda_t1","LO"] <- ifelse(result$posterior["lambda_t1","LO"] < 0.01, 0,
-                                                 result$posterior["lambda_t1","LO"])
 
   } else{
 
@@ -699,13 +715,14 @@ panelTVP <- function(formula,
                                 mcmc.opt = mcmc.opt,
                                 settings.NegBin = settings.NegBin,
                                 HPD.coverage = HPD.coverage,
+                                random.effects = random.effects,
                                 progress.bar = progress.bar)
     # add WAIC and remove chain of factor scores and risk-indicators to save memory
-    result$WAIC <- compute_waic(result)
-    result$fitted.values <- compute_fitted_ZINB(result)
-    result[["fmcmc_logit"]] <- NULL
-    result[["fmcmc_nb"]] <- NULL
-    result[["mcmc_risk"]] <- NULL
+    # result$WAIC <- compute_waic(result)
+    # result$posterior.predictive <- compute_fitted_ZINB(result)
+    # result$fmcmc_logit <- NULL
+    # result$fmcmc_nb <- NULL
+    # result$mcmc_risk <- NULL
 
     # adding learning settings to output
     hyperpara <- c("a.xi", "a.tau", "kappa.xi", "kappa.tau", "kappa.zeta", "kappa.phi")
@@ -724,22 +741,12 @@ panelTVP <- function(formula,
     colnames(result$learning.settings_nb) <- c("hyperparameter", "model.part", "learned?")
     result$learning.settings_logit <- cbind(hyperpara, part, learn_logit)
     colnames(result$learning.settings_logit) <- c("hyperparameter", "model.part", "learned?")
-
+    if(!random.effects){
+      result$learning.settings_logit <- result$learning.settings_logit[1:4,]
+      result$learning.settings_nb <- result$learning.settings_nb[1:4,]
+    }
     # adding mcmc setting to output (incl. ASIS Boolean)
     result$mcmc.settings <- mcmc.opt
-
-    # rounding HPD lower bound to exactly 0 to cover cases that should be zero
-    # but do not include zero due to sign flip
-    index1_nb <- startsWith(rownames(result$posterior_nb), "abs(")
-    result$posterior_nb[index1_nb, "LO"] <- ifelse(result$posterior_nb[index1_nb,"LO"] < 0.01, 0,
-                                                   result$posterior_nb[index1_nb,"LO"])
-    result$posterior_nb["lambda_t1","LO"] <- ifelse(result$posterior_nb["lambda_t1","LO"] < 0.01, 0,
-                                                    result$posterior_nb["lambda_t1","LO"])
-    index1_logit <- startsWith(rownames(result$posterior_logit), "abs(")
-    result$posterior_logit[index1_logit, "LO"] <- ifelse(result$posterior_logit[index1_logit,"LO"] < 0.01, 0,
-                                                         result$posterior_logit[index1_logit,"LO"])
-    result$posterior_logit["lambda_t1","LO"] <- ifelse(result$posterior_logit["lambda_t1","LO"] < 0.01, 0,
-                                                       result$posterior_logit["lambda_t1","LO"])
 
   }
 

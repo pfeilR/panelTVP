@@ -37,6 +37,7 @@ panelTVP(
   settings.NegBin = list(alpha.r = 2, beta.r = 1, expansion.steps = 10, width = 1,
     p.overrelax = 0, accuracy.overrelax = 10),
   HPD.coverage = 0.95,
+  random.effects = TRUE,
   progress.bar = FALSE
 )
 }
@@ -327,6 +328,10 @@ see the original paper on Slice sampling by Neal (2003)}
 \item{HPD.coverage}{coverage probability of highest posterior density intervals
 (default yields 95 percent coverage)}
 
+\item{random.effects}{if TRUE (= default) a factor model is included for estimating
+random effects, if FALSE the model does not contain random effects and, consequently,
+priors on the parameters of the factor model are ignored}
+
 \item{progress.bar}{if TRUE a progressbar is displayed, if FALSE the progress bar is omitted}
 }
 \value{
@@ -349,7 +354,7 @@ corresponding rows contain the imputed values of every iteration.}
 \item{mcmc}{Markov Chains for every parameter except for the factor scores
 (to save memory)}
 \item{posterior}{preliminary summary of posterior results}
-\item{fmean}{posterior means of factor scores}
+\item{fmean}{posterior means of factor scores (only when random effects are estimated)}
 \item{model}{the fitted model}
 \item{acceptance.rates}{the achieved acceptance rates when using Metropolis-Hastings}
 \item{HPD.coverage}{coverage probability of HPD intervals (based on input)}
@@ -357,7 +362,7 @@ corresponding rows contain the imputed values of every iteration.}
 \item{WAIC}{the Widely Applicable Information Criterion for model comparison
 (note that the WAIC is only computed from the actually observed data,
 i.e., missing data are fully ignored when computing WAIC)}
-\item{fitted.values}{the \eqn{Tn \times M} matrix that contains the posterior
+\item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 predictive distribution for each observation (rows) and each MCMC draw (columns)}
 \item{learning.settings}{information on which parameters have been learned}
 \item{mcmc.settings}{details on the MCMC sampler}
@@ -382,9 +387,9 @@ Logit component of the model}
 \item{posterior_nb}{preliminary summary of posterior results for the
 Negative Binomial component of the model}
 \item{fmean_logit}{posterior means of factor scores for the
-Logit component of the model}
+Logit component of the model (only when random effects are estimated)}
 \item{fmean_nb}{posterior means of factor scores for the
-Negative Binomial component of the model}
+Negative Binomial component of the model (only when random effects are estimated)}
 \item{model}{the fitted model}
 \item{acceptance.rates}{the achieved acceptance rates when using
 Metropolis-Hastings for both components of the model}
@@ -393,7 +398,7 @@ Metropolis-Hastings for both components of the model}
 \item{WAIC}{the Widely Applicable Information Criterion for model comparison
 (note that the WAIC is only computed from the actually observed data,
 i.e., missing data are fully ignored when computing WAIC)}
-\item{fitted.values}{the \eqn{Tn \times M} matrix that contains the posterior
+\item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 predictive distribution for each observation (rows) and each MCMC draw (columns)}
 \item{learning.settings_logit}{information on which parameters have been learned
 for the Logit component of the model}

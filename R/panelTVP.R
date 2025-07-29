@@ -681,12 +681,12 @@ panelTVP <- function(formula,
     }
     # add WAIC and remove chain of factor scores to save memory
     # result$WAIC <- compute_waic(result, random.effects)
-    # if(random.effects){
-    #   result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
-    # } else{
-    #   result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin_no.fac(result)
-    # }
-    # result$fmcmc <- NULL
+    if(random.effects){
+      result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
+    } else{
+      result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin_no.fac(result)
+    }
+    result$fmcmc <- NULL
 
     # adding learning settings to output
     hyperpara <- c("a.xi", "a.tau", "kappa.xi", "kappa.tau", "kappa.zeta", "kappa.phi")
@@ -717,12 +717,43 @@ panelTVP <- function(formula,
                                 HPD.coverage = HPD.coverage,
                                 random.effects = random.effects,
                                 progress.bar = progress.bar)
+    # if not random effects structure requested, delete placeholders
+    if(!random.effects){
+      result$fmean_nb <- NULL
+      result$fmean_logit <- NULL
+      result$mcmc_nb <- result$mcmc_nb[, !startsWith(colnames(result$mcmc_nb), "lambda")]
+      result$mcmc_logit <- result$mcmc_logit[, !startsWith(colnames(result$mcmc_logit), "lambda")]
+      result$mcmc_nb <- result$mcmc_nb[, !(colnames(result$mcmc_nb) %in% c(
+        "psi", "phi2", "zeta2",
+        "a.phi", "kappa.phi",
+        "a.zeta", "kappa.zeta"))
+      ]
+      result$mcmc_logit <- result$mcmc_logit[, !(colnames(result$mcmc_logit) %in% c(
+        "psi", "phi2", "zeta2",
+        "a.phi", "kappa.phi",
+        "a.zeta", "kappa.zeta"))
+      ]
+      result$posterior_nb <- result$posterior_nb[!startsWith(rownames(result$posterior_nb), "lambda"),]
+      result$posterior_nb <- result$posterior_nb[!(rownames(result$posterior_nb) %in%
+                                               c("abs(psi)", "phi2", "zeta2",
+                                                 "a.phi", "kappa.phi",
+                                                 "a.zeta", "kappa.zeta")),]
+      result$posterior_logit <- result$posterior_logit[!startsWith(rownames(result$posterior_logit), "lambda"),]
+      result$posterior_logit <- result$posterior_logit[!(rownames(result$posterior_logit) %in%
+                                                     c("abs(psi)", "phi2", "zeta2",
+                                                       "a.phi", "kappa.phi",
+                                                       "a.zeta", "kappa.zeta")),]
+    }
     # add WAIC and remove chain of factor scores and risk-indicators to save memory
     # result$WAIC <- compute_waic(result)
-    # result$posterior.predictive <- compute_fitted_ZINB(result)
-    # result$fmcmc_logit <- NULL
-    # result$fmcmc_nb <- NULL
-    # result$mcmc_risk <- NULL
+    if(random.effects){
+      result$posterior.predictive <- compute_fitted_ZINB(result)
+    } else{
+      result$posterior.predictive <- compute_fitted_ZINB_no.fac(result)
+    }
+    result$fmcmc_logit <- NULL
+    result$fmcmc_nb <- NULL
+    result$mcmc_risk <- NULL
 
     # adding learning settings to output
     hyperpara <- c("a.xi", "a.tau", "kappa.xi", "kappa.tau", "kappa.zeta", "kappa.phi")
@@ -737,13 +768,13 @@ panelTVP <- function(formula,
                      prior.load_logit$learn.kappa.zeta, prior.load_logit$learn.kappa.phi)
     if(!(prior.reg_logit$type %in% c("rw1", "rw2"))) learn_logit[1:4] <- NA
     if(!(prior.load_logit$type %in% c("rw1", "rw2"))) learn_logit[5:6] <- NA
-    result$learning.settings_nb <- cbind(hyperpara, part, learn_nb)
-    colnames(result$learning.settings_nb) <- c("hyperparameter", "model.part", "learned?")
     result$learning.settings_logit <- cbind(hyperpara, part, learn_logit)
     colnames(result$learning.settings_logit) <- c("hyperparameter", "model.part", "learned?")
+    result$learning.settings_nb <- cbind(hyperpara, part, learn_nb)
+    colnames(result$learning.settings_nb) <- c("hyperparameter", "model.part", "learned?")
     if(!random.effects){
-      result$learning.settings_logit <- result$learning.settings_logit[1:4,]
       result$learning.settings_nb <- result$learning.settings_nb[1:4,]
+      result$learning.settings_logit <- result$learning.settings_logit[1:4,]
     }
     # adding mcmc setting to output (incl. ASIS Boolean)
     result$mcmc.settings <- mcmc.opt

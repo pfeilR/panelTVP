@@ -45,6 +45,14 @@ stepF <- function(response,
   fi <- fi*signsw
   alpha_lambda <- alpha_lambda*signsw
 
+  # Step F4: Identification ----------------------------------------------------
+
+  if(lambda[1] < 0){
+    lambda <- -lambda
+    fi <- -fi
+    alpha_lambda <- -alpha_lambda
+  }
+
   return(list(fi = fi, lambda = lambda, alpha_lambda = alpha_lambda, prior.load = prior.load))
 
 }

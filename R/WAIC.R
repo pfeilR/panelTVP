@@ -1,4 +1,4 @@
-# In this file, the WAIC is computed under 6 different likelihoods.
+# In this file, the WAIC is computed under 5 different likelihoods.
 
 library(LaplacesDemon)
 
@@ -18,7 +18,8 @@ lp.model <- function(model, s, R){
   Tmax <- model$data$Tmax
   mc <- model$mcmc
   N <- nrow(X)
-  if(sum(startsWith(colnames(mc), "lambda_t")) == 1) cps <- TRUE else cps <- FALSE
+  if(sum(startsWith(colnames(mc), "lambda_t")) == 1) cps <- TRUE
+  else cps <- FALSE
   X_split <- split(as.data.frame(X), X[,"t"])
   if(cps) lambda_col <- "lambda_t"
   eta_list <- vector("list", Tmax)

@@ -4,7 +4,15 @@
 \alias{predict.panelTVP.Gaussian}
 \title{Get predictions for new subjects based on a \code{panelTVP.Gaussian} object}
 \usage{
-\method{predict}{panelTVP.Gaussian}(object, X.new, timepoint, coverage = 0.95, pop.pred = FALSE, ...)
+\method{predict}{panelTVP.Gaussian}(
+  object,
+  X.new,
+  timepoint,
+  coverage = 0.95,
+  pop.pred = FALSE,
+  n.replicates = 100,
+  ...
+)
 }
 \arguments{
 \item{object}{an object of class \code{panelTVP.Gaussian}}
@@ -25,13 +33,19 @@ that ignore the random effects structure, if FALSE the random effects structure
 is included as well where the unknown factor scores are sampled from their
 standard Normal prior - defaults to FALSE}
 
+\item{n.replicates}{number of replicates within each Monte Carlo draw and for each subject
+for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})}
+
 \item{...}{optional arguments passed to the function (those are ignored)}
 }
 \value{
 a list containing the following elements
 \itemize{
 \item \code{predictive.distribution}: a matrix where each row contains draws
-from the posterior predictive distribution for the corresponding observation
+from the posterior predictive distribution for the corresponding observation.
+The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
+and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+we have replication draws for marginalizing over the unknown random factors
 \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 posterior predictive distribution for each new observation
 }

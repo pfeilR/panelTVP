@@ -47,11 +47,12 @@ This vignette is structured as follows: Section 2 introduces the reader to the m
 
 ## Shrinkage in time-varying parameter panel models
 
-We consider a balanced panel $y_{it}$ with $t = 1,\dots,T$ observations for $i = 1,\dots,n$ subjects, where $y_{it}$ is either a Gaussian, binary or count response. The linear predictor of the model is given as 
-\begin{equation*}
+We consider a balanced panel $\text{y}_{it}$ with $t = 1,\dots,T$ observations for $i = 1,\dots,n$ subjects, where $\text{y}_{it}$ is either a Gaussian, binary or count response. The linear predictor of the model is given as 
+\begin{equation}
+\label{centered}
     \eta_{it} = \textbf{x}_{it}^\top \boldsymbol{\beta}_t + f_i\lambda_t,
-\end{equation*}
-where $\textbf{x}_{it}$ is a $d \times 1$ vector of covariate values (including a $1$ for the intercept as the first value), $\boldsymbol{\beta}_t$ is a $d \times 1$ vector of regression effects at time $t,$ $\lambda_t$ is a time-specific factor loading and $f_i$ is a subject-specific factor score. The factor model with time-specific factor loadings in $\eta_{it}$ can be interpreted as a model with a time-varying random intercept.
+\end{equation}
+where $\textbf{x}_{it}$ is a $d \times 1$ vector of covariate values (including a $1$ for the intercept as the first value), $\boldsymbol{\beta}_t$ is a $d \times 1$ vector of regression effects at time $t,$ $\lambda_t$ is a time-specific factor loading and $f_i$ is a subject-specific factor score. The factor model with time-specific factor loadings in $\eta_{it}$ can be interpreted as a model with a time-varying random intercept. For reasons discussed below, we refer to Equation (\ref{centered}) as the linear predictor of the model in centered representation.
 
 The goal is now to identify whether an effect is time-varying, time-invariant or zero. For this, a random walk specification of the effects is considered, i.e.,
 \begin{equation*}
@@ -69,14 +70,14 @@ where $\textbf{Q} = \text{diag}(\theta^2_1,\dots,\theta^2_d)$ and we assume that
 \end{equation*}
 Alternatively, it is also possible to let the processes start at $T=0.$ Simulations have shown that results are very similar when starting at $T=0$ or $T=1$.
 
-In order to place prior distributions on all model parameters, we exploit the non-centered parameterization that was used for state space models (Frühwirth-Schnatter and Wagner, 2010) 
+In order to place prior distributions on all model parameters, we exploit the non-centered parameterization that was used for state space models (Frühwirth-Schnatter and Wagner, 2010), where the time-varying parameters are expressed as 
 \begin{equation*}
     \begin{aligned}
-        \boldsymbol{\beta}_t &= \boldsymbol{\beta} + \boldsymbol{\Theta} \tilde{\boldsymbol{\beta}}_t \\
-        \lambda_t &= \lambda + \psi \tilde{\lambda}_t.
+        \boldsymbol{\beta}_t &= \boldsymbol{\beta} + \boldsymbol{\Theta} \tilde{\boldsymbol{\beta}}_t, \\
+        \lambda_t &= \lambda + \psi \tilde{\lambda}_t,
     \end{aligned}
 \end{equation*}
-where $\boldsymbol{\Theta} = \text{diag}(\theta_1,\dots,\theta_d).$
+where $\boldsymbol{\Theta} = \text{diag}(\theta_1,\dots,\theta_d).$ 
 
 In the non-centered representation the random processes are defined as
 \begin{equation*}
@@ -85,7 +86,11 @@ In the non-centered representation the random processes are defined as
     \tilde{\lambda}_t &= \tilde{\lambda}_{t-1} + \tilde{\nu}^\lambda_t, \quad \tilde{\nu}^\lambda_t \sim \mathcal{N}(0,1)
 \end{aligned}
 \end{equation*}
-with starting distributions $\tilde{\boldsymbol{\beta}}_0 \sim \mathcal{N}(\textbf{0},c^\beta \textbf{I})$ and $\tilde{\lambda}_0 \sim \mathcal{N}(0,c^\lambda)$ or $\tilde{\boldsymbol{\beta}}_1 \sim \mathcal{N}(\textbf{0},c^\beta \textbf{I})$ and $\tilde{\lambda}_1 \sim \mathcal{N}(0,c^\lambda)$ depending on the random walk specification.
+with starting distributions $\tilde{\boldsymbol{\beta}}_0 \sim \mathcal{N}(\textbf{0},c^\beta \textbf{I})$ and $\tilde{\lambda}_0 \sim \mathcal{N}(0,c^\lambda)$ or $\tilde{\boldsymbol{\beta}}_1 \sim \mathcal{N}(\textbf{0},c^\beta \textbf{I})$ and $\tilde{\lambda}_1 \sim \mathcal{N}(0,c^\lambda)$ depending on the random walk specification. The linear predictor in non-centered representation is then given by
+\begin{equation}
+\label{non-centered}
+    \eta_{it} = \textbf{x}_{it}^\top \boldsymbol{\beta} + \textbf{x}_{it}^\top \boldsymbol{\Theta} \tilde{\boldsymbol{\beta}}_t + f_i\lambda + f_i \psi \tilde{\lambda}_t.
+\end{equation}
 
 A major advantage when using the non-centered model representation is that the parameters of interest $\boldsymbol{\beta}, \boldsymbol{\Theta}, \lambda$ and $\psi$ are all regression coefficients and, thus, well-known prior distributions from regression analysis can be placed on those coefficients. As in Bitto and Frühwirth-Schnatter (2019) and Pfeiler and Wagner (2024), we consider Normal-Gamma shrinkage priors
 \begin{equation*}
@@ -96,14 +101,144 @@ A major advantage when using the non-centered model representation is that the p
         \lambda|\phi^2 &\sim \mathcal{N}(0,\phi^2), \quad \phi^2|a^\phi, \kappa^\phi \sim \mathcal{G}\Bigl(a^\phi, \frac{a^\phi \kappa^\phi}{2}\Bigr),
 \end{aligned}
 \end{equation*}
-where the scale parameters of the stochastic processes $\theta_1,\dots\theta_d,\psi$ have support on $\mathbb{R}$ and are therefore defined as the positive and negative square root of the variance parameters $\theta^2_1,\dots,\theta^2_d,\psi^2.$ 
+where the scale parameters of the stochastic processes $\theta_1,\dots\theta_d,\psi$ have support on $\mathbb{R}$ and are therefore defined as the positive and negative square root of the variance parameters $\theta^2_1,\dots,\theta^2_d,\psi^2.$  
 
-## General MCMC sampling scheme
+Hyperparameters of the model are either fixed or sampled using Metropolis-Hastings udpates.
 
-## Data Augmentation for binary and count models
+## Pólya-Gamma data augmentation
+
+Bayesian inference for binary and count data is challenging as the posterior is in general not available in closed form and, thus, MCMC techniques are necessary. Within the machinery of MCMC, a Metropolis-Hastings (MH) algorithm based on an IWLS (\textit{iteratively weighted least squares}) proposal distribution (Gamerman, 1997) is one possibility. However, updating the parameters using MH is potentially costly due to low acceptance rates in high-dimensional parameters settings (Fahrmeir, Kneib, Lang and Marx, 2021). In their seminal paper, Albert and Chib (1993) discuss a data augmentation scheme for Probit regression based on the latent utility representation of binary choice models. For Logit models, their sampler cannot be used due to the non-Gaussianity of errors in the latent utility representation of the Logit model. However, Polson, Scott and Windle (2013) introduced an efficient data augmentation scheme for posterior inference in models with binomial likelihoods. Their method can be used for Bayesian inference in Logit and Negative Binomial regression models and is briefly outlined in the following as it is also used in the \texttt{panelTVP} package.
+
+The basic idea is that conditional on a Pólya-Gamma distributed random variable, Bayesian inference in the Logit or Negative Binomial model is based on a Gaussian posterior. A random variable $\omega$ follows a Pólya-Gamma distribution with parameters $b > 0$ and $c \in \mathbb{R},$ if
+\begin{equation*}
+    \omega \overset{D}{=} \frac{1}{2\pi^2}\sum_{k=1}^\infty \frac{g_k}{(k-1/2)^2+c^2/(4\pi^2)},
+\end{equation*}
+where $g_k \sim \mathcal{G}(b,1)$ are independent Gamma random variables. Algorithms for sampling from the Pólya-Gamma distribution are implemented in the \texttt{R}-package \texttt{BayesLogit} (Polson, Scott and Windle, 2013).
+
+Polson, Scott and Windle (2013) established the following integral identity
+\begin{equation}
+\label{Integral}
+    \frac{(\exp(\eta))^a}{(1+\exp(\eta))^b} = 2 ^{-b}\exp(\eta\delta)\int_0^\infty \exp\Bigl(-\frac{\omega\eta^2}{2}\Bigr) p(\omega) \; d\omega,
+\end{equation}
+where $\eta$ is a linear predictor, $\delta = a-b/2$ and $\omega \sim \mathcal{PG}(b,0)$ follows a Pólya-Gamma distribution.
+
+The likelihood contribution in the Logit panel model in centered parameterization (see Equation (\ref{centered})) is given by
+\begin{equation*}
+ p(\text{y}_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t,\omega_{it}) = \frac{(\exp(\eta_{it}))^{\text{y}_{it}}}{1+\exp(\eta_{it})} \propto  \exp\Bigl(-\frac{\omega_{it}}{2}\Bigl(\frac{\text{y}_{it}-1/2}{\omega_{it}}-\eta_{it}\Bigr)^2\Bigr),
+\end{equation*}
+which follows from Equation (\ref{Integral}) and by completing the square. Hence, conditional on the Pólya-Gamma variable $\omega,$ the coefficients in the Logit model can be sampled from a Gaussian posterior. Moreover, the distribution of $\omega$ - conditional on the parameters in the linear predictor $\eta$ - is a Pólya-Gamma distribution as well, which makes Gibbs sampling feasible. 
+
+In order to perform inference in the Bayesian Negative Binomial model, we first consider a specific parameterization of the Negative Binomial distribution, where
+\begin{equation*}
+ p(\text{y}_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t) \propto \Bigl(1-\frac{\exp(\eta_{it})}{1+\exp(\eta_{it})}\Bigr)^r \Bigl(\frac{\exp(\eta_{it})}{1+\exp(\eta_{it})}\Bigr)^{\text{y}_{it}} = \frac{(\exp(\eta_{it}))^{\text{y}_{it}}}{(1+\exp(\eta_{it}))^{\text{y}_{it} + r}}
+\end{equation*}
+Using this parameterization, the conditional moments are then given by
+\begin{equation*}
+ \mathbb{E}(\text{y}_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t) \equiv \mu_{it} = r  \exp(\eta_{it}), \quad \mathbb{V}(\text{y}_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t) = r \exp(\eta_{it}) (1 + \exp(\eta_{it})).
+\end{equation*}
+After some algebra and by using the integral identity from Equation (\ref{Integral}), the likelihood contribution in the Negative Binomial panel data model can be expressed as
+\begin{equation*}
+ p(\text{y}_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t, \omega_{it}) \propto 
+ \frac{(\exp(\eta_{it}))^{\text{y}_{it}}}{(1+\exp(\eta_{it}))^{\text{y}_{it} + r}} \propto \exp\Bigl(-\frac{\omega_{it}}{2}\Bigl(\frac{\text{y}_{it}-r}{2\omega_{it}} - \eta_{it}\Bigr)^2\Bigr).
+\end{equation*}
+Hence, inference in Bayesian Negative Binomial models is again based on a Gaussian posterior conditional on the Pólya-Gamma variables that are sampled in an additional data augmentation step (see Pillow and Scott (2012) for more details on Pólya-Gamma data augmentation in Negative Binomial models).
 
 ## Zero-Inflated Negative Binomial model
 
+For modelling both zero-inflated and overdispersed count data, we assume that there are two latent classes of zeros to account for the excess zeros: structural and at-risk zeros. A structural zero belongs to an observation that is not at risk of experiencing the event, whereas an at-risk zero belongs to an observation that is at-risk of experiencing the event but has for some reason a zero recorded. It is therefore assumed that the outcome in the Zero-Inflated Negative Binomial model
+$\text{y}_{it}$ is a realization of a mixture distribution with a point mass at zero (for the structural zeros) and a standard Negative Binomial count model for observations that are at-risk,
+i.e., this includes both at-risk zeros and positive counts. The ZINB model can, thus, be stated as
+\begin{equation*}
+ \text{y}_{it}|r,\mu_{it},w_{it} \sim (1-\pi_{it}) \cdot \mathbb{I}_{(w_{it} = 0)} + \pi_{it} \cdot \mathcal{NB}(\mu_{it},r) \mathbb{I}_{(w_{it}=1)},
+\end{equation*}
+where ${w_{it}}$ is a latent at-risk indicator such that with probability ${1-\pi_{it}, w_{it} = 0}$ and with probability ${\pi_{it}, w_{it} = 1}$, and ${\mu_{it}}$ is the mean of the Negative Binomial distribution, as defined previously.
+
+There are two separate linear predictors in the ZINB model. The first
+linear predictor ${\eta_{it}^{\text{logit}}}$ is related to the zero-inflated
+part of the model through
+${\pi_{it} = \frac{\exp(\eta_{it}^{\text{logit}})}{1+\exp(\eta_{it}^{\text{logit}})},}$
+whereas the second linear predictor ${\eta_{it}^{\text{nb}}}$ is the linear predictor of the Negative Binomial regression model. As the zero-inflation part is typically modelled with a Logit model, the Zero-Inflated Negative Binomial model contains both a Logit and a Negative Binomial regression model (for more details on Bayesian Zero-Inflated Negative Binomial regression see Neelon, 2019).
+
+## MCMC sampling schemes
+
+In the following, the general sampling steps for the various regression models in \texttt{panelTVP} are briefly outlined. Details on the sampling steps are omitted in this vignette. For the sampling steps, we define $\boldsymbol{\lambda} = (\lambda_1,\dots,\lambda_T)^\top,$ $\mathbf{f} = (f_1,\dots,f_n)^\top,$ $\boldsymbol{\omega}=(\omega_{11},\dots,\omega_{nT})^\top$ and $\textbf{X}_t,$ is an $(n\times d)$ regressor matrix with rows $\textbf{x}_{it}^\top.$
+
+### Gaussian model
+
+The Gaussian panel data model in centered representation is given by
+\begin{equation*}
+ \text{y}_{it} = \textbf{x}_{it}^\top \boldsymbol{\beta}_t + f_i\lambda_t + \varepsilon_{it}, \quad \varepsilon_{it} \sim \mathcal{N}(0,\sigma^2),
+\end{equation*}
+where $\sigma^2$ is the constant error variance. In the Gaussian model, posterior inference is easier than in the other models as a Pólya-Gamma data augmentation step is not required. However, the homoscedastic error variance must be sampled unlike in the other models. For this, we assume a  conjugate Inverse-Gamma prior for $\sigma^2$, i.e.,
+\begin{equation*}
+ \sigma^2|C_0 \sim \mathcal{G}^{-1}(c_0, C_0), \quad C_0 \sim \mathcal{G}(g_0,G_0),
+\end{equation*}
+where the parameters $c_0$, $g_0$ and $G_0$ are set to fixed values. 
+
+Bayesian inference in the Gaussian panel data model then involves looping over the following steps:
+\begin{enumerate}
+    \item Sample the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T$ the factors $\mathbf{f},$ the loadings $\boldsymbol{\lambda}$ and the homoscedastic error variance $\sigma^2$ from the posterior of a Normal regression model with response $\text{y}_{it}-f_i\lambda_t.$
+    \item Sample the factors $\mathbf{f}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the loadings $\boldsymbol{\lambda}$ and the homoscedastic error variance $\sigma^2$ from the posterior of a Normal regression model with response  $\text{y}_{it}-\textbf{x}_{it}^\top \boldsymbol{\beta}_t$.
+    \item Sample the loadings $\boldsymbol{\lambda}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the factors $\mathbf{f}$ and the homoscedastic error variance $\sigma^2$ from the posterior of a Normal regression model with response  $\text{y}_{it}-\textbf{x}_{it}^\top \boldsymbol{\beta}_t.$
+     \item Sample the homoscedastic error variance $\sigma^2$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the factors $\mathbf{f}$ and the factor loadings $\boldsymbol{\lambda}$ from an Inverse-Gamma posterior.
+\end{enumerate}
+
+### Probit model
+
+The Probit model can be represented as a latent utility model with standard Normal noise, i.e.,
+\begin{equation*}
+  \tilde{\text{y}}_{it} = \textbf{x}_{it}^\top \boldsymbol{\beta}_t + f_i\lambda_t + \varepsilon_{it}, \quad \varepsilon_{it} \sim \mathcal{N}(0,1),
+\end{equation*}
+where $\tilde{y}_{it}$ is the latent utility that is linked to the observed binary response via a threshold mechanism: The observed response is 1 when $\tilde{\text{y}}_{it} > 0$, and it is 0 when $\tilde{\text{y}}_{it} \le 0.$ The latent utility $\tilde{\text{y}}_{it}$ can easily be sampled from a truncated Normal distribution (Albert and Chib, 1993). Therefore, Bayesian inference in the Probit panel data model involves looping over the following steps:
+\begin{enumerate}
+   \item Sample the latent utility $\tilde{\text{y}}_{it}$ either from a positively truncated Normal distribution, when $\text{y}_{it} = 1,$ or from a negatively truncated Normal distribution, when $\text{y}_{it} = 0.$
+    \item Sample the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T$ the factors $\mathbf{f},$ and the loadings $\boldsymbol{\lambda}$ from the posterior of a Normal regression model with response $\tilde{\text{y}}_{it}-f_i\lambda_t.$
+    \item Sample the factors $\mathbf{f}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ and the loadings $\boldsymbol{\lambda}$  from the posterior of a Normal regression model with response  $\tilde{\text{y}}_{it}-\textbf{x}_{it}^\top \boldsymbol{\beta}_t$.
+    \item Sample the loadings $\boldsymbol{\lambda}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ and the factors $\mathbf{f}$ from the posterior of a Normal regression model with response  $\tilde{\text{y}}_{it}-\textbf{x}_{it}^\top \boldsymbol{\beta}_t.$
+\end{enumerate}
+
+### Logit model
+
+Bayesian inference in the Logit model requires a Pólya-Gamma data augmentation step. Hence, Gibbs sampling involves looping over the following steps:
+
+\begin{enumerate}
+    \item Sample $\omega_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t \sim \mathcal{PG}(1, \eta_{it})$ and define the new response as $\text{y}_{it}^* \equiv (\text{y}_{it}-1/2)/\omega_{it}\; \forall i,t$.
+    \item Sample the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T$ the factors $\mathbf{f},$ the loadings $\boldsymbol{\lambda}$ and the weights $\boldsymbol{\omega}$ from the posterior of a Normal regression model with response $\text{y}_{it}^*-f_i\lambda_t.$
+    \item Sample the factors $\mathbf{f}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the loadings $\boldsymbol{\lambda}$ and the weights $\boldsymbol{\omega}$ from the posterior of a Normal regression model with response  $\text{y}_{it}^*-\textbf{x}_{it}^\top \boldsymbol{\beta}_t$.
+    \item Sample the loadings $\boldsymbol{\lambda}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the factors $\mathbf{f}$ and the weights $\boldsymbol{\omega}$ from the posterior of a Normal regression model with response  $\text{y}_{it}^*-\textbf{x}_{it}^\top \boldsymbol{\beta}_t.$
+\end{enumerate}
+
+### Negative Binomial model
+
+Bayesian inference in the Negative Binomial model also requires a Pólya-Gamma data augmentation step and an additional step to sample the dispersion parameter of the Negative Binomial distribution. The dispersion parameter could be sampled by Metropolis-Hastings, but we achieved better results with univariate Slice sampling. In this MCMC technique, the parameter of interest is drawn uniformly from a region under the graph of its posterior distribution. The Slice sampler, thus, requires less tuning than the Metropolis-Hastings sampler. Moreover, the random walk behavior of the chain can be suppressed by adding an overrelaxation step (see Neal (2003) for further details on Slice sampling). Posterior inference in the Negative Binomial model then involves looping over the following steps:
+
+\begin{enumerate}
+    \item Sample $\omega_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t,\text{y}_{it}, r \sim \mathcal{PG}(\text{y}_{it}+r, \eta_{it})$ and define the new response as $\text{y}_{it}^* \equiv (\text{y}_{it}-r)/(2\omega_{it})\; \forall i,t$.
+    \item Sample the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T$ the factors $\mathbf{f},$ the loadings $\boldsymbol{\lambda},$ the weights $\boldsymbol{\omega}$ and the dispersion parameter $r$ from the posterior of a Normal regression model with response $\text{y}_{it}^*-f_i\lambda_t.$
+    \item Sample the factors $\mathbf{f}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the loadings $\boldsymbol{\lambda},$ the weights $\boldsymbol{\omega}$ and the dispersion parameter $r$ from the posterior of a Normal regression model with response  $\text{y}_{it}^*-\textbf{x}_{it}^\top \boldsymbol{\beta}_t$.
+    \item Sample the loadings $\boldsymbol{\lambda}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the factors $\mathbf{f},$ the weights $\boldsymbol{\omega}$ and the dispersion parameter $r$ from the posterior of a Normal regression model with response  $\text{y}_{it}^*-\textbf{x}_{it}^\top \boldsymbol{\beta}_t.$
+    \item Sample the dispersion parameter $r$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the factors $\mathbf{f}$, the loadings $\boldsymbol{\lambda}$ and the weights $\boldsymbol{\omega}$ using univariate Slice sampling. 
+\end{enumerate}
+
+
+### Zero-Inflated Negative Binomial model
+
+As the Zero-Inflated Negative Binomial model consists of two sub-models, i.e., a Logit model for the zero-inflation component and a Negative Binomial model for the count component, the MCMC sampler is basically a combination of the two sampling schemes for Logit and Negative Binomial regression with an additional step for sampling the latent at-risk indicators. As a consequence, we have two separate linear predictors with time-varying regression and random effects, i.e.,
+\begin{equation*}
+ \begin{aligned}
+ \eta_{it}^{\text{logit}} &= (\textbf{x}^{\text{logit}}_{it})^\top \boldsymbol{\beta}_t^{\text{logit}} + f_i^{\text{logit}} \lambda_t^{\text{logit}}, \\
+  \eta_{it}^{\text{nb}} &= (\textbf{x}^{\text{nb}}_{it})^\top \boldsymbol{\beta}_t^{\text{nb}} + f_i^{\text{nb}} \lambda_t^{\text{nb}}.
+ \end{aligned}
+\end{equation*}
+The same set of covariates can be used for modelling both components of the Zero-Inflated Negative Binomial distribution, but it is not mandatory to include the same covariates in both predictors.
+
+An MCMC scheme for sampling the parameters of a Bayesian Zero-Inflated Negative Binomial panel model then involves looping over the following steps:
+\begin{enumerate}
+    \item Sample the latent at-risk indicators ${w}_1,\dots,{w}_n$ conditional on all model parameters.
+    \item Update the parameters in the predictor of the zero-inflation component $\eta_{it}^{\text{logit}}$ by using the data augmentation sampler of the Logit model.
+    \item For all observations that are currently in the at-risk class, i.e. for which $w_{it}=1$, update the parameters in the predictor of the count component $\eta_{it}^{\text{nb}}$ and the dispersion parameter of the Negative Binomial distribution $r$ by using the data augmentation sampler of the Negative Binomial model as well as the Slice sampler, respectively.
+\end{enumerate}
+Note that the at-risk indicators are only updated for observations for which $\text{y}_{it} = 0$. For observations with a positive count, $\text{w}_{it} = 1$ in all iterations of the MCMC sampler.
 
 
 # Basic structure of \texttt{panelTVP}

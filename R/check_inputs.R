@@ -81,7 +81,7 @@ check_sim <- function(n,
 
 # check input arguments of predict S3-functions --------------------------------
 
-check.predict <- function(model, X.new, timepoint, coverage, pop.pred){
+check.predict <- function(model, X.new, timepoint, coverage, pop.pred, n.replicates){
 
   if(!(is.matrix(X.new) || is.data.frame(X.new))){
     stop("Argument 'X.new' must be either a matrix or a data frame.")
@@ -109,7 +109,7 @@ check.predict <- function(model, X.new, timepoint, coverage, pop.pred){
   }
 
   if(!is.numeric(timepoint) || length(timepoint) != 1 || timepoint %% 1 != 0 || !is.finite(timepoint)){
-    stop("Argument 'timepoint' must be a single numeric value. If you want predictions for multiple time points, please call the predict function multiple times.")
+    stop("Argument 'timepoint' must be a single integer. If you want predictions for multiple time points, please call the predict function multiple times.")
   }
 
   if(!is.numeric(coverage) || length(coverage) != 1 || !is.finite(coverage) || coverage < 0 || coverage > 1){
@@ -120,9 +120,13 @@ check.predict <- function(model, X.new, timepoint, coverage, pop.pred){
     stop("Argument 'pop.pred' must be a single logical value.")
   }
 
+  if(!is.numeric(n.replicates) || length(n.replicates) != 1 || timepoint %% 1 != 0 || !is.finite(n.replicates) || n.replicates < 1){
+    stop("Argument 'n.replicates' must be a single, positive integer.")
+  }
+
 }
 
-check.predict_ZINB <- function(model, X_nb.new, X_logit.new, timepoint, coverage, pop.pred){
+check.predict_ZINB <- function(model, X_nb.new, X_logit.new, timepoint, coverage, pop.pred, n.replicates){
 
   if(!(is.matrix(X_nb.new) || is.data.frame(X_nb.new))){
     stop("Argument 'X_nb.new' must be either a matrix or a data frame.")
@@ -184,6 +188,10 @@ check.predict_ZINB <- function(model, X_nb.new, X_logit.new, timepoint, coverage
 
   if(!is.logical(pop.pred) || length(pop.pred) != 1 || !is.finite(pop.pred)){
     stop("Argument 'pop.pred' must be a single logical value.")
+  }
+
+  if(!is.numeric(n.replicates) || length(n.replicates) != 1 || timepoint %% 1 != 0 || !is.finite(n.replicates) || n.replicates < 1){
+    stop("Argument 'n.replicates' must be a single, positive integer.")
   }
 
 }

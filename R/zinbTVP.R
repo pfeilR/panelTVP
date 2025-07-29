@@ -344,13 +344,6 @@ zinbTVP <- function(df,
   colnames(res_logit)[startsWith(colnames(res_logit), "theta")] <- paste0("abs(theta", 1:df.logit$d, ")")
   res_logit[,startsWith(colnames(res_logit), "psi")] <- abs(res_logit[,startsWith(colnames(res_logit), "psi")])
   colnames(res_logit)[startsWith(colnames(res_logit), "psi")] <- "abs(psi)"
-  if(prior.load_logit$type != "cps"){
-    sign.lambda1_logit <- sign(res_logit[, "lambda_t1"])
-    ind_logit <- startsWith(colnames(res_logit), "lambda")
-    res_logit[,ind_logit] <- sign.lambda1_logit*res_logit[,ind_logit]
-  } else{
-    res_logit[, "lambda_t"] <- abs(res_logit[, "lambda_t"])
-  }
   res_logit <- coda::mcmc(data = res_logit[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
   hpint_logit <- coda::HPDinterval(res_logit, prob = HPD.coverage)
   mcmcsummary_logit <- cbind(hpint_logit[,"lower"],
@@ -371,13 +364,6 @@ zinbTVP <- function(df,
   colnames(res_nb)[startsWith(colnames(res_nb), "theta")] <- paste0("abs(theta", 1:df.nb$d, ")")
   res_nb[,startsWith(colnames(res_nb), "psi")] <- abs(res_nb[,startsWith(colnames(res_nb), "psi")])
   colnames(res_nb)[startsWith(colnames(res_nb), "psi")] <- "abs(psi)"
-  if(prior.load_nb$type != "cps"){
-    sign.lambda1_nb <- sign(res_nb[, "lambda_t1"])
-    ind_nb <- startsWith(colnames(res_nb), "lambda")
-    res_nb[,ind_nb] <- sign.lambda1_nb*res_nb[,ind_nb]
-  } else{
-    res_nb[, "lambda_t"] <- abs(res_nb[, "lambda_t"])
-  }
   res_nb <- coda::mcmc(data = res_nb[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
   hpint_nb <- coda::HPDinterval(res_nb, prob = HPD.coverage)
   mcmcsummary_nb <- cbind(hpint_nb[,"lower"],

@@ -17,13 +17,18 @@
 #'  that ignore the random effects structure, if FALSE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
+#' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
+#'  for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler, Helga Wagner
 #' @returns a list containing the following elements
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
-#'    from the posterior predictive distribution for the corresponding observation
+#'    from the posterior predictive distribution for the corresponding observation.
+#'    The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
+#'    and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+#'    we have replication draws for marginalizing over the unknown random factors
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 #'    posterior predictive distribution for each new observation
 #' }
@@ -57,11 +62,12 @@
 #' plot(density(pp$predictive.distribution[2,]))
 #' pp$predictive.summary
 predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
-                                      coverage = 0.95, pop.pred = FALSE, ...){
+                                      coverage = 0.95, pop.pred = FALSE,
+                                      n.replicates = 100, ...){
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
-                pop.pred = pop.pred)
+                pop.pred = pop.pred, n.replicates = n.replicates)
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
-                 coverage = coverage, pop.pred = pop.pred)
+              coverage = coverage, pop.pred = pop.pred, n.replicates = n.replicates)
 }
 
 #' @title Get predictions for new subjects based on a \code{panelTVP.Probit} object
@@ -84,13 +90,18 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #'  that ignore the random effects structure, if FALSE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
-#' @param ... optional arguments passed to the function (those are ignored)
+#' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
+#'   for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})
+#'@param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler, Helga Wagner
 #' @returns a list containing the following elements
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
-#'    from the posterior predictive distribution for the corresponding observation
+#'    from the posterior predictive distribution for the corresponding observation.
+#'    The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
+#'    and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+#'    we have replication draws for marginalizing over the unknown random factors
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 #'    posterior predictive distribution for each new observation
 #' }
@@ -122,11 +133,12 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #' plot(density(pp$predictive.distribution[2,]))
 #' pp$predictive.summary
 predict.panelTVP.Probit <- function(object, X.new, timepoint,
-                                    coverage = 0.95, pop.pred = FALSE, ...){
+                                    coverage = 0.95, pop.pred = FALSE,
+                                    n.replicates = 100, ...){
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
-                pop.pred = pop.pred)
+                pop.pred = pop.pred, n.replicates = n.replicates)
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
-                 coverage = coverage, pop.pred = pop.pred)
+              coverage = coverage, pop.pred = pop.pred, n.replicates = n.replicates)
 }
 
 #' @title Get predictions for new subjects based on a \code{panelTVP.Logit} object
@@ -149,13 +161,18 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #'  that ignore the random effects structure, if FALSE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
+#' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
+#'   for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler, Helga Wagner
 #' @returns a list containing the following elements
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
-#'    from the posterior predictive distribution for the corresponding observation
+#'    from the posterior predictive distribution for the corresponding observation.
+#'    The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
+#'    and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+#'    we have replication draws for marginalizing over the unknown random factors
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 #'    posterior predictive distribution for each new observation
 #' }
@@ -187,11 +204,12 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #' plot(density(pp$predictive.distribution[2,]))
 #' pp$predictive.summary
 predict.panelTVP.Logit <- function(object, X.new, timepoint,
-                                   coverage = 0.95, pop.pred = FALSE, ...){
+                                   coverage = 0.95, pop.pred = FALSE,
+                                   n.replicates = 100, ...){
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
-                pop.pred = pop.pred)
+                pop.pred = pop.pred, n.replicates = n.replicates)
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
-                 coverage = coverage, pop.pred = pop.pred)
+              coverage = coverage, pop.pred = pop.pred, n.replicates = n.replicates)
 }
 
 #' @title Get predictions for new subjects based on a \code{panelTVP.NegBin} object
@@ -213,13 +231,18 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #'  that ignore the random effects structure, if FALSE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
+#' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
+#'   for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler, Helga Wagner
 #' @returns a list containing the following elements
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
-#'    from the posterior predictive distribution for the corresponding observation
+#'    from the posterior predictive distribution for the corresponding observation.
+#'    The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
+#'    and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+#'    we have replication draws for marginalizing over the unknown random factors
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 #'    posterior predictive distribution for each new observation
 #' }
@@ -252,11 +275,12 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #' plot(density(pp$predictive.distribution[2,]))
 #' pp$predictive.summary
 predict.panelTVP.NegBin <- function(object, X.new, timepoint,
-                                    coverage = 0.95, pop.pred = FALSE, ...){
+                                    coverage = 0.95, pop.pred = FALSE,
+                                    n.replicates = 100, ...){
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
-                pop.pred = pop.pred)
+                pop.pred = pop.pred, n.replicates = n.replicates)
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
-                 coverage = coverage, pop.pred = pop.pred)
+              coverage = coverage, pop.pred = pop.pred, n.replicates = n.replicates)
 }
 
 #' @title Get predictions for new subjects based on a \code{panelTVP.ZINB} object
@@ -282,13 +306,18 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #'  that ignore the random effects structure, if FALSE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
+#' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
+#'   for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler, Helga Wagner
 #' @returns a list containing the following elements
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
-#'    from the posterior predictive distribution for the corresponding observation
+#'    from the posterior predictive distribution for the corresponding observation.
+#'    The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
+#'    and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+#'    we have replication draws for marginalizing over the unknown random factors
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 #'    posterior predictive distribution for each new observation
 #' }
@@ -330,15 +359,18 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #' plot(density(pp$predictive.distribution[2,]))
 #' pp$predictive.summary
 predict.panelTVP.ZINB <- function(object, X_nb.new, X_logit.new, timepoint,
-                                  coverage = 0.95, pop.pred = FALSE, ...){
+                                  coverage = 0.95, pop.pred = FALSE,
+                                  n.replicates = 100, ...){
   check.predict_ZINB(model = object, X_nb.new = X_nb.new, X_logit.new = X_logit.new,
-                     timepoint = timepoint, coverage = coverage, pop.pred = pop.pred)
+                     timepoint = timepoint, coverage = coverage, pop.pred = pop.pred,
+                     n.replicates = n.replicates)
   pred.helper_ZINB(model = object, X_nb.new = X_nb.new, X_logit.new = X_logit.new,
-                      timepoint = timepoint, coverage = coverage, pop.pred = pop.pred)
+                   timepoint = timepoint, coverage = coverage, pop.pred = pop.pred,
+                   n.replicates = n.replicates)
 }
 
 pred.helper <- function(model, X.new, timepoint,
-                           coverage = 0.95, pop.pred = FALSE){
+                        coverage, pop.pred, n.replicates){
 
   if(is.data.frame(X.new)) X.new <- as.matrix(X.new)
   cla <- class(model)
@@ -354,10 +386,10 @@ pred.helper <- function(model, X.new, timepoint,
   }
   if(cla == "panelTVP.Gaussian") sigma2 <- model$mcmc[,"sigma2"]
   if(cla == "panelTVP.NegBin") r <- model$mcmc[,"r"]
-  y.future <- matrix(nrow = n, ncol = S)
-  mcmc.eta <- matrix(nrow = n, ncol = S)
   LO <- numeric(n); UP <- numeric(n)
   if(pop.pred){
+    y.future <- matrix(nrow = n, ncol = S)
+    mcmc.eta <- matrix(nrow = n, ncol = S)
     for(s in 1:S){
       mcmc.eta[, s] <- X.new %*% mcmc.beta[s,]
       if(cla == "panelTVP.Gaussian"){
@@ -374,21 +406,28 @@ pred.helper <- function(model, X.new, timepoint,
       }
     }
   } else{
+    y.future <- matrix(nrow = n, ncol = S * n.replicates)
     for(s in 1:S){
-      fi <- rnorm(n) # sampling from the prior for new subjects
-      mcmc.eta[, s] <- X.new %*% mcmc.beta[s,] + mcmc.lamb[s] * fi
-      if(cla == "panelTVP.Gaussian"){
-        y.future[, s] <- rnorm(n, mean = mcmc.eta[, s], sd = sqrt(sigma2[s]))
+      eta.replicant <- matrix(nrow = n, ncol = n.replicates)
+      y.replicant <- matrix(nrow = n, ncol = n.replicates)
+      for(replicant in 1:n.replicates){
+        fi <- rnorm(n) # sampling from the prior for new subjects
+        eta.replicant[, replicant] <- X.new %*% mcmc.beta[s,] + mcmc.lamb[s] * fi
+        if(cla == "panelTVP.Gaussian"){
+          y.replicant[, replicant] <- rnorm(n, mean = eta.replicant[, replicant], sd = sqrt(sigma2[s]))
+        }
+        if(cla == "panelTVP.Probit"){
+          y.replicant[, replicant] <- rbinom(n, size = 1, prob = pnorm(eta.replicant[, replicant]))
+        }
+        if(cla == "panelTVP.Logit"){
+          y.replicant[, replicant] <- rbinom(n, size = 1, prob = plogis(eta.replicant[, replicant]))
+        }
+        if(cla == "panelTVP.NegBin"){
+          y.replicant[, replicant] <- MASS::rnegbin(n, mu = r[s] * exp(eta.replicant[, replicant]), theta = r[s])
+        }
       }
-      if(cla == "panelTVP.Probit"){
-        y.future[, s] <- rbinom(n, size = 1, prob = pnorm(mcmc.eta[,s]))
-      }
-      if(cla == "panelTVP.Logit"){
-        y.future[, s] <- rbinom(n, size = 1, prob = plogis(mcmc.eta[,s]))
-      }
-      if(cla == "panelTVP.NegBin"){
-        y.future[, s] <- MASS::rnegbin(n, mu = r[s] * exp(mcmc.eta[,s]), theta = r[s])
-      }
+      col.idx <- 1+(n.replicates*(s-1))
+      y.future[,col.idx:(col.idx+(n.replicates-1))] <- y.replicant
     }
   }
 
@@ -409,7 +448,7 @@ pred.helper <- function(model, X.new, timepoint,
 }
 
 pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
-                                coverage = 0.95, pop.pred = FALSE){
+                             coverage, pop.pred, n.replicates){
 
   if(is.data.frame(X_nb.new)) X_nb.new <- as.matrix(X_nb.new)
   if(is.data.frame(X_logit.new)) X_logit.new <- as.matrix(X_logit.new)
@@ -431,11 +470,11 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
     mcmc.lamb_logit <- model$mcmc_logit[, paste0("lambda_t", t)]
   }
   r <- model$mcmc_nb[,"r"]
-  y.future <- matrix(nrow = n, ncol = S)
-  mcmc.eta_nb <- matrix(nrow = n, ncol = S)
-  mcmc.eta_logit <- matrix(nrow = n, ncol = S)
   LO <- numeric(n); UP <- numeric(n)
   if(pop.pred){
+    y.future <- matrix(nrow = n, ncol = S)
+    mcmc.eta_nb <- matrix(nrow = n, ncol = S)
+    mcmc.eta_logit <- matrix(nrow = n, ncol = S)
     for(s in 1:S){
       mcmc.eta_nb[, s] <- X_nb.new %*% mcmc.beta_nb[s,]
       mcmc.eta_logit[, s] <- X_logit.new %*% mcmc.beta_logit[s,]
@@ -446,18 +485,26 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
       y.future[, s] <- y.draw
     }
   } else{
+    y.future <- matrix(nrow = n, ncol = S * n.replicates)
     for(s in 1:S){
-      fi_nb <- rnorm(n)
-      fi_logit <- rnorm(n)
-      mcmc.eta_nb[, s] <- X_nb.new %*% mcmc.beta_nb[s,] +
-        mcmc.lamb_nb[s] * fi_nb
-      mcmc.eta_logit[, s] <- X_logit.new %*% mcmc.beta_logit[s,] +
-        mcmc.lamb_logit[s] * fi_logit
-      w <- rbinom(n, size = 1, prob = plogis(mcmc.eta_logit[,s]))
-      idx <- w == 1
-      y.draw <- vector(mode = "numeric", length = length(w))
-      y.draw[idx] <- MASS::rnegbin(sum(idx), mu = r[s] * exp(mcmc.eta_nb[idx,s]), theta = r[s])
-      y.future[, s] <- y.draw
+      eta_nb.replicant <- matrix(nrow = n, ncol = n.replicates)
+      eta_logit.replicant <- matrix(nrow = n, ncol = n.replicates)
+      y.replicant <- matrix(nrow = n, ncol = n.replicates)
+      for(replicant in 1:n.replicates){
+        fi_nb <- rnorm(n)
+        fi_logit <- rnorm(n)
+        eta_nb.replicant[, replicant] <- X_nb.new %*% mcmc.beta_nb[s,] +
+          mcmc.lamb_nb[s] * fi_nb
+        eta_logit.replicant[, replicant] <- X_logit.new %*% mcmc.beta_logit[s,] +
+          mcmc.lamb_logit[s] * fi_logit
+        w <- rbinom(n, size = 1, prob = plogis(eta_logit.replicant[,replicant]))
+        idx <- w == 1
+        y.draw <- vector(mode = "numeric", length = length(w))
+        y.draw[idx] <- MASS::rnegbin(sum(idx), mu = r[s] * exp(eta_nb.replicant[idx,replicant]), theta = r[s])
+        y.replicant[,replicant] <- y.draw
+      }
+      col.idx <- 1+(n.replicates*(s-1))
+      y.future[,col.idx:(col.idx+(n.replicates-1))] <- y.replicant
     }
   }
 

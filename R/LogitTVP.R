@@ -173,15 +173,6 @@ LogitTVP <- function(df,
   # added on 05.08.24: apply the absolute value to psi for the summary
   res[,startsWith(colnames(res), "psi")] <- abs(res[,startsWith(colnames(res), "psi")])
   colnames(res)[startsWith(colnames(res), "psi")] <- "abs(psi)"
-
-  # in summary report lambda with positive sign for lambda 1
-  if(prior.load$type != "cps"){
-    sign.lambda1 <- sign(res[, "lambda_t1"])
-    ind <- startsWith(colnames(res), "lambda")
-    res[,ind] <- sign.lambda1*res[,ind]
-  } else{
-    res[, "lambda_t"] <- abs(res[, "lambda_t"])
-  }
   res <- coda::mcmc(data = res[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
   hpint <- coda::HPDinterval(res, prob = HPD.coverage)
 

@@ -37,6 +37,7 @@ panelTVP(
   settings.NegBin = list(alpha.r = 2, beta.r = 1, expansion.steps = 10, width = 1,
     p.overrelax = 0, accuracy.overrelax = 10),
   HPD.coverage = 0.95,
+  R.WAIC = 1000,
   random.effects = TRUE,
   progress.bar = FALSE
 )
@@ -327,6 +328,9 @@ see the original paper on Slice sampling by Neal (2003)}
 
 \item{HPD.coverage}{coverage probability of highest posterior density intervals
 (default yields 95 percent coverage)}
+
+\item{R.WAIC}{number of replications for computing the marginal WAIC, where
+the latent factors are integrated out}
 
 \item{random.effects}{if TRUE (= default) a factor model is included for estimating
 random effects, if FALSE the model does not contain random effects and, consequently,

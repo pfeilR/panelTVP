@@ -412,6 +412,7 @@ pred.helper <- function(model, X.new, timepoint,
       y.replicant <- matrix(nrow = n, ncol = n.replicates)
       for(replicant in 1:n.replicates){
         fi <- rnorm(n) # sampling from the prior for new subjects
+        fi <- fi - mean(fi)
         eta.replicant[, replicant] <- X.new %*% mcmc.beta[s,] + mcmc.lamb[s] * fi
         if(cla == "panelTVP.Gaussian"){
           y.replicant[, replicant] <- rnorm(n, mean = eta.replicant[, replicant], sd = sqrt(sigma2[s]))
@@ -492,7 +493,9 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
       y.replicant <- matrix(nrow = n, ncol = n.replicates)
       for(replicant in 1:n.replicates){
         fi_nb <- rnorm(n)
+        fi_nb <- fi_nb - mean(fi_nb)
         fi_logit <- rnorm(n)
+        fi_logit <- fi_logit - mean(fi_logit)
         eta_nb.replicant[, replicant] <- X_nb.new %*% mcmc.beta_nb[s,] +
           mcmc.lamb_nb[s] * fi_nb
         eta_logit.replicant[, replicant] <- X_logit.new %*% mcmc.beta_logit[s,] +

@@ -273,6 +273,8 @@
 #'  see the original paper on Slice sampling by Neal (2003)
 #' @param HPD.coverage coverage probability of highest posterior density intervals
 #'  (default yields 95 percent coverage)
+#' @param R.WAIC number of replications for computing the marginal WAIC, where
+#'  the latent factors are integrated out
 #' @param random.effects if TRUE (= default) a factor model is included for estimating
 #'  random effects, if FALSE the model does not contain random effects and, consequently,
 #'  priors on the parameters of the factor model are ignored
@@ -642,6 +644,7 @@ panelTVP <- function(formula,
                        width = 1, p.overrelax = 0, accuracy.overrelax = 10
                      ),
                      HPD.coverage = 0.95,
+                     R.WAIC = 1000,
                      random.effects = TRUE,
                      progress.bar = FALSE
 ){
@@ -680,7 +683,7 @@ panelTVP <- function(formula,
                                                "a.zeta", "kappa.zeta")),]
     }
     # add WAIC and remove chain of factor scores to save memory
-    # result$WAIC <- compute_waic(result, random.effects)
+    # result$WAIC <- compute_waic(result, random.effects, R.WAIC)
     if(random.effects){
       result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
     } else{
@@ -745,7 +748,7 @@ panelTVP <- function(formula,
                                                        "a.zeta", "kappa.zeta")),]
     }
     # add WAIC and remove chain of factor scores and risk-indicators to save memory
-    # result$WAIC <- compute_waic(result)
+    # result$WAIC <- compute_waic(result, random.effects, R.WAIC)
     if(random.effects){
       result$posterior.predictive <- compute_fitted_ZINB(result)
     } else{

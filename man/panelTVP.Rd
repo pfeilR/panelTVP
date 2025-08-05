@@ -14,27 +14,27 @@ panelTVP(
     nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi = 10,
     iota.tau = 1, iota.xi = 1, learn.a.tau = TRUE, learn.a.xi = TRUE, target.rate.tau =
     0.44, target.rate.xi = 0.44, learn.kappa.tau = TRUE, learn.kappa.xi = TRUE, type =
-    "rw2", c = 1, B0 = 1),
+    "rw-t1", c = 1, B0 = 1),
   prior.var = list(learn.C0.hyp = list(g0 = 5, G0 = 3.333333), c0 = 2.5),
   prior.load = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001, a.phi =
     1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi = TRUE,
-    learn.kappa.zeta = TRUE, type = "rw2", c = 1, L0 = 1),
+    learn.kappa.zeta = TRUE, type = "rw-t1", c = 1, L0 = 1),
   prior.reg_nb = list(d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001, b.tau =
     10, nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi =
     10, iota.tau = 1, iota.xi = 1, learn.a.tau = TRUE, learn.a.xi = TRUE, target.rate.tau
     = 0.44, target.rate.xi = 0.44, learn.kappa.tau = TRUE, learn.kappa.xi = TRUE, type =
-    "rw2", c = 1, B0 = 1),
+    "rw-t1", c = 1, B0 = 1),
   prior.load_nb = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
     a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi = TRUE,
-    learn.kappa.zeta = TRUE, type = "rw2", c = 1, L0 = 1),
+    learn.kappa.zeta = TRUE, type = "rw-t1", c = 1, L0 = 1),
   prior.reg_logit = list(d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001, b.tau
     = 10, nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi
     = 10, iota.tau = 1, iota.xi = 1, learn.a.tau = TRUE, learn.a.xi = TRUE,
     target.rate.tau = 0.44, target.rate.xi = 0.44, learn.kappa.tau = TRUE, learn.kappa.xi
-    = TRUE, type = "rw2", c = 1, B0 = 1),
+    = TRUE, type = "rw-t1", c = 1, B0 = 1),
   prior.load_logit = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
     a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi = TRUE,
-    learn.kappa.zeta = TRUE, type = "rw2", c = 1, L0 = 1),
+    learn.kappa.zeta = TRUE, type = "rw-t1", c = 1, L0 = 1),
   mcmc.opt = list(chain.length = 12000, burnin = 2000, thin = 10, asis = TRUE),
   settings.NegBin = list(alpha.r = 2, beta.r = 1, expansion.steps = 10, width = 1,
     p.overrelax = 0, accuracy.overrelax = 10),
@@ -106,8 +106,8 @@ if FALSE \eqn{\kappa^\tau = } \code{kappa.tau}
 Gibbs-step with the value of argument \code{kappa.xi} used as starting value,
 if FALSE \eqn{\kappa^\xi = } \code{kappa.xi}
 \item \code{type}: the type of prior you want on your regression effects;
-this argument is either "rw1" (RW1 shrinkage prior), "rw2" (RW2 shrinkage prior)
-or "ind" (independence prior)
+this argument is either "rw-t0" (shrinkage prior starting at T = 0),
+"rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior)
 \item \code{c}: prior parameter that scales the variance when using
 shrinkage prior (ignored when using independence prior)
 \item \code{B0}: prior variance on the regression parameters when using
@@ -145,8 +145,8 @@ if FALSE \eqn{\kappa^\phi = } \code{kappa.phi}
 Gibbs-step with the value of argument \code{kappa.zeta} used as starting value,
 if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta}
 \item \code{type}: the type of prior you want on your regression effects;
-this argument is either "cps" (compound symmetric), "rw1" (RW1 shrinkage prior),
-"rw2" (RW2 shrinkage prior) or "ind" (independence prior)
+this argument is either "cps" (compound symmetric), "rw-t0" (shrinkage prior starting at T = 0),
+"rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior)
 \item \code{c}: prior parameter that scales the variance when using shrinkage prior
 (ignored when using cps or independence prior)
 \item \code{L0}: prior variance on the factor loading when using either cps or independence
@@ -194,8 +194,8 @@ if FALSE \eqn{\kappa^\tau = } \code{kappa.tau} (count model)
 Gibbs-step with the value of argument \code{kappa.xi} used as starting value,
 if FALSE \eqn{\kappa^\xi = } \code{kappa.xi} (count model)
 \item \code{type}: the type of prior you want on your regression effects;
-this argument is either "rw1" (RW1 shrinkage prior), "rw2" (RW2 shrinkage prior)
-or "ind" (independence prior) (count model)
+this argument is either "rw-t0" (shrinkage prior starting at T = 0),
+"rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior) (count model)
 \item \code{c}: prior parameter that scales the variance when using shrinkage prior
 (ignored when using independence prior) (count model)
 \item \code{B0}: prior variance on the regression parameters when using
@@ -221,8 +221,8 @@ if FALSE \eqn{\kappa^\phi = } \code{kappa.phi} (count model)
 Gibbs-step with the value of argument \code{kappa.zeta} used as starting value,
 if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta} (count model)
 \item \code{type}: the type of prior you want on your regression effects;
-this argument is either "cps" (compound symmetric), "rw1" (RW1 shrinkage prior),
-"rw2" (RW2 shrinkage prior) or "ind" (independence prior) (count model)
+this argument is either "cps" (compound symmetric), "rw-t0" (shrinkage prior starting at T = 0),
+"rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior) (count model)
 \item \code{c}: prior parameter that scales the variance when using
 shrinkage prior (ignored when using cps or independence prior) (count model)
 \item \code{L0}: prior variance on the factor loading (ignored when using shrinkage prior) (count model)
@@ -269,8 +269,8 @@ if FALSE \eqn{\kappa^\tau = } \code{kappa.tau} (zero-inflation model)
 Gibbs-step with the value of argument \code{kappa.xi} used as starting value,
 if FALSE \eqn{\kappa^\xi = } \code{kappa.xi} (zero-inflation model)
 \item \code{type}: the type of prior you want on your regression effects;
-this argument is either "rw1" (RW1 shrinkage prior), "rw2" (RW2 shrinkage prior)
-or "ind" (independence prior) (zero-inflation model)
+this argument is either "rw-t0" (shrinkage prior starting at T = 0),
+"rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior) (zero-inflation model)
 \item \code{c}: prior parameter that scales the variance when using
 shrinkage prior (ignored when using independence prior) (zero-inflation model)
 \item \code{B0}: prior variance on the regression parameters when using
@@ -296,8 +296,8 @@ if FALSE \eqn{\kappa^\phi = } \code{kappa.phi} (zero-inflation model)
 Gibbs-step with the value of argument \code{kappa.zeta} used as starting value,
 if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta} (zero-inflation model)
 \item \code{type}: the type of prior you want on your regression effects;
-this argument is either "cps" (compound symmetric), "rw1" (RW1 shrinkage prior),
-"rw2" (RW2 shrinkage prior) or "ind" (independence prior) (zero-inflation model)
+this argument is either "cps" (compound symmetric), "rw-t0" (shrinkage prior starting at T = 0),
+"rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior) (zero-inflation model)
 \item \code{c}: prior parameter that scales the variance when using
 shrinkage prior (ignored when using cps or independence prior) (zero-inflation model)
 \item \code{L0}: prior variance on the factor loading (ignored when using shrinkage prior) (zero-inflation model)

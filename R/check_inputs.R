@@ -114,10 +114,10 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
   if(!is.null(id) && (length(id) != nrow(data) || !is.numeric(id) || sum(id %% 1) != 0 || sum(!is.finite(id)) != 0)){
     stop("Argument 'id' must be an integer-valued vector with length equal to the number of observations in 'data'.")
   }
-  if(is.null(t) && !("t" %in% vars)){
+  if(is.null(t) && !("t" %in% colnames(data))){
     stop("Your dataset does not contain a time-variable called 't'. Hence, you must specify explicitly the argument 't'.")
   }
-  if(is.null(id) && !("id" %in% vars)){
+  if(is.null(id) && !("id" %in% colnames(data))){
     stop("Your dataset does not contain a subject-index called 'id'. Hence, you must specify explicitly the argument 'id'.")
   }
 
@@ -178,7 +178,7 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
   # R.WAIC
   if(is.null(R.WAIC) ||!is.numeric(R.WAIC) || length(R.WAIC) != 1 || R.WAIC %% 1 != 0 ||
      !is.finite(R.WAIC) || R.WAIC < 1)
-    stop("Argument 'expansion.steps' in settings.NegBin must be a single, positive integer.")
+    stop("Argument 'R.WAIC' must be a single, positive integer.")
 
   # random.effects
   if(is.null(random.effects) || !is.logical(random.effects) ||
@@ -235,8 +235,8 @@ check.prior.reg <- function(prior.reg){
     stop("Argument learn.kappa.tau in regression prior must be a logical scalar.")
   if(is.null(prior.reg$learn.kappa.xi) || !is.logical(prior.reg$learn.kappa.xi) || length(prior.reg$learn.kappa.xi) != 1)
     stop("Argument learn.kappa.xi in regression prior must be a logical scalar.")
-  if(!prior.reg$type %in% c("rw1", "rw2", "ind"))
-    stop("Argument type in regression prior must either be 'rw1', 'rw2' or 'ind'.")
+  if(!prior.reg$type %in% c("rw-t0", "rw-t1", "ind"))
+    stop("Argument type in regression prior must either be 'rw-t0', 'rw-t1' or 'ind'.")
   check.hyper_double.positive(prior.reg$c, "c in regression prior")
   check.hyper_double.positive(prior.reg$B0, "B0 in regression prior")
 }
@@ -255,8 +255,8 @@ check.prior.load <- function(prior.load){
     stop("Argument learn.kappa.phi in loading prior must be a logical scalar.")
   if(is.null(prior.load$learn.kappa.zeta) || !is.logical(prior.load$learn.kappa.zeta) || length(prior.load$learn.kappa.zeta) != 1)
     stop("Argument learn.kappa.zeta in loading prior must be a logical scalar.")
-  if(is.null(prior.load$type) || !prior.load$type %in% c("rw1", "rw2", "ind", "cps"))
-    stop("Argument type in in loading prior must either be 'rw1', 'rw2', 'ind' or 'cps'.")
+  if(is.null(prior.load$type) || !prior.load$type %in% c("rw-t0", "rw-t1", "ind", "cps"))
+    stop("Argument type in in loading prior must either be 'rw-t0', 'rw-t1', 'ind' or 'cps'.")
   check.hyper_double.positive(prior.load$c, "c in loading prior")
   check.hyper_double.positive(prior.load$L0, "L0 in loading prior")
 }

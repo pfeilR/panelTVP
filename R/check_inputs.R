@@ -18,13 +18,13 @@ check_sim <- function(n,
                       lambda.logit = NULL,
                       psi.logit = NULL){
 
-  if(!is.numeric(n) || length(n) != 1 || n %% 1 != 0 || !is.finite(n)){
+  if(is.null(n) || !is.numeric(n) || length(n) != 1 || n %% 1 != 0 || !is.finite(n)){
     stop("Argument 'n' must be a single value that represents the number of subjects")
   }
-  if(!is.numeric(Tmax) || length(Tmax) != 1 || Tmax %% 1 != 0 || !is.finite(Tmax) || Tmax <= 2){
+  if(is.null(Tmax) || !is.numeric(Tmax) || length(Tmax) != 1 || Tmax %% 1 != 0 || !is.finite(Tmax) || Tmax <= 2){
     stop("Argument 'Tmax' must be a single value > 2 that represents the number of repeated measurements")
   }
-  if(!(model %in% c("Gaussian", "Probit", "Logit", "NegBin", "ZINB"))){
+  if(is.null(model) || !(model %in% c("Gaussian", "Probit", "Logit", "NegBin", "ZINB"))){
     stop("Argument 'model' must be either 'Gaussian', 'Probit', 'Logit', 'NegBin' or 'ZINB'")
   }
   if(model %in% c("NegBin", "ZINB") && is.null(r)){
@@ -79,6 +79,246 @@ check_sim <- function(n,
 
 # check input arguments of panelTVP --------------------------------------------
 
+check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, prior.load,
+                           prior.reg_nb, prior.load_nb, prior.reg_logit, prior.load_logit,
+                           mcmc.opt, settings.NegBin, HPD.coverage, R.WAIC,
+                           random.effects, progress.bar){
+
+  if(is.null(formula) || is.null(data)) stop("Arguments 'formula' and 'data' are required with no defaults.")
+
+  # checking model type
+  if(is.null(model) || !model %in% c("Gaussian", "Probit", "Logit", "NegBin", "ZINB")){
+    stop("Argument 'model' must be either 'Gaussian', 'Probit', 'Logit', 'NegBin' or 'ZINB'.")
+  }
+  # checking formula (together with model)
+  if(!inherits(formula, "formula")) {
+    stop("Argument 'formula' must be a formula object.")
+  }
+  if(model != "ZINB" && any(grepl("\\|", deparse(formula)))){
+    stop("The character '|' in argument 'formula' is only valid for Zero-Inflated Negative Binomial regression.")
+  }
+  if(model == "ZINB" && sum(grepl("\\|", deparse(formula))) != 1){
+    stop("Argument 'formula' needs exactly one '|' character for Zero-Inflated Negative Binomial regression.")
+  }
+  # data, id, t
+  if(!is.data.frame(data)){
+    stop("Argument 'data' must be a (Tn x d) data frame.")
+  }
+  vars <- all.vars(formula)
+  if(sum(!(vars %in% colnames(data))) > 0){
+    stop("There are variables in your 'formula' argument that are not contained in 'data'.")
+  }
+  if(!is.null(t) && (length(t) != nrow(data) || !is.numeric(t) || sum(t %% 1) != 0 || sum(!is.finite(t)) != 0)){
+    stop("Argument 't' must be an integer-valued vector with length equal to the number of observations in 'data'.")
+  }
+  if(!is.null(id) && (length(id) != nrow(data) || !is.numeric(id) || sum(id %% 1) != 0 || sum(!is.finite(id)) != 0)){
+    stop("Argument 'id' must be an integer-valued vector with length equal to the number of observations in 'data'.")
+  }
+  if(is.null(t) && !("t" %in% vars)){
+    stop("Your dataset does not contain a time-variable called 't'. Hence, you must specify explicitly the argument 't'.")
+  }
+  if(is.null(id) && !("id" %in% vars)){
+    stop("Your dataset does not contain a subject-index called 'id'. Hence, you must specify explicitly the argument 'id'.")
+  }
+
+  # response variable check
+  resp <- data[, as.character(formula[[2]])]
+  if(model %in% c("Probit", "Logit")){
+    if(is.factor(resp) && length(levels(resp)) != 2){
+      stop("When response variable is a factor, it must have exactly two levels for Probit and Logit models.")
+    } else if(is.numeric(resp) && !all(resp %in% c(0,1))){
+      stop("When response is of type numeric, it must only contain 0 and 1 for Probit and Logit models.")
+    } else if(!is.factor(resp) && !is.numeric(resp) && !is.logical(resp)){
+      stop("Response must be a factor with two levels, numeric 0/1, or logical for Probit and Logit models.")
+    }
+  }
+  if(model %in% c("NegBin", "ZINB")){
+    if(!is.numeric(resp)){
+      stop("Response must be numeric for count data regression.")
+    }
+    if(any(resp) < 0){
+      stop("Response must be positive for count data regression.")
+    }
+    if(any(abs(resp - round(resp)) > .Machine$double.eps^0.5)){
+      stop("Response must be integer-valued (count data) for count data regression.")
+    }
+  }
+
+  # hyperparameter checks for non-ZINB models
+  if(model != "ZINB"){
+
+    check.prior.reg(prior.reg)
+    if(model == "Gaussian"){
+      # prior.var.check
+      check.hyper_double.positive(prior.var$learn.C0.hyp$g0, "g0 in prior.var")
+      check.hyper_double.positive(prior.var$learn.C0.hyp$G0, "G0 in prior.var")
+      check.hyper_double.positive(prior.var$c0, "c0 in prior.var")
+    }
+    check.prior.load(prior.load)
+
+  } else{ # ZINB-Checks
+
+    check.prior.reg(prior.reg_nb)
+    check.prior.load(prior.load_nb)
+    check.prior.reg(prior.reg_logit)
+    check.prior.load(prior.load_logit)
+
+  }
+
+  # MCMC setting checks
+  check.mcmc.opt(mcmc.opt)
+
+  # settings.NegBin
+  if(model %in% c("NegBin", "ZINB")) check.settings.NegBin(settings.NegBin)
+
+  # HPD coverage
+  if(is.null(HPD.coverage) ||!is.numeric(HPD.coverage) || HPD.coverage < 0 || HPD.coverage > 1)
+    stop("Argument HPD.coverage must be valid probability.")
+
+  # R.WAIC
+  if(is.null(R.WAIC) ||!is.numeric(R.WAIC) || length(R.WAIC) != 1 || R.WAIC %% 1 != 0 ||
+     !is.finite(R.WAIC) || R.WAIC < 1)
+    stop("Argument 'expansion.steps' in settings.NegBin must be a single, positive integer.")
+
+  # random.effects
+  if(is.null(random.effects) || !is.logical(random.effects) ||
+     length(random.effects) != 1 || !is.finite(random.effects)){
+    stop("Argument 'random.effects' must be a single logical value.")
+  }
+
+  # progress.bar
+  if(is.null(progress.bar) || !is.logical(progress.bar) ||
+     length(progress.bar) != 1 || !is.finite(progress.bar)){
+    stop("Argument 'progress.bar' must be a single logical value.")
+  }
+
+
+}
+
+# helper for check.panelTVP ----------------------------------------------------
+check.hyper_double.positive <- function(x, argument){
+  if(is.null(x) || !is.numeric(x) || length(x) != 1 || !is.finite(x) || x <= 0)
+    stop(paste("Argument", argument, "must be a positive and finite numeric scalar."))
+}
+
+check.prior.reg <- function(prior.reg){
+  if(is.null(prior.reg)) stop("Your regression prior setting is not allowed to be NULL.")
+  check.hyper_double.positive(prior.reg$d.tau, "d.tau in regression prior")
+  check.hyper_double.positive(prior.reg$e.tau, "e.tau in regression prior")
+  check.hyper_double.positive(prior.reg$d.xi, "d.xi in regression prior")
+  check.hyper_double.positive(prior.reg$e.xi, "e.xi in regression prior")
+  check.hyper_double.positive(prior.reg$b.tau, "b.tau in regression prior")
+  check.hyper_double.positive(prior.reg$nu.tau, "nu.tau in regression prior")
+  check.hyper_double.positive(prior.reg$b.xi, "b.xi in regression prior")
+  check.hyper_double.positive(prior.reg$nu.xi, "nu.xi in regression prior")
+  check.hyper_double.positive(prior.reg$a.tau, "a.tau in regression prior")
+  check.hyper_double.positive(prior.reg$kappa.tau, "kappa.tau in regression prior")
+  check.hyper_double.positive(prior.reg$a.xi, "a.xi in regression prior")
+  check.hyper_double.positive(prior.reg$kappa.xi, "kappa.xi in regression prior")
+  check.hyper_double.positive(prior.reg$iota.tau, "iota.tau in regression prior")
+  check.hyper_double.positive(prior.reg$iota.xi, "iota.xi in regression prior")
+  if(!is.logical(prior.reg$learn.a.tau) || length(prior.reg$learn.a.tau) > 1)
+    stop("Argument learn.a.tau in regression prior must be a logical scalar.")
+  if(!is.logical(prior.reg$learn.a.xi) || length(prior.reg$learn.a.xi) > 1)
+    stop("Argument learn.a.xi in regression prior must be a logical scalar.")
+  if(prior.reg$learn.a.tau){
+    if(is.null(prior.reg$target.rate.tau) ||!is.numeric(prior.reg$target.rate.tau) ||
+       prior.reg$target.rate.tau < 0 || prior.reg$target.rate.tau > 1)
+      stop("Argument target.rate.tau in regression prior must be valid probability when learning a.tau.")
+  }
+  if(prior.reg$learn.a.xi){
+    if(is.null(prior.reg$target.rate.xi) || !is.numeric(prior.reg$target.rate.xi) ||
+       prior.reg$target.rate.xi < 0 || prior.reg$target.rate.xi > 1)
+      stop("Argument target.rate.xi in regression prior must be valid probability when learning a.xi.")
+  }
+  if(is.null(prior.reg$learn.kappa.tau) || !is.logical(prior.reg$learn.kappa.tau) || length(prior.reg$learn.kappa.tau) != 1)
+    stop("Argument learn.kappa.tau in regression prior must be a logical scalar.")
+  if(is.null(prior.reg$learn.kappa.xi) || !is.logical(prior.reg$learn.kappa.xi) || length(prior.reg$learn.kappa.xi) != 1)
+    stop("Argument learn.kappa.xi in regression prior must be a logical scalar.")
+  if(!prior.reg$type %in% c("rw1", "rw2", "ind"))
+    stop("Argument type in regression prior must either be 'rw1', 'rw2' or 'ind'.")
+  check.hyper_double.positive(prior.reg$c, "c in regression prior")
+  check.hyper_double.positive(prior.reg$B0, "B0 in regression prior")
+}
+
+check.prior.load <- function(prior.load){
+  if(is.null(prior.load)) stop("Your loading prior setting is not allowed to be NULL.")
+  check.hyper_double.positive(prior.load$d.phi, "d.phi in loading prior")
+  check.hyper_double.positive(prior.load$e.phi, "e.phi in loading prior")
+  check.hyper_double.positive(prior.load$d.zeta, "d.zeta in loading prior")
+  check.hyper_double.positive(prior.load$e.zeta, "e.zeta in loading prior")
+  check.hyper_double.positive(prior.load$a.phi, "a.phi in loading prior")
+  check.hyper_double.positive(prior.load$kappa.phi, "kappa.phi in loading prior")
+  check.hyper_double.positive(prior.load$a.zeta, "a.zeta in loading prior")
+  check.hyper_double.positive(prior.load$kappa.zeta, "kappa.zeta in loading prior")
+  if(is.null(prior.load$learn.kappa.phi) || !is.logical(prior.load$learn.kappa.phi) || length(prior.load$learn.kappa.phi) != 1)
+    stop("Argument learn.kappa.phi in loading prior must be a logical scalar.")
+  if(is.null(prior.load$learn.kappa.zeta) || !is.logical(prior.load$learn.kappa.zeta) || length(prior.load$learn.kappa.zeta) != 1)
+    stop("Argument learn.kappa.zeta in loading prior must be a logical scalar.")
+  if(is.null(prior.load$type) || !prior.load$type %in% c("rw1", "rw2", "ind", "cps"))
+    stop("Argument type in in loading prior must either be 'rw1', 'rw2', 'ind' or 'cps'.")
+  check.hyper_double.positive(prior.load$c, "c in loading prior")
+  check.hyper_double.positive(prior.load$L0, "L0 in loading prior")
+}
+
+check.mcmc.opt <- function(mcmc.opt) {
+  if(is.null(mcmc.opt)) stop("Your MCMC settings are not allowed to be NULL.")
+  if (is.null(mcmc.opt$chain.length) || is.null(mcmc.opt$burnin) ||
+      is.null(mcmc.opt$thin) || is.null(mcmc.opt$asis)) {
+    stop("The arguments in 'mcmc.opt' are not allowed to be NULL.")
+  }
+  if (!is.numeric(mcmc.opt$chain.length) | length(mcmc.opt$chain.length) != 1) {
+    stop("'mcmc.opt$chain.length' of wrong type or not single value")
+  }
+  if (!is.numeric(mcmc.opt$burnin) | length(mcmc.opt$burnin) != 1) {
+    stop("'mcmc.opt$burn-in' of wrong type or not single value")
+  }
+  if (!is.logical(mcmc.opt$asis) | length(mcmc.opt$asis) != 1) {
+    stop("'mcmc.opt$asis' of wrong type or not single value")
+  }
+
+  if (mcmc.opt$chain.length <= 0 | (floor(mcmc.opt$chain.length) != mcmc.opt$chain.length)) {
+    stop("'mcmc.opt$chain.length' needs to be a positive integer")
+  }
+  if (mcmc.opt$burnin <= 0 | (floor(mcmc.opt$burnin) != mcmc.opt$burnin)) {
+    stop("'mcmc.opt$burn-in' needs to be a positive integer")
+  }
+  if (mcmc.opt$burnin >= mcmc.opt$chain.length) {
+    stop("burn-in period needs to be shorter than the entire chain length")
+  }
+  if (mcmc.opt$chain.length - mcmc.opt$burnin == 1){
+    stop("Markov Chain needs to be at least of length 2 after burn-in")
+  }
+  if (mcmc.opt$thin > (mcmc.opt$chain.length - mcmc.opt$burnin)) {
+    stop(paste("Thinning factor cannot be greater than the number of remaining samples after burn-in (",
+               mcmc.opt$chain.length - mcmc.opt$burnin, ").", sep=""))
+  }
+  if ((is.numeric(mcmc.opt$thin) & !isTRUE(all.equal(mcmc.opt$thin, as.integer(mcmc.opt$thin)))) | mcmc.opt$thin <= 0) {
+    stop("Thining factor must be a positive integer.")
+  }
+  if ((mcmc.opt$chain.length - mcmc.opt$burnin) %% mcmc.opt$thin != 0) {
+    stop(paste("Thinning factor must be a multiple of remaining samples after burn-in ("),
+         mcmc.opt$chain.length - mcmc.opt$burnin, ").", sep = "")
+  }
+}
+
+check.settings.NegBin <- function(settings.NegBin){
+  if(is.null(settings.NegBin)) stop("Your Negative Binomial settings are not allowed to be NULL for count models.")
+  check.hyper_double.positive(settings.NegBin$alpha.r, "alpha.r in settings.NegBin")
+  check.hyper_double.positive(settings.NegBin$beta.r, "beta.r in settings.NegBin")
+  if(is.null(settings.NegBin$expansion.steps) || !is.numeric(settings.NegBin$expansion.steps) ||
+     length(settings.NegBin$expansion.steps) != 1 || settings.NegBin$expansion.steps %% 1 != 0 ||
+     !is.finite(settings.NegBin$expansion.steps) || settings.NegBin$expansion.steps < 1)
+    stop("Argument 'expansion.steps' in settings.NegBin must be a single, positive integer.")
+  check.hyper_double.positive(settings.NegBin$width, "width in settings.NegBin")
+  if(is.null(settings.NegBin$p.overrelax) || !is.numeric(settings.NegBin$p.overrelax) ||
+     settings.NegBin$p.overrelax < 0 || settings.NegBin$p.overrelax > 1)
+    stop("Argument p.overrelax in settings.NegBin prior must be valid probability")
+  if(settings.NegBin$p.overrelax > 0){
+    check.hyper_double.positive(settings.NegBin$accuracy.overrelax, "accuracy.overrelax in settings.NegBin")
+  }
+}
+
 # check input arguments of predict S3-functions --------------------------------
 
 check.predict <- function(model, X.new, timepoint, coverage, pop.pred, n.replicates){
@@ -108,19 +348,19 @@ check.predict <- function(model, X.new, timepoint, coverage, pop.pred, n.replica
 
   }
 
-  if(!is.numeric(timepoint) || length(timepoint) != 1 || timepoint %% 1 != 0 || !is.finite(timepoint)){
+  if(is.null(timepoint) || !is.numeric(timepoint) || length(timepoint) != 1 || timepoint %% 1 != 0 || !is.finite(timepoint)){
     stop("Argument 'timepoint' must be a single integer. If you want predictions for multiple time points, please call the predict function multiple times.")
   }
 
-  if(!is.numeric(coverage) || length(coverage) != 1 || !is.finite(coverage) || coverage < 0 || coverage > 1){
+  if(is.null(coverage) || !is.numeric(coverage) || length(coverage) != 1 || !is.finite(coverage) || coverage < 0 || coverage > 1){
     stop("Argument 'coverage' must be a single numeric value between 0 and 1.")
   }
 
-  if(!is.logical(pop.pred) || length(pop.pred) != 1 || !is.finite(pop.pred)){
+  if(is.null(pop.pred) || !is.logical(pop.pred) || length(pop.pred) != 1 || !is.finite(pop.pred)){
     stop("Argument 'pop.pred' must be a single logical value.")
   }
 
-  if(!is.numeric(n.replicates) || length(n.replicates) != 1 || timepoint %% 1 != 0 || !is.finite(n.replicates) || n.replicates < 1){
+  if(is.null(n.replicates) || !is.numeric(n.replicates) || length(n.replicates) != 1 || timepoint %% 1 != 0 || !is.finite(n.replicates) || n.replicates < 1){
     stop("Argument 'n.replicates' must be a single, positive integer.")
   }
 
@@ -178,19 +418,19 @@ check.predict_ZINB <- function(model, X_nb.new, X_logit.new, timepoint, coverage
 
   }
 
-  if(!is.numeric(timepoint) || length(timepoint) != 1 || timepoint %% 1 != 0 || !is.finite(timepoint)){
+  if(is.null(timepoint) || !is.numeric(timepoint) || length(timepoint) != 1 || timepoint %% 1 != 0 || !is.finite(timepoint)){
     stop("Argument 'timepoint' must be a single numeric value. If you want predictions for multiple time points, please call the predict function multiple times.")
   }
 
-  if(!is.numeric(coverage) || length(coverage) != 1 || !is.finite(coverage) || coverage < 0 || coverage > 1){
+  if(is.null(timepoint) || !is.numeric(coverage) || length(coverage) != 1 || !is.finite(coverage) || coverage < 0 || coverage > 1){
     stop("Argument 'coverage' must be a single numeric value between 0 and 1.")
   }
 
-  if(!is.logical(pop.pred) || length(pop.pred) != 1 || !is.finite(pop.pred)){
+  if(is.null(timepoint) || !is.logical(pop.pred) || length(pop.pred) != 1 || !is.finite(pop.pred)){
     stop("Argument 'pop.pred' must be a single logical value.")
   }
 
-  if(!is.numeric(n.replicates) || length(n.replicates) != 1 || timepoint %% 1 != 0 || !is.finite(n.replicates) || n.replicates < 1){
+  if(is.null(timepoint) || !is.numeric(n.replicates) || length(n.replicates) != 1 || n.replicates %% 1 != 0 || !is.finite(n.replicates) || n.replicates < 1){
     stop("Argument 'n.replicates' must be a single, positive integer.")
   }
 

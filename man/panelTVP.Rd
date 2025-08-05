@@ -7,6 +7,8 @@
 panelTVP(
   formula,
   data,
+  id = NULL,
+  t = NULL,
   model,
   prior.reg = list(d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001, b.tau = 10,
     nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi = 10,
@@ -52,6 +54,14 @@ zero-inflation component of the model (no default)}
 
 \item{data}{a data frame that contains the variables of the formula argument
 (no default)}
+
+\item{id}{a vector with length equal to the number of observations in the dataset.
+If this argument is not specified, then you must make sure that your data object
+contains the column \texttt{id}, which must contain this information.}
+
+\item{t}{a vector with length equal to the number of observations in the dataset.
+If this argument is not specified, then you must make sure that your data object
+contains the column \texttt{t}, which must contain this information.}
 
 \item{model}{a character indicating which model should be estimated.
 This parameter is either 'Gaussian', 'Probit', 'Logit', 'NegBin' or 'ZINB' depending on

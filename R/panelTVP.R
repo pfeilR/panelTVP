@@ -8,12 +8,10 @@
 #'  zero-inflation component of the model (no default)
 #' @param data a data frame that contains the variables of the formula argument
 #'  (no default)
-#' @param id a vector with length equal to the number of observations in the dataset.
-#'  If this argument is not specified, then you must make sure that your data object
-#'  contains the column \texttt{id}, which must contain this information.
-#' @param t a vector with length equal to the number of observations in the dataset.
-#'  If this argument is not specified, then you must make sure that your data object
-#'  contains the column \texttt{t}, which must contain this information.
+#' @param id a vector with length equal to the number of observations in the dataset, i.e.,
+#'  this is the 'subject' variable in the dataset (no default)
+#' @param t a vector with length equal to the number of observations in the dataset, i.e.,
+#'  this is the 'time' variable in the dataset (no default)
 #' @param model a character indicating which model should be estimated.
 #'  This parameter is either 'Gaussian', 'Probit', 'Logit', 'NegBin' or 'ZINB' depending on
 #'  whether a model for Gaussian, Probit, Logit, Negative Binomial or
@@ -588,11 +586,11 @@
 #'  with Time-Varying Coefficients. In: Einbeck, J. Maeng, H., Ogundium, E. and
 #'  Perrakis, K. (Editors): Developments in Statistical Modelling, Springer, 109-115.
 #' @import stats
-panelTVP <- function(formula,
-                     data,
+panelTVP <- function(formula = NULL,
+                     data = NULL,
                      id = NULL,
                      t = NULL,
-                     model,
+                     model = NULL,
                      prior.reg = list(
                        d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001,
                        b.tau = 10, nu.tau = 5, b.xi = 10, nu.xi = 5,
@@ -662,6 +660,11 @@ panelTVP <- function(formula,
                  prior.reg_nb, prior.load_nb, prior.reg_logit, prior.load_logit,
                  mcmc.opt, settings.NegBin, HPD.coverage, R.WAIC,
                  random.effects, progress.bar)
+
+  # ordering dataset and removing gaps in id
+  data$id <- as.integer(factor(id))
+  data$t <- t
+  data <- data[order(data$t, data$id),]
 
   if(model != "ZINB"){
 

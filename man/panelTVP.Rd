@@ -5,11 +5,11 @@
 \title{Fit a Bayesian panel model with time-varying parameters}
 \usage{
 panelTVP(
-  formula,
-  data,
+  formula = NULL,
+  data = NULL,
   id = NULL,
   t = NULL,
-  model,
+  model = NULL,
   prior.reg = list(d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001, b.tau = 10,
     nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi = 10,
     iota.tau = 1, iota.xi = 1, learn.a.tau = TRUE, learn.a.xi = TRUE, target.rate.tau =
@@ -55,13 +55,11 @@ zero-inflation component of the model (no default)}
 \item{data}{a data frame that contains the variables of the formula argument
 (no default)}
 
-\item{id}{a vector with length equal to the number of observations in the dataset.
-If this argument is not specified, then you must make sure that your data object
-contains the column \texttt{id}, which must contain this information.}
+\item{id}{a vector with length equal to the number of observations in the dataset, i.e.,
+this is the 'subject' variable in the dataset (no default)}
 
-\item{t}{a vector with length equal to the number of observations in the dataset.
-If this argument is not specified, then you must make sure that your data object
-contains the column \texttt{t}, which must contain this information.}
+\item{t}{a vector with length equal to the number of observations in the dataset, i.e.,
+this is the 'time' variable in the dataset (no default)}
 
 \item{model}{a character indicating which model should be estimated.
 This parameter is either 'Gaussian', 'Probit', 'Logit', 'NegBin' or 'ZINB' depending on

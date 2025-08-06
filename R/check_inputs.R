@@ -101,24 +101,23 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
     stop("Argument 'formula' needs exactly one '|' character for Zero-Inflated Negative Binomial regression.")
   }
   # data, id, t
-  if(!is.data.frame(data)){
+  if(is.null(data) || !is.data.frame(data)){
     stop("Argument 'data' must be a (Tn x d) data frame.")
   }
   vars <- all.vars(formula)
   if(sum(!(vars %in% colnames(data))) > 0){
     stop("There are variables in your 'formula' argument that are not contained in 'data'.")
   }
-  if(!is.null(t) && (length(t) != nrow(data) || !is.numeric(t) || sum(t %% 1) != 0 || sum(!is.finite(t)) != 0)){
+  if(is.null(t) && (length(t) != nrow(data) || !is.numeric(t) || sum(t %% 1) != 0 || sum(!is.finite(t)) != 0)){
     stop("Argument 't' must be an integer-valued vector with length equal to the number of observations in 'data'.")
   }
-  if(!is.null(id) && (length(id) != nrow(data) || !is.numeric(id) || sum(id %% 1) != 0 || sum(!is.finite(id)) != 0)){
+  if(is.null(id) && (length(id) != nrow(data) || !is.numeric(id) || sum(id %% 1) != 0 || sum(!is.finite(id)) != 0)){
     stop("Argument 'id' must be an integer-valued vector with length equal to the number of observations in 'data'.")
   }
-  if(is.null(t) && !("t" %in% colnames(data))){
-    stop("Your dataset does not contain a time-variable called 't'. Hence, you must specify explicitly the argument 't'.")
-  }
-  if(is.null(id) && !("id" %in% colnames(data))){
-    stop("Your dataset does not contain a subject-index called 'id'. Hence, you must specify explicitly the argument 'id'.")
+
+  # check if panel is balanced
+  if(length(t) %% max(t) != 0){
+    stop("Panel must be balanced, i.e., the same number of repeated measurements for every subject.")
   }
 
   # response variable check

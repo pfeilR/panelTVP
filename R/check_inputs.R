@@ -136,7 +136,7 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
     if(!is.numeric(resp)){
       stop("Response must be numeric for count data regression.")
     }
-    if(any(resp) < 0){
+    if(any(resp < 0)){
       stop("Response must be positive for count data regression.")
     }
     if(any(abs(resp - round(resp)) > .Machine$double.eps^0.5)){
@@ -280,8 +280,8 @@ check.mcmc.opt <- function(mcmc.opt) {
   if (mcmc.opt$chain.length <= 0 | (floor(mcmc.opt$chain.length) != mcmc.opt$chain.length)) {
     stop("'mcmc.opt$chain.length' needs to be a positive integer")
   }
-  if (mcmc.opt$burnin <= 0 | (floor(mcmc.opt$burnin) != mcmc.opt$burnin)) {
-    stop("'mcmc.opt$burn-in' needs to be a positive integer")
+  if (mcmc.opt$burnin < 0 | (floor(mcmc.opt$burnin) != mcmc.opt$burnin)) {
+    stop("'mcmc.opt$burn-in' needs to be a positive integer or zero")
   }
   if (mcmc.opt$burnin >= mcmc.opt$chain.length) {
     stop("burn-in period needs to be shorter than the entire chain length")

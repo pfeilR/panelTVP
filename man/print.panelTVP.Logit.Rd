@@ -28,6 +28,8 @@ sim.logit <- sim_panelTVP(n = 100,
                           model = "Logit")
 res.logit <- panelTVP(y ~ W1 + W2 + W3,
                       data = sim.logit$observed,
+                      id = sim.logit$observed$id,
+                      t = sim.logit$observed$t,
                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                       model = "Logit")
 print(res.logit)

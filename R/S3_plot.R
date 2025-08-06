@@ -29,6 +29,8 @@
 #'                              sigma2 = 0.7)
 #' res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
 #'                          data = sim.gaussian$observed,
+#'                          id = sim.gaussian$observed$id,
+#'                          t = sim.gaussian$observed$t,
 #'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                          model = "Gaussian")
 #' plot(res.gaussian, nplots = 1)
@@ -66,6 +68,8 @@ plot.panelTVP.Gaussian <- function(x, nplots = 4, ...){
 #'                            model = "Probit")
 #' res.probit <- panelTVP(y ~ W1 + W2 + W3,
 #'                        data = sim.probit$observed,
+#'                        id = sim.probit$observed$id,
+#'                        t = sim.probit$observed$t,
 #'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                        model = "Probit")
 #' plot(res.probit, nplots = 1)
@@ -103,6 +107,8 @@ plot.panelTVP.Probit <- function(x, nplots = 4, ...){
 #'                           model = "Logit")
 #' res.logit <- panelTVP(y ~ W1 + W2 + W3,
 #'                       data = sim.logit$observed,
+#'                       id = sim.logit$observed$id,
+#'                       t = sim.logit$observed$t,
 #'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                       model = "Logit")
 #' plot(res.logit, nplots = 1)
@@ -141,6 +147,8 @@ plot.panelTVP.Logit <- function(x, nplots = 4, ...){
 #'                            model = "NegBin")
 #' res.negbin <- panelTVP(y ~ W1 + W2 + W3,
 #'                        data = sim.negbin$observed,
+#'                        id = sim.negbin$observed$id,
+#'                        t = sim.negbin$observed$t,
 #'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                        model = "NegBin")
 #' plot(res.negbin, nplots = 1)
@@ -187,6 +195,8 @@ plot.panelTVP.NegBin <- function(x, nplots = 4, ...){
 #'                          model = "ZINB")
 #' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
 #'                      data = sim.zinb$observed,
+#'                      id = sim.zinb$observed$id,
+#'                      t = sim.zinb$observed$t,
 #'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                      model = "ZINB")
 #' plot(res.zinb, nplots = 1, component = "NegBin") # effects that belong to count component

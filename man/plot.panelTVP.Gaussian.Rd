@@ -33,6 +33,8 @@ sim.gaussian <- sim_panelTVP(n = 100,
                              sigma2 = 0.7)
 res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
                          data = sim.gaussian$observed,
+                         id = sim.gaussian$observed$id,
+                         t = sim.gaussian$observed$t,
                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                          model = "Gaussian")
 plot(res.gaussian, nplots = 1)

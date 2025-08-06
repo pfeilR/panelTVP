@@ -39,7 +39,7 @@ is included as well where the unknown factor scores are sampled from their
 standard Normal prior - defaults to FALSE}
 
 \item{n.replicates}{number of replicates within each Monte Carlo draw and for each subject
-for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})}
+for integrating over the unknown subject-specific factors (ignored when \code{pop.pred = TRUE})}
 
 \item{...}{optional arguments passed to the function (those are ignored)}
 }
@@ -48,8 +48,8 @@ a list containing the following elements
 \itemize{
 \item \code{predictive.distribution}: a matrix where each row contains draws
 from the posterior predictive distribution for the corresponding observation.
-The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
-and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+The number of columns equals the number of MCMC draws when \code{pop.pred = TRUE}
+and otherwise is multiplied by \code{n.replicates}, i.e., for each MCMC draw
 we have replication draws for marginalizing over the unknown random factors
 \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 posterior predictive distribution for each new observation
@@ -78,6 +78,8 @@ sim.zinb <- sim_panelTVP(n = 100,
                          model = "ZINB")
 res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
                      data = sim.zinb$observed,
+                     id = sim.zinb$observed$id,
+                     t = sim.zinb$observed$t,
                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                      model = "ZINB")
 # setting up design matrix for predicting two new observations

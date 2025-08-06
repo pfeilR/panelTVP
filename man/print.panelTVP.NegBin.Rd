@@ -29,6 +29,8 @@ sim.negbin <- sim_panelTVP(n = 100,
                            model = "NegBin")
 res.negbin <- panelTVP(y ~ W1 + W2 + W3,
                        data = sim.negbin$observed,
+                       id = sim.negbin$observed$id,
+                       t = sim.negbin$observed$t,
                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                        model = "NegBin")
 print(res.negbin)

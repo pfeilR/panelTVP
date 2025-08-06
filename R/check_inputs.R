@@ -146,6 +146,10 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
   # hyperparameter checks for non-ZINB models
   if(model != "ZINB"){
 
+    if(as.character(formula[[2]]) %in% as.character(formula[[3]])){
+      stop("Response variable is also contained as predictor.")
+    }
+
     check.prior.reg(prior.reg)
     if(model == "Gaussian"){
       # prior.var.check
@@ -156,6 +160,11 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
     check.prior.load(prior.load)
 
   } else{ # ZINB-Checks
+
+    if(as.character(formula[[2]]) %in% c(as.character(formula[[3]][[2]]),
+                                         as.character(formula[[3]][[3]]))){
+      stop("Response variable is also contained as predictor.")
+    }
 
     check.prior.reg(prior.reg_nb)
     check.prior.load(prior.load_nb)

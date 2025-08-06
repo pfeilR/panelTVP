@@ -28,6 +28,8 @@
 #'                              sigma2 = 0.7)
 #' res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
 #'                          data = sim.gaussian$observed,
+#'                          id = sim.gaussian$observed$id,
+#'                          t = sim.gaussian$observed$t,
 #'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                          model = "Gaussian")
 #' summary(res.gaussian) # default = ordering by covariate
@@ -74,6 +76,8 @@ Posterior Summary of the Bayesian Normal Model with Time-Varying Coefficients:
 #'                            model = "Probit")
 #' res.probit <- panelTVP(y ~ W1 + W2 + W3,
 #'                        data = sim.probit$observed,
+#'                        id = sim.probit$observed$id,
+#'                        t = sim.probit$observed$t,
 #'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                        model = "Probit")
 #' summary(res.probit) # default = ordering by covariate
@@ -120,6 +124,8 @@ Posterior Summary of the Bayesian Probit Model with Time-Varying Coefficients:
 #'                           model = "Logit")
 #' res.logit <- panelTVP(y ~ W1 + W2 + W3,
 #'                       data = sim.logit$observed,
+#'                       id = sim.logit$observed$id,
+#'                       t = sim.logit$observed$t,
 #'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                       model = "Logit")
 #' summary(res.logit) # default = ordering by covariate
@@ -167,6 +173,8 @@ Posterior Summary of the Bayesian Logit Model with Time-Varying Coefficients:
 #'                            model = "NegBin")
 #' res.negbin <- panelTVP(y ~ W1 + W2 + W3,
 #'                        data = sim.negbin$observed,
+#'                        id = sim.negbin$observed$id,
+#'                        t = sim.negbin$observed$t,
 #'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                        model = "NegBin")
 #' summary(res.negbin) # default = ordering by covariate
@@ -218,6 +226,8 @@ Posterior Summary of the Bayesian Negative Binomial Model with Time-Varying Coef
 #'                          model = "ZINB")
 #' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
 #'                      data = sim.zinb$observed,
+#'                      id = sim.zinb$observed$id,
+#'                      t = sim.zinb$observed$t,
 #'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                      model = "ZINB")
 #' # plots for count / Negative Binomial component

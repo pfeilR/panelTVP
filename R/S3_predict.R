@@ -18,7 +18,7 @@
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
 #' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
-#'  for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})
+#'  for integrating over the unknown subject-specific factors (ignored when \code{pop.pred = TRUE})
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler, Helga Wagner
@@ -26,8 +26,8 @@
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
 #'    from the posterior predictive distribution for the corresponding observation.
-#'    The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
-#'    and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+#'    The number of columns equals the number of MCMC draws when \code{pop.pred = TRUE}
+#'    and otherwise is multiplied by \code{n.replicates}, i.e., for each MCMC draw
 #'    we have replication draws for marginalizing over the unknown random factors
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 #'    posterior predictive distribution for each new observation
@@ -48,6 +48,8 @@
 #'                              sigma2 = 0.7)
 #' res.gaussian <- panelTVP(y ~ W1 + W2 + W3,
 #'                          data = sim.gaussian$observed,
+#'                          id = sim.gaussian$observed$id,
+#'                          t = sim.gaussian$observed$t,
 #'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                          model = "Gaussian")
 #' # setting up design matrix for predicting two new observations
@@ -91,7 +93,7 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
 #' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
-#'   for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})
+#'   for integrating over the unknown subject-specific factors (ignored when \code{pop.pred = TRUE})
 #'@param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler, Helga Wagner
@@ -99,8 +101,8 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
 #'    from the posterior predictive distribution for the corresponding observation.
-#'    The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
-#'    and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+#'    The number of columns equals the number of MCMC draws when \code{pop.pred = TRUE}
+#'    and otherwise is multiplied by \code{n.replicates}, i.e., for each MCMC draw
 #'    we have replication draws for marginalizing over the unknown random factors
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 #'    posterior predictive distribution for each new observation
@@ -119,6 +121,8 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #'                            model = "Probit")
 #' res.probit <- panelTVP(y ~ W1 + W2 + W3,
 #'                        data = sim.probit$observed,
+#'                        id = sim.probit$observed$id,
+#'                        t = sim.probit$observed$t,
 #'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                        model = "Probit")
 #' # setting up design matrix for predicting two new observations
@@ -162,7 +166,7 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
 #' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
-#'   for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})
+#'   for integrating over the unknown subject-specific factors (ignored when \code{pop.pred = TRUE})
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler, Helga Wagner
@@ -170,8 +174,8 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
 #'    from the posterior predictive distribution for the corresponding observation.
-#'    The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
-#'    and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+#'    The number of columns equals the number of MCMC draws when \code{pop.pred = TRUE}
+#'    and otherwise is multiplied by \code{n.replicates}, i.e., for each MCMC draw
 #'    we have replication draws for marginalizing over the unknown random factors
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 #'    posterior predictive distribution for each new observation
@@ -190,6 +194,8 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #'                           model = "Logit")
 #' res.logit <- panelTVP(y ~ W1 + W2 + W3,
 #'                       data = sim.logit$observed,
+#'                       id = sim.logit$observed$id,
+#'                       t = sim.logit$observed$t,
 #'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                       model = "Logit")
 #' # setting up design matrix for predicting two new observations
@@ -232,7 +238,7 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
 #' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
-#'   for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})
+#'   for integrating over the unknown subject-specific factors (ignored when \code{pop.pred = TRUE})
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler, Helga Wagner
@@ -240,8 +246,8 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
 #'    from the posterior predictive distribution for the corresponding observation.
-#'    The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
-#'    and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+#'    The number of columns equals the number of MCMC draws when \code{pop.pred = TRUE}
+#'    and otherwise is multiplied by \code{n.replicates}, i.e., for each MCMC draw
 #'    we have replication draws for marginalizing over the unknown random factors
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 #'    posterior predictive distribution for each new observation
@@ -261,6 +267,8 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #'                            model = "NegBin")
 #' res.negbin <- panelTVP(y ~ W1 + W2 + W3,
 #'                        data = sim.negbin$observed,
+#'                        id = sim.negbin$observed$id,
+#'                        t = sim.negbin$observed$t,
 #'                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                        model = "NegBin")
 #' # setting up design matrix for predicting two new observations
@@ -307,7 +315,7 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
 #' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
-#'   for integrating over the unknown subject-specific factors (ignored when \texttt{pop.pred = TRUE})
+#'   for integrating over the unknown subject-specific factors (ignored when \code{pop.pred = TRUE})
 #' @param ... optional arguments passed to the function (those are ignored)
 #'
 #' @author Roman Pfeiler, Helga Wagner
@@ -315,8 +323,8 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #' \itemize{
 #'   \item \code{predictive.distribution}: a matrix where each row contains draws
 #'    from the posterior predictive distribution for the corresponding observation.
-#'    The number of columns equals the number of MCMC draws when \texttt{pop.pred = TRUE}
-#'    and otherwise is multiplied by \texttt{n.replicates}, i.e., for each MCMC draw
+#'    The number of columns equals the number of MCMC draws when \code{pop.pred = TRUE}
+#'    and otherwise is multiplied by \code{n.replicates}, i.e., for each MCMC draw
 #'    we have replication draws for marginalizing over the unknown random factors
 #'   \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 #'    posterior predictive distribution for each new observation
@@ -340,6 +348,8 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #'                          model = "ZINB")
 #' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
 #'                      data = sim.zinb$observed,
+#'                      id = sim.zinb$observed$id,
+#'                      t = sim.zinb$observed$t,
 #'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                      model = "ZINB")
 #' # setting up design matrix for predicting two new observations

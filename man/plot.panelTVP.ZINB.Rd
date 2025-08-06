@@ -42,6 +42,8 @@ sim.zinb <- sim_panelTVP(n = 100,
                          model = "ZINB")
 res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
                      data = sim.zinb$observed,
+                     id = sim.zinb$observed$id,
+                     t = sim.zinb$observed$t,
                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                      model = "ZINB")
 plot(res.zinb, nplots = 1, component = "NegBin") # effects that belong to count component

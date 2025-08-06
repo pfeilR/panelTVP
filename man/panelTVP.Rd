@@ -573,6 +573,8 @@ sim.gaussian <- sim_panelTVP(n = 100,
                              sigma2 = 0.7)
 res.gaussian1 <- panelTVP(y ~ W1 + W2 + W3,
                          data = sim.gaussian$observed,
+                         id = sim.gaussian$observed$id,
+                         t = sim.gaussian$observed$t,
                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                          model = "Gaussian")
 # Example 2: Gaussian Response, Bayesian Lasso
@@ -580,6 +582,8 @@ prior.reg <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg),
                                list(learn.a.tau = FALSE, learn.a.xi = FALSE))
 res.gaussian2 <- panelTVP(y ~ W1 + W2 + W3,
                          data = sim.gaussian$observed,
+                         id = sim.gaussian$observed$id,
+                         t = sim.gaussian$observed$t,
                          prior.reg = prior.reg,
                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                          model = "Gaussian")
@@ -594,6 +598,8 @@ sim.logit <- sim_panelTVP(n = 100,
                           model = "Logit")
 res.logit <- panelTVP(y ~ W1 + W2 + W3,
                       data = sim.logit$observed,
+                      id = sim.logit$observed$id,
+                      t = sim.logit$observed$t,
                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                       model = "Logit")
 
@@ -612,6 +618,8 @@ sim.zinb <- sim_panelTVP(n = 100,
                          model = "ZINB")
 res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
                      data = sim.zinb$observed,
+                     id = sim.zinb$observed$id,
+                     t = sim.zinb$observed$t,
                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                      model = "ZINB")
 

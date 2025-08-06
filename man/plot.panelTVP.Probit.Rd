@@ -32,6 +32,8 @@ sim.probit <- sim_panelTVP(n = 100,
                            model = "Probit")
 res.probit <- panelTVP(y ~ W1 + W2 + W3,
                        data = sim.probit$observed,
+                       id = sim.probit$observed$id,
+                       t = sim.probit$observed$t,
                        mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
                        model = "Probit")
 plot(res.probit, nplots = 1)

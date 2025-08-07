@@ -42,7 +42,7 @@ LogitTVP <- function(df,
       b.t <- cbind(c(t(betat)), rep(1:df$Tmax, each = df$d))
       colnames(b.t) <- c("b", "t")
       eta <- lapply(1:df$Tmax, FUN = function(t){
-        X.t[X.t[,"t"] == t, -ncol(X.t)] %*% b.t[b.t[,"t"] == t, -ncol(b.t)] +
+        as.matrix(X.t[X.t[,"t"] == t, -ncol(X.t)]) %*% b.t[b.t[,"t"] == t, -ncol(b.t)] +
           reff.t[reff.t[,"t"]==t,-ncol(reff.t)]
       })
       eta <- do.call("rbind", eta)

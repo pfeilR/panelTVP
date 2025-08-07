@@ -223,14 +223,14 @@ You may use the following functions to get additional information:\n
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.zinb <- sim_panelTVP(n = 100,
 #'                          Tmax = 4,
-#'                          beta.nb = c(0.5,-0.7,0,0),
-#'                          theta.nb = c(0.05,0.5,0,0),
-#'                          lambda.nb = 0.5,
-#'                          psi.nb = 0.02,
-#'                          beta.logit = c(-1,0.6,0,0),
-#'                          theta.logit = c(0,1,0,0),
-#'                          lambda.logit = 0.7,
-#'                          psi.logit = 0,
+#'                          beta_zinb.count = c(0.5,-0.7,0,0),
+#'                          theta_zinb.count = c(0.05,0.5,0,0),
+#'                          lambda_zinb.count = 0.5,
+#'                          psi_zinb.count = 0.02,
+#'                          beta_zinb.inflation = c(-1,0.6,0,0),
+#'                          theta_zinb.inflation = c(0,1,0,0),
+#'                          lambda_zinb.inflation = 0.7,
+#'                          psi_zinb.inflation = 0,
 #'                          r = 2,
 #'                          model = "ZINB")
 #' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
@@ -243,20 +243,20 @@ You may use the following functions to get additional information:\n
 print.panelTVP.ZINB <- function(x, ...){
   cat("\nThis is an object of class panelTVP.ZINB. It contains:\n
   - data: Input data and additional context information derived from the data.\n
-  - mcmc_logit: Markov Chains for every parameter except for the factor scores. (Logit) \n
-  - mcmc_nb: Markov Chains for every parameter except for the factor scores. (Negative Binomial) \n
-  - posterior_logit: Posterior summary. (Logit) \n
-  - posterior_nb: Posterior summary. (Negative Binomial) \n
-  - fmean_logit: Posterior means of random intercepts. (Logit) \n
-  - fmean_nb: Posterior means of random intercepts. (Negative Binomial) \n
+  - mcmc_logit: Markov Chains for every parameter except for the factor scores. (zero-finlation component) \n
+  - mcmc_nb: Markov Chains for every parameter except for the factor scores. (count component) \n
+  - posterior_logit: Posterior summary. (zero-finlation component) \n
+  - posterior_nb: Posterior summary. (count component) \n
+  - fmean_logit: Posterior means of random intercepts. (zero-finlation component) \n
+  - fmean_nb: Posterior means of random intercepts. (count component) \n
   - model: The model you have fitted.\n
   - acceptance.rates: The achieved acceptance rates of Metropolis-Hastings.\n
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
-  - learning.settings_logit: Information on learning status of hyperparameters. (Logit) \n
-  - learning.settings_nb: Information on learning status of hyperparameters. (Negative Binomial) \n
+  - learning.settings_logit: Information on learning status of hyperparameters. (zero-finlation component) \n
+  - learning.settings_nb: Information on learning status of hyperparameters. (count component) \n
   - mcmc.settings: Details on MCMC sampler. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n

@@ -167,7 +167,7 @@ plot.panelTVP.NegBin <- function(x, nplots = 4, ...){
 #'   the Logit (or zero-inflation) model.
 #'
 #' @param x an object of class \code{panelTVP.ZINB}
-#' @param component either 'NegBin' or 'Logit' to create plots for either the count or the
+#' @param component either 'count' or 'inflation' to create plots for either the count or the
 #'  zero-inflation component (no default)
 #' @param nplots indicates how many plots should be printed on one page
 #' @param ... optional arguments passed to the function (those are ignored)
@@ -183,14 +183,14 @@ plot.panelTVP.NegBin <- function(x, nplots = 4, ...){
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.zinb <- sim_panelTVP(n = 100,
 #'                          Tmax = 4,
-#'                          beta.nb = c(0.5,-0.7,0,0),
-#'                          theta.nb = c(0.05,0.5,0,0),
-#'                          lambda.nb = 0.5,
-#'                          psi.nb = 0.02,
-#'                          beta.logit = c(-1,0.6,0,0),
-#'                          theta.logit = c(0,1,0,0),
-#'                          lambda.logit = 0.7,
-#'                          psi.logit = 0,
+#'                          beta_zinb.count = c(0.5,-0.7,0,0),
+#'                          theta_zinb.count = c(0.05,0.5,0,0),
+#'                          lambda_zinb.count = 0.5,
+#'                          psi_zinb.count = 0.02,
+#'                          beta_zinb.inflation = c(-1,0.6,0,0),
+#'                          theta_zinb.inflation = c(0,1,0,0),
+#'                          lambda_zinb.inflation = 0.7,
+#'                          psi_zinb.inflation = 0,
 #'                          r = 2,
 #'                          model = "ZINB")
 #' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
@@ -199,13 +199,13 @@ plot.panelTVP.NegBin <- function(x, nplots = 4, ...){
 #'                      t = sim.zinb$observed$t,
 #'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                      model = "ZINB")
-#' plot(res.zinb, nplots = 1, component = "NegBin") # effects that belong to count component
-#' plot(res.zinb, nplots = 1, component = "Logit") # effects that belong to zero-inflation component
+#' plot(res.zinb, nplots = 1, component = "count") # count component
+#' plot(res.zinb, nplots = 1, component = "inflation") # zero-inflation component
 plot.panelTVP.ZINB <- function(x, component = NULL, nplots = 4, ...){
-  if(is.null(component) || length(component) != 1 || !(component %in% c("NegBin", "Logit"))){
-    stop("Argument 'component' must be either NegBin or Logit depending on which parameters you are interested in.")
+  if(is.null(component) || length(component) != 1 || !(component %in% c("count", "inflation"))){
+    stop("Argument 'component' must be either 'count' or 'inflation' depending on which parameters you are interested in.")
   }
-  if(component == "NegBin"){
+  if(component == "count"){
     return(plot_effects(summary_table = x$posterior_nb, Tmax = x$data$Tmax, X = x$data$X_nb, nplots = nplots))
   } else{
     return(plot_effects(summary_table = x$posterior_logit, Tmax = x$data$Tmax, X = x$data$X_logit, nplots = nplots))
@@ -225,26 +225,12 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
     rownames(mat) <- paste0("lambda_t", 1:Tmax)
     beta_lambda_data <- rbind(beta_lambda_data, mat)
   }
-  parse_index <- function(name){
-    if(grepl("^beta_t\\d{2,}$", name)){
-      matches <- regmatches(name, regexec("^beta_t(\\d)(\\d+)$", name))[[1]]
-      return(data.frame(
-        var = paste0("x", matches[2]),
-        time = as.integer(matches[3]),
-        stringsAsFactors = FALSE
-      ))
-    }
-    if(grepl("^lambda_t\\d+$", name)){
-      matches <- regmatches(name, regexec("^lambda_t(\\d+)$", name))[[1]]
-      return(data.frame(
-        var = "Factor Loading",
-        time = as.integer(matches[2]),
-        stringsAsFactors = FALSE
-      ))
-    }
-    return(NULL)
-  }
-  index_df <- do.call(rbind, lapply(beta_lambda_rows, parse_index))
+  index_df <- matrix(nrow = (ncol(X)+1)*Tmax, ncol = 2)
+  index_df[,1] <- c(rep(paste0("x",1:ncol(X)), each = Tmax), rep("Factor Loading", Tmax))
+  index_df[,2] <- rep(1:Tmax, ncol(X)+1)
+  index_df <- as.data.frame(index_df)
+  colnames(index_df) <- c("var", "time")
+  index_df$time <- as.numeric(index_df$time)
   beta_lambda_df <- data.frame(
     name = beta_lambda_rows,
     lower = beta_lambda_data[, "LO"],
@@ -255,6 +241,16 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
   index_df$varname <- rep(true_names, each = Tmax)
   plot_df <- cbind(index_df, beta_lambda_df)
   plot_list <- dplyr::group_split(dplyr::group_by(plot_df, var))
+  plot_list <- plot_list[order(
+    sapply(plot_list, function(x){
+      var_value <- x$var[1]
+      if(var_value == "Factor Loading"){
+        return(0)
+      }else{
+        return(as.numeric(sub("x", "", var_value)))
+      }
+    })
+  )]
   plot_objs <- list()
   for(i in 1:length(plot_list)) plot_objs[[i]] <- make_plot(plot_list[[i]])
   plot_objs[[1]] <- plot_objs[[1]] + ggplot2::ylab(expression(hat(lambda)))

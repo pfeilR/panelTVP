@@ -24,6 +24,9 @@ fit_panelTVP_ZINB <- function(formula,
     tv.load_logit = TRUE
   }
 
+  if(any(colnames(data) == "t")) dat <- data[,names(data) != "t"]
+  if(any(colnames(dat) == "id")) dat <- dat[,names(dat) != "id"]
+
   resp <- all.vars(formula)[1]
   miss <- ifelse(is.na(data[,resp]), TRUE, FALSE)
   N.miss <- sum(miss)
@@ -35,10 +38,10 @@ fit_panelTVP_ZINB <- function(formula,
   rhs.parts <- trimws(rhs.parts)
   formula_nb <- as.formula(paste(deparse(formula[[2]]), "~", rhs.parts[1]))
   formula_logit  <- as.formula(paste(deparse(formula[[2]]), "~", rhs.parts[2]))
-  mf_nb <- model.frame(formula = formula_nb, data = data, drop.unused.levels = TRUE)
+  mf_nb <- model.frame(formula = formula_nb, data = dat, drop.unused.levels = TRUE)
   mt_nb <- attr(mf_nb, "terms")
   x_nb <- model.matrix(mt_nb, mf_nb)
-  mf_logit <- model.frame(formula = formula_logit, data = data, drop.unused.levels = TRUE)
+  mf_logit <- model.frame(formula = formula_logit, data = dat, drop.unused.levels = TRUE)
   mt_logit <- attr(mf_logit, "terms")
   x_logit <- model.matrix(mt_logit, mf_logit)
   y <- model.response(mf_nb)

@@ -25,7 +25,10 @@ fit_panelTVP <- function(formula,
   if(model %in% c("Probit", "Logit")) data$y[miss] <- rbinom(n = N.miss, size = 1, prob = 0.5)
   if(model == "NegBin") data$y[miss] <- MASS::rnegbin(n = N.miss, mu = 1, theta = 1)
 
-  mf <- model.frame(formula = formula, data = data, drop.unused.levels = TRUE)
+  if(any(colnames(data) == "t")) dat <- data[,names(data) != "t"]
+  if(any(colnames(dat) == "id")) dat <- dat[,names(dat) != "id"]
+
+  mf <- model.frame(formula = formula, data = dat, drop.unused.levels = TRUE)
   y <- model.response(mf)
   mt <- attr(mf, "terms")
   x <- model.matrix(mt, mf)

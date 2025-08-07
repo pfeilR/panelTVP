@@ -4,7 +4,7 @@
 #' @param Tmax number of time points / repeated measurements per subject (scalar)
 #' @param model either "Gaussian", "Probit", "Logit", "NegBin" or "ZINB"
 #' @param beta fixed regression effects of Gaussian, Probit, Logit or
-#'  Negative Binomial model with the first value representing the
+#'  Negative Binomial model with psi_zinb.countthe first value representing the
 #'  global intercept (vector of dimension d)
 #' @param theta standard deviations of random walk for regression effects
 #'  of Gaussian, Probit, Logit or Negative Binomial model;
@@ -15,28 +15,28 @@
 #' @param psi standard deviation of random walk for factor loading
 #'  of Gaussian, Probit, Logit or Negative Binomial model;
 #'  a larger value yields a factor loading that varies stronger over time (scalar)
-#' @param beta.nb fixed regression effects in count component of Zero-Inflated
+#' @param beta_zinb.count fixed regression effects in count component of Zero-Inflated
 #'  Negative Binomial model with the first value representing the
 #'  global intercept (vector of dimension d_nb)
-#' @param theta.nb standard deviations of random walk for regression effects
+#' @param theta_zinb.count standard deviations of random walk for regression effects
 #'  in count component of Zero-Inflated Negative Binomial model;
 #'  larger values yield regression effects that vary stronger over time
 #'  (vector of dimension d_nb)
-#' @param lambda.nb fixed factor loading in count component
+#' @param lambda_zinb.count fixed factor loading in count component
 #'  of Zero-Inflated Negative Binomial model (scalar)
-#' @param psi.nb standard deviation of random walk for factor loading
+#' @param psi_zinb.count standard deviation of random walk for factor loading
 #'  in count component Zero-Inflated Negative Binomial model;
 #'  a larger value yields a factor loading that varies stronger over time (scalar)
-#' @param beta.logit fixed regression effects in zero-inflation component of Zero-Inflated
+#' @param beta_zinb.inflation fixed regression effects in zero-inflation component of Zero-Inflated
 #'  Negative Binomial model with the first value representing the
 #'  global intercept (vector of dimension d_logit)
-#' @param theta.logit standard deviations of random walk for regression effects
+#' @param theta_zinb.inflation standard deviations of random walk for regression effects
 #'  in zero-inflation component of Zero-Inflated Negative Binomial model;
 #'  larger values yield regression effects that vary stronger over time
 #'  (vector of dimension d_logit)
-#' @param lambda.logit fixed factor loading in zero-inflation component
+#' @param lambda_zinb.inflation fixed factor loading in zero-inflation component
 #'  of Zero-Inflated Negative Binomial model (scalar)
-#' @param psi.logit standard deviation of random walk for factor loading
+#' @param psi_zinb.inflation standard deviation of random walk for factor loading
 #'  in zero-inflation component Zero-Inflated Negative Binomial model;
 #'  a larger value yields a factor loading that varies stronger over time (scalar)
 #' @param r dispersion parameter of the Negative Binomial and
@@ -60,16 +60,16 @@
 #'  \item{lambda}{a T x 1 matrix of factor loadings, i.e., each row contains
 #'   the factor loading of the corresponding time point (only in Gaussian,
 #'   Probit, Logit and Negative Binomial model)}
-#'   \item{beta.logit}{a T x d_logit matrix of regression effects
+#'   \item{beta_zinb.inflation}{a T x d_logit matrix of regression effects
 #'    in zero-inflation component of the model, i.e., each row contains
 #'    the regression effects of the corresponding time point (only in ZINB model)}
-#'   \item{beta.nb}{a T x d_nb matrix of regression effects
+#'   \item{beta_zinb.count}{a T x d_nb matrix of regression effects
 #'    in count component of the model, i.e., each row contains
 #'    the regression effects of the corresponding time point (only in ZINB model)}
-#'  \item{lambda.logit}{a T x 1 matrix of factor loadings in
+#'  \item{lambda_zinb.inflation}{a T x 1 matrix of factor loadings in
 #'   zero-inflation component of the model, i.e., each row contains
 #'   the factor loading of the corresponding time point (only in ZINB model)}
-#'   \item{lambda.nb}{a T x 1 matrix of factor loadings in
+#'   \item{lambda_zinb.count}{a T x 1 matrix of factor loadings in
 #'    count component of the model, i.e., each row contains
 #'    the factor loading of the corresponding time point (only in ZINB model)}
 #'   \item{sigma2}{a scalar containing the value of \eqn{\sigma^2} (only in
@@ -142,8 +142,8 @@
 #'  Observations that are not at risk of experiencing the event, i.e., for which \eqn{w_{it}=0},
 #'  are defined as structural zeros and, thus, set to zero.
 #'  As the ZINB model contains two different linear predictors with time-varying parameters,
-#'  simulation from this model requires the arguments \code{beta.nb}, \code{theta.nb}, \code{lambda.nb},
-#'  \code{psi.nb}, \code{beta.logit}, \code{theta.logit}, \code{lambda.logit}, \code{psi.logit}.
+#'  simulation from this model requires the arguments \code{beta_zinb.count}, \code{theta_zinb.count}, \code{lambda_zinb.count},
+#'  \code{psi_zinb.count}, \code{beta_zinb.inflation}, \code{theta_zinb.inflation}, \code{lambda_zinb.inflation}, \code{psi_zinb.inflation}.
 #'  Those parameters serve the same purpose as the parameters \code{beta}, \code{theta}, \code{lambda},
 #'  \code{psi} of the previous models. Furthermore, note that not the same sets of covariates have
 #'  to be used in the zero-inflation and count predictors \eqn{\eta_{it}^\text{logit}} and
@@ -214,16 +214,20 @@
 #'
 #' # Simulating data from a Zero-Inflated Negative Binomial panel model
 #' x <- sim_panelTVP(n = 100, Tmax = 4,
-#'                   beta.nb = c(0.5,0,-0.2), theta.nb = c(0.1,0,0),
-#'                   lambda.nb = 0.3, psi.nb = 0,
-#'                   beta.logit = c(0.9,0.1,0), theta.logit = c(0.05,0,0),
-#'                   lambda.logit = 0.8, psi.logit = 0.1,
+#'                   beta_zinb.count = c(0.5,0,-0.2),
+#'                   theta_zinb.count = c(0.1,0,0),
+#'                   lambda_zinb.count = 0.3,
+#'                   psi_zinb.count = 0,
+#'                   beta_zinb.inflation = c(0.9,0.1,0),
+#'                   theta_zinb.inflation = c(0.05,0,0),
+#'                   lambda_zinb.inflation = 0.8,
+#'                   psi_zinb.inflation = 0.1,
 #'                   model = "ZINB", r = 2)
 #' head(x$observed, 10)
-#' x$beta.logit
-#' x$beta.nb
-#' x$lambda.logit
-#' x$lambda.nb
+#' x$beta_zinb.inflation
+#' x$beta_zinb.count
+#' x$lambda_zinb.inflation
+#' x$lambda_zinb.count
 #' x$r
 #' @author Roman Pfeiler, Helga Wagner
 #' @export
@@ -234,16 +238,26 @@ sim_panelTVP <- function(n,
                          theta = NULL,
                          lambda = NULL,
                          psi = NULL,
-                         beta.nb = NULL,
-                         theta.nb = NULL,
-                         lambda.nb = NULL,
-                         psi.nb = NULL,
-                         beta.logit = NULL,
-                         theta.logit = NULL,
-                         lambda.logit = NULL,
-                         psi.logit = NULL,
+                         beta_zinb.count = NULL,
+                         theta_zinb.count = NULL,
+                         lambda_zinb.count = NULL,
+                         psi_zinb.count = NULL,
+                         beta_zinb.inflation = NULL,
+                         theta_zinb.inflation = NULL,
+                         lambda_zinb.inflation = NULL,
+                         psi_zinb.inflation = NULL,
                          r = NULL,
                          sigma2 = NULL){
+
+  beta.nb <- beta_zinb.count
+  theta.nb <- theta_zinb.count
+  lambda.nb <- lambda_zinb.count
+  psi.nb <- psi_zinb.count
+
+  beta.logit <- beta_zinb.inflation
+  theta.logit <- theta_zinb.inflation
+  lambda.logit <- lambda_zinb.inflation
+  psi.logit <- psi_zinb.inflation
 
   # Input Checks ---------------------------------------------------------------
 

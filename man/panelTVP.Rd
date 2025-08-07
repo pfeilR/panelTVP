@@ -19,22 +19,22 @@ panelTVP(
   prior.load = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001, a.phi =
     1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi = TRUE,
     learn.kappa.zeta = TRUE, type = "rw-t1", c = 1, L0 = 1),
-  prior.reg_nb = list(d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001, b.tau =
-    10, nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi =
-    10, iota.tau = 1, iota.xi = 1, learn.a.tau = TRUE, learn.a.xi = TRUE, target.rate.tau
-    = 0.44, target.rate.xi = 0.44, learn.kappa.tau = TRUE, learn.kappa.xi = TRUE, type =
-    "rw-t1", c = 1, B0 = 1),
-  prior.load_nb = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
-    a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi = TRUE,
-    learn.kappa.zeta = TRUE, type = "rw-t1", c = 1, L0 = 1),
-  prior.reg_logit = list(d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001, b.tau
-    = 10, nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi
-    = 10, iota.tau = 1, iota.xi = 1, learn.a.tau = TRUE, learn.a.xi = TRUE,
+  prior.reg_zinb.count = list(d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001,
+    b.tau = 10, nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi = 1,
+    kappa.xi = 10, iota.tau = 1, iota.xi = 1, learn.a.tau = TRUE, learn.a.xi = TRUE,
     target.rate.tau = 0.44, target.rate.xi = 0.44, learn.kappa.tau = TRUE, learn.kappa.xi
     = TRUE, type = "rw-t1", c = 1, B0 = 1),
-  prior.load_logit = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
-    a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi = TRUE,
-    learn.kappa.zeta = TRUE, type = "rw-t1", c = 1, L0 = 1),
+  prior.load_zinb.count = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta =
+    0.001, a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi =
+    TRUE, learn.kappa.zeta = TRUE, type = "rw-t1", c = 1, L0 = 1),
+  prior.reg_zinb.inflation = list(d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi =
+    0.001, b.tau = 10, nu.tau = 5, b.xi = 10, nu.xi = 5, a.tau = 1, kappa.tau = 10, a.xi
+    = 1, kappa.xi = 10, iota.tau = 1, iota.xi = 1, learn.a.tau = TRUE, learn.a.xi = TRUE,
+    target.rate.tau = 0.44, target.rate.xi = 0.44, learn.kappa.tau = TRUE, learn.kappa.xi
+    = TRUE, type = "rw-t1", c = 1, B0 = 1),
+  prior.load_zinb.inflation = list(d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta =
+    0.001, a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10, learn.kappa.phi =
+    TRUE, learn.kappa.zeta = TRUE, type = "rw-t1", c = 1, L0 = 1),
   mcmc.opt = list(chain.length = 12000, burnin = 2000, thin = 10, asis = TRUE),
   settings.NegBin = list(alpha.r = 2, beta.r = 1, expansion.steps = 10, width = 1,
     p.overrelax = 0, accuracy.overrelax = 10),
@@ -153,7 +153,7 @@ prior (ignored when using shrinkage prior)
 Note that for the factor model, the hyperparameters \code{a.phi} and
 \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings}
 
-\item{prior.reg_nb}{A list of arguments for estimating the parameters of the regression
+\item{prior.reg_zinb.count}{A list of arguments for estimating the parameters of the regression
 part of the count model. This argument is only used when \code{model = 'ZINB'} and
 otherwise ignored. The arguments are:
 \itemize{
@@ -200,7 +200,7 @@ this argument is either "rw-t0" (shrinkage prior starting at T = 0),
 independence prior (ignored when using shrinkage prior) (count model)
 }}
 
-\item{prior.load_nb}{A list of arguments for estimating the parameters of the factor
+\item{prior.load_zinb.count}{A list of arguments for estimating the parameters of the factor
 part of the count model. This argument is only used when \code{model = 'ZINB'} and
 otherwise ignored. The arguments are:
 \itemize{
@@ -228,7 +228,7 @@ shrinkage prior (ignored when using cps or independence prior) (count model)
 Note that for the factor model, the hyperparameters \code{a.phi} and
 \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings}
 
-\item{prior.reg_logit}{A list of arguments for estimating the parameters of the regression
+\item{prior.reg_zinb.inflation}{A list of arguments for estimating the parameters of the regression
 part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
 otherwise ignored. The arguments are:
 \itemize{
@@ -275,7 +275,7 @@ shrinkage prior (ignored when using independence prior) (zero-inflation model)
 independence prior (ignored when using shrinkage prior) (zero-inflation model)
 }}
 
-\item{prior.load_logit}{A list of arguments for estimating the parameters of the factor
+\item{prior.load_zinb.inflation}{A list of arguments for estimating the parameters of the factor
 part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
 otherwise ignored. The arguments are:
 \itemize{
@@ -606,14 +606,14 @@ res.logit <- panelTVP(y ~ W1 + W2 + W3,
 # Example 4: ZINB, learn all possible parameters
 sim.zinb <- sim_panelTVP(n = 100,
                          Tmax = 4,
-                         beta.nb = c(0.5,-0.7,0,0),
-                         theta.nb = c(0.05,0.5,0,0),
-                         lambda.nb = 0.5,
-                         psi.nb = 0.02,
-                         beta.logit = c(-1,0.6,0,0),
-                         theta.logit = c(0,1,0,0),
-                         lambda.logit = 0.7,
-                         psi.logit = 0,
+                         beta_zinb.count = c(0.5,-0.7,0,0),
+                         theta_zinb.count = c(0.05,0.5,0,0),
+                         lambda_zinb.count = 0.5,
+                         psi_zinb.count = 0.02,
+                         beta_zinb.inflation = c(-1,0.6,0,0),
+                         theta_zinb.inflation = c(0,1,0,0),
+                         lambda_zinb.inflation = 0.7,
+                         psi_zinb.inflation = 0,
                          r = 2,
                          model = "ZINB")
 res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,

@@ -104,10 +104,32 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
   if(is.null(data) || !is.data.frame(data)){
     stop("Argument 'data' must be a (Tn x d) data frame.")
   }
-  vars <- all.vars(formula)
-  if(sum(!(vars %in% colnames(data))) > 0){
-    stop("There are variables in your 'formula' argument that are not contained in 'data'.")
+  if(model != "ZINB"){
+    vars <- all.vars(formula)
+    if(sum(!(vars %in% colnames(data))) > 0){
+      if(formula[[3]] != "."){
+        stop("There are variables in your 'formula' argument that are not contained in 'data'.")
+      }
+    }
+  } else{
+    counti <- formula[[3]][[2]]
+    vars.counti <- all.vars(counti)
+    if(sum(!(vars.counti %in% colnames(data))) > 0){
+      if(counti != "."){
+        stop("There are variables in the count part of your 'formula' argument that are not contained in 'data'.")
+      }
+    }
+    logi <- formula[[3]][[3]]
+    vars.logi <- all.vars(logi)
+    if(sum(!(vars.logi %in% colnames(data))) > 0){
+      if(logi != "."){
+        stop("There are variables in the zero-inflation part of your 'formula' argument that are not contained in 'data'.")
+      }
+    }
   }
+  vars <- all.vars(formula)
+  if("t" %in% vars) stop("Covariates in the formula are not allowed to be called 't'. This is for the time index. Please rename the variable.")
+  if("id" %in% vars) stop("Covariates in the formula are not allowed to be called 'id'. This is for the subject index. Please rename the variable.")
   if(is.null(t) && (length(t) != nrow(data) || !is.numeric(t) || sum(t %% 1) != 0 || sum(!is.finite(t)) != 0)){
     stop("Argument 't' must be an integer-valued vector with length equal to the number of observations in 'data'.")
   }

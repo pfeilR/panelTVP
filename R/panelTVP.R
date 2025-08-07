@@ -100,7 +100,7 @@
 #'  }
 #'  Note that for the factor model, the hyperparameters \code{a.phi} and
 #'  \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings
-#' @param prior.reg_nb A list of arguments for estimating the parameters of the regression
+#' @param prior.reg_zinb.count A list of arguments for estimating the parameters of the regression
 #'  part of the count model. This argument is only used when \code{model = 'ZINB'} and
 #'  otherwise ignored. The arguments are:
 #'   \itemize{
@@ -146,7 +146,7 @@
 #'    \item \code{B0}: prior variance on the regression parameters when using
 #'     independence prior (ignored when using shrinkage prior) (count model)
 #'   }
-#' @param prior.load_nb A list of arguments for estimating the parameters of the factor
+#' @param prior.load_zinb.count A list of arguments for estimating the parameters of the factor
 #'  part of the count model. This argument is only used when \code{model = 'ZINB'} and
 #'  otherwise ignored. The arguments are:
 #'  \itemize{
@@ -173,7 +173,7 @@
 #'  }
 #'  Note that for the factor model, the hyperparameters \code{a.phi} and
 #'  \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings
-#' @param prior.reg_logit A list of arguments for estimating the parameters of the regression
+#' @param prior.reg_zinb.inflation A list of arguments for estimating the parameters of the regression
 #'  part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
 #'  otherwise ignored. The arguments are:
 #'   \itemize{
@@ -219,7 +219,7 @@
 #'    \item \code{B0}: prior variance on the regression parameters when using
 #'     independence prior (ignored when using shrinkage prior) (zero-inflation model)
 #'   }
-#' @param prior.load_logit A list of arguments for estimating the parameters of the factor
+#' @param prior.load_zinb.inflation A list of arguments for estimating the parameters of the factor
 #'  part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
 #'  otherwise ignored. The arguments are:
 #'  \itemize{
@@ -546,14 +546,14 @@
 #' # Example 4: ZINB, learn all possible parameters
 #' sim.zinb <- sim_panelTVP(n = 100,
 #'                          Tmax = 4,
-#'                          beta.nb = c(0.5,-0.7,0,0),
-#'                          theta.nb = c(0.05,0.5,0,0),
-#'                          lambda.nb = 0.5,
-#'                          psi.nb = 0.02,
-#'                          beta.logit = c(-1,0.6,0,0),
-#'                          theta.logit = c(0,1,0,0),
-#'                          lambda.logit = 0.7,
-#'                          psi.logit = 0,
+#'                          beta_zinb.count = c(0.5,-0.7,0,0),
+#'                          theta_zinb.count = c(0.05,0.5,0,0),
+#'                          lambda_zinb.count = 0.5,
+#'                          psi_zinb.count = 0.02,
+#'                          beta_zinb.inflation = c(-1,0.6,0,0),
+#'                          theta_zinb.inflation = c(0,1,0,0),
+#'                          lambda_zinb.inflation = 0.7,
+#'                          psi_zinb.inflation = 0,
 #'                          r = 2,
 #'                          model = "ZINB")
 #' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
@@ -618,7 +618,7 @@ panelTVP <- function(formula = NULL,
                        learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE,
                        type = "rw-t1", c = 1, L0 = 1
                      ),
-                     prior.reg_nb = list(
+                     prior.reg_zinb.count = list(
                        d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001,
                        b.tau = 10, nu.tau = 5, b.xi = 10, nu.xi = 5,
                        a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi = 10,
@@ -628,13 +628,13 @@ panelTVP <- function(formula = NULL,
                        learn.kappa.tau = TRUE, learn.kappa.xi = TRUE,
                        type = "rw-t1", c = 1, B0 = 1
                      ),
-                     prior.load_nb = list(
+                     prior.load_zinb.count = list(
                        d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
                        a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10,
                        learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE,
                        type = "rw-t1", c = 1, L0 = 1
                      ),
-                     prior.reg_logit = list(
+                     prior.reg_zinb.inflation = list(
                        d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001,
                        b.tau = 10, nu.tau = 5, b.xi = 10, nu.xi = 5,
                        a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi = 10,
@@ -644,7 +644,7 @@ panelTVP <- function(formula = NULL,
                        learn.kappa.tau = TRUE, learn.kappa.xi = TRUE,
                        type = "rw-t1", c = 1, B0 = 1
                      ),
-                     prior.load_logit = list(
+                     prior.load_zinb.inflation = list(
                        d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
                        a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10,
                        learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE,
@@ -662,6 +662,11 @@ panelTVP <- function(formula = NULL,
                      random.effects = TRUE,
                      progress.bar = FALSE
 ){
+
+  prior.reg_nb <- prior.reg_zinb.count
+  prior.load_nb <- prior.load_zinb.count
+  prior.reg_logit <- prior.reg_zinb.inflation
+  prior.load_logit <- prior.load_zinb.inflation
 
   # input checks
   check.panelTVP(formula, data, id, t, model, prior.reg, prior.var, prior.load,

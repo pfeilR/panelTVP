@@ -70,7 +70,7 @@ zinbTVP <- function(df,
       b.t_nb <- cbind(c(t(betat_nb)), rep(1:df$Tmax, each = df$d_nb))
       colnames(b.t_nb) <- c("b", "t")
       eta_nb <- lapply(1:df$Tmax, FUN = function(t){
-        X.t_nb[X.t_nb[,"t"] == t, -ncol(X.t_nb)] %*% b.t_nb[b.t_nb[,"t"] == t, -ncol(b.t_nb)] +
+        as.matrix(X.t_nb[X.t_nb[,"t"] == t, -ncol(X.t_nb)]) %*% b.t_nb[b.t_nb[,"t"] == t, -ncol(b.t_nb)] +
           reff.t_nb[reff.t_nb[,"t"]==t,-ncol(reff.t_nb)]
       })
       eta_nb <- do.call("rbind", eta_nb)
@@ -84,7 +84,7 @@ zinbTVP <- function(df,
       b.t_logit <- cbind(c(t(betat_logit)), rep(1:df$Tmax, each = df$d_logit))
       colnames(b.t_logit) <- c("b", "t")
       eta_logit <- lapply(1:df$Tmax, FUN = function(t){
-        X.t_logit[X.t_logit[,"t"] == t, -ncol(X.t_logit)] %*% b.t_logit[b.t_logit[,"t"] == t, -ncol(b.t_logit)] +
+        as.matrix(X.t_logit[X.t_logit[,"t"] == t, -ncol(X.t_logit)]) %*% b.t_logit[b.t_logit[,"t"] == t, -ncol(b.t_logit)] +
           reff.t_logit[reff.t_logit[,"t"]==t,-ncol(reff.t_logit)]
       })
       eta_logit <- do.call("rbind", eta_logit)

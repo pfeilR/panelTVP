@@ -217,10 +217,10 @@ sim_ZINB <- function(n,
   colnames(W.nb) <- names.nb
   observed <- data.frame(y = y, W.logit, W.nb, t = rep(1:t, each = n), id = indivID)
   ret <- list(observed = observed,
-              beta.logit = betat.logit,
-              beta.nb = betat.nb,
-              lambda.logit = lambdat.logit,
-              lambda.nb = lambdat.nb,
+              beta_zinb.inflation = betat.logit,
+              beta_zinb.count = betat.nb,
+              lambda_zinb.inflation = lambdat.logit,
+              lambda_zinb.count = lambdat.nb,
               r = r,
               model = "ZINB")
   return(ret)

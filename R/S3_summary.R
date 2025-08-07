@@ -214,14 +214,14 @@ Posterior Summary of the Bayesian Negative Binomial Model with Time-Varying Coef
 #' # of the Markov Chain. You should use a much longer chain in your applications.
 #' sim.zinb <- sim_panelTVP(n = 100,
 #'                          Tmax = 4,
-#'                          beta.nb = c(0.5,-0.7,0,0),
-#'                          theta.nb = c(0.05,0.5,0,0),
-#'                          lambda.nb = 0.5,
-#'                          psi.nb = 0.02,
-#'                          beta.logit = c(-1,0.6,0,0),
-#'                          theta.logit = c(0,1,0,0),
-#'                          lambda.logit = 0.7,
-#'                          psi.logit = 0,
+#'                          beta_zinb.count = c(0.5,-0.7,0,0),
+#'                          theta_zinb.count = c(0.05,0.5,0,0),
+#'                          lambda_zinb.count = 0.5,
+#'                          psi_zinb.count = 0.02,
+#'                          beta_zinb.inflation = c(-1,0.6,0,0),
+#'                          theta_zinb.inflation = c(0,1,0,0),
+#'                          lambda_zinb.inflation = 0.7,
+#'                          psi_zinb.inflation = 0,
 #'                          r = 2,
 #'                          model = "ZINB")
 #' res.zinb <- panelTVP(y ~ W1.nb + W2.nb + W3.nb | W1.logit + W2.logit + W3.logit,
@@ -230,12 +230,8 @@ Posterior Summary of the Bayesian Negative Binomial Model with Time-Varying Coef
 #'                      t = sim.zinb$observed$t,
 #'                      mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                      model = "ZINB")
-#' # plots for count / Negative Binomial component
-#' summary(res.zinb, component = "NegBin") # default = ordering by covariate
-#' summary(res.zinb, by = "timepoint", component = "NegBin") # ordering by time point
-#' # plots for zero-inflation / Logit component
-#' summary(res.zinb, component = "Logit") # default = ordering by covariate
-#' summary(res.zinb, by = "timepoint", component = "Logit") # ordering by time point
+#' summary(res.zinb) # default = ordering by covariate
+#' summary(res.zinb, by = "timepoint") # ordering by time point
 summary.panelTVP.ZINB <- function(object, by = "covariate", ...){
   if(length(by)>1 | !is.character(by)){
     stop("by is a scalar character")

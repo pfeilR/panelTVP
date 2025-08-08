@@ -144,13 +144,12 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
 
   # response variable check
   resp <- data[, as.character(formula[[2]])]
+  if(length(unique(resp)) == 1){
+    stop("There is no variation in your response variable.")
+  }
   if(model %in% c("Probit", "Logit")){
-    if(is.factor(resp) && length(levels(resp)) != 2){
-      stop("When response variable is a factor, it must have exactly two levels for Probit and Logit models.")
-    } else if(is.numeric(resp) && !all(resp %in% c(0,1))){
-      stop("When response is of type numeric, it must only contain 0 and 1 for Probit and Logit models.")
-    } else if(!is.factor(resp) && !is.numeric(resp) && !is.logical(resp)){
-      stop("Response must be a factor with two levels, numeric 0/1, or logical for Probit and Logit models.")
+    if(!is.numeric(resp) || !all(resp %in% c(0,1))){
+      stop("For binary regression, response must be a numeric with categories coded as 0 and 1.")
     }
   }
   if(model %in% c("NegBin", "ZINB")){

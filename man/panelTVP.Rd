@@ -355,6 +355,8 @@ Zero-Inflated Negative Binomial model was
 fitted. When either a Gaussian, Probit, Logit or Negative Binomial model was fitted,
 the returned object contains a list of the following elements:
 \describe{
+\item{learning.settings}{information on which parameters have been learned}
+\item{variable.codes}{information on which covariate is associated with which parameter}
 \item{data}{the data used for fitting the model and additional context information
 derived from the data}
 \item{Y}{the \eqn{Tn \times M} response data matrix of every iteration of the chain,
@@ -376,12 +378,19 @@ corresponding rows contain the imputed values of every iteration.}
 i.e., missing data are fully ignored when computing WAIC)}
 \item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 predictive distribution for each observation (rows) and each MCMC draw (columns)}
-\item{learning.settings}{information on which parameters have been learned}
 \item{mcmc.settings}{details on the MCMC sampler}
 }
 When modelling a Zero-Inflated Negative Binomial response,
 the returned object contains a list of the following elements:
 \describe{
+\item{learning.settings_logit}{information on which parameters have been learned
+for the zero-inflation component of the model}
+\item{learning.settings_nb}{information on which parameters have been learned
+for the count component of the model}
+\item{variable.codes_logit}{information on which covariate is associated with which parameter
+for the zero-inflation component of the model}
+\item{variable.codes_nb}{information on which covariate is associated with which parameter
+for the count component of the model}
 \item{data}{the data used for fitting the model and additional context information
 derived from the data}
 \item{Y}{the \eqn{Tn \times M} response data matrix of every iteration of the chain,
@@ -391,17 +400,17 @@ the sampled values of a specific observation. For observed data, the correspondi
 rows are essentially replicates of the same value. For missing data, the
 corresponding rows contain the imputed values of every iteration.}
 \item{mcmc_logit}{Markov Chains for every parameter except for the factor scores
-(to save memory) for the Logit component of the model}
+(to save memory) for the zero-inflation component of the model}
 \item{mcmc_nb}{Markov Chains for every parameter except for the factor scores
-(to save memory) for the Negative Binomial component of the model}
+(to save memory) for the count component of the model}
 \item{posterior_logit}{preliminary summary of posterior results for the
-Logit component of the model}
+zero-inflation component of the model}
 \item{posterior_nb}{preliminary summary of posterior results for the
-Negative Binomial component of the model}
+count component of the model}
 \item{fmean_logit}{posterior means of factor scores for the
-Logit component of the model (only when random effects are estimated)}
+zero-inflation component of the model (only when random effects are estimated)}
 \item{fmean_nb}{posterior means of factor scores for the
-Negative Binomial component of the model (only when random effects are estimated)}
+count component of the model (only when random effects are estimated)}
 \item{model}{the fitted model}
 \item{acceptance.rates}{the achieved acceptance rates when using
 Metropolis-Hastings for both components of the model}
@@ -412,10 +421,6 @@ Metropolis-Hastings for both components of the model}
 i.e., missing data are fully ignored when computing WAIC)}
 \item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 predictive distribution for each observation (rows) and each MCMC draw (columns)}
-\item{learning.settings_logit}{information on which parameters have been learned
-for the Logit component of the model}
-\item{learning.settings_nb}{information on which parameters have been learned
-for the Negative Binomial component of the model}
 \item{mcmc.settings}{details on the MCMC sampler}
 }
 }

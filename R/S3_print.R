@@ -32,6 +32,8 @@
 #' print(res.gaussian)
 print.panelTVP.Gaussian <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Gaussian. It contains:\n
+  - learning.settings: Information on learning status of hyperparameters. \n
+  - variable.codes: Information on which variable is associated with which regression parameter. \n
   - data: Input data and additional context information derived from the data.\n
   - mcmc: Markov Chains for every parameter except for the factor scores.\n
   - posterior: Posterior summary. \n
@@ -42,7 +44,6 @@ print.panelTVP.Gaussian <- function(x, ...){
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
-  - learning.settings: Information on learning status of hyperparameters. \n
   - mcmc.settings: Details on MCMC sampler. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
@@ -83,6 +84,8 @@ You may use the following functions to get additional information:\n
 #' print(res.probit)
 print.panelTVP.Probit <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Probit. It contains:\n
+  - learning.settings: Information on learning status of hyperparameters. \n
+  - variable.codes: Information on which variable is associated with which regression parameter. \n
   - data: Input data and additional context information derived from the data.\n
   - mcmc: Markov Chains for every parameter except for the factor scores.\n
   - posterior: Posterior summary. \n
@@ -93,7 +96,6 @@ print.panelTVP.Probit <- function(x, ...){
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
-  - learning.settings: Information on learning status of hyperparameters. \n
   - mcmc.settings: Details on MCMC sampler. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
@@ -134,6 +136,8 @@ You may use the following functions to get additional information:\n
 #' print(res.logit)
 print.panelTVP.Logit <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Logit. It contains:\n
+  - learning.settings: Information on learning status of hyperparameters. \n
+  - variable.codes: Information on which variable is associated with which regression parameter. \n
   - data: Input data and additional context information derived from the data.\n
   - mcmc: Markov Chains for every parameter except for the factor scores.\n
   - posterior: Posterior summary. \n
@@ -144,7 +148,6 @@ print.panelTVP.Logit <- function(x, ...){
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
-  - learning.settings: Information on learning status of hyperparameters. \n
   - mcmc.settings: Details on MCMC sampler. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
@@ -186,6 +189,8 @@ You may use the following functions to get additional information:\n
 #' print(res.negbin)
 print.panelTVP.NegBin <- function(x, ...){
   cat("\nThis is an object of class panelTVP.NegBin. It contains:\n
+  - learning.settings: Information on learning status of hyperparameters. \n
+  - variable.codes: Information on which variable is associated with which regression parameter. \n
   - data: Input data and additional context information derived from the data.\n
   - mcmc: Markov Chains for every parameter except for the factor scores.\n
   - posterior: Posterior summary. \n
@@ -196,7 +201,6 @@ print.panelTVP.NegBin <- function(x, ...){
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
-  - learning.settings: Information on learning status of hyperparameters. \n
   - mcmc.settings: Details on MCMC sampler. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
@@ -242,12 +246,16 @@ You may use the following functions to get additional information:\n
 #' print(res.zinb)
 print.panelTVP.ZINB <- function(x, ...){
   cat("\nThis is an object of class panelTVP.ZINB. It contains:\n
+  - learning.settings_logit: Information on learning status of hyperparameters. (zero-inflation component) \n
+  - learning.settings_nb: Information on learning status of hyperparameters. (count component) \n
+  - variable.codes_logit: Information on which variable is associated with which regression parameter. (zero-inflation component) \n
+  - variable.codes_nb: Information on which variable is associated with which regression parameter. (count component) \n
   - data: Input data and additional context information derived from the data.\n
-  - mcmc_logit: Markov Chains for every parameter except for the factor scores. (zero-finlation component) \n
+  - mcmc_logit: Markov Chains for every parameter except for the factor scores. (zero-inflation component) \n
   - mcmc_nb: Markov Chains for every parameter except for the factor scores. (count component) \n
-  - posterior_logit: Posterior summary. (zero-finlation component) \n
+  - posterior_logit: Posterior summary. (zero-inflation component) \n
   - posterior_nb: Posterior summary. (count component) \n
-  - fmean_logit: Posterior means of random intercepts. (zero-finlation component) \n
+  - fmean_logit: Posterior means of random intercepts. (zero-inflation component) \n
   - fmean_nb: Posterior means of random intercepts. (count component) \n
   - model: The model you have fitted.\n
   - acceptance.rates: The achieved acceptance rates of Metropolis-Hastings.\n
@@ -255,8 +263,6 @@ print.panelTVP.ZINB <- function(x, ...){
   - runtime: The total time for fitting the model (measured in seconds).\n
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
-  - learning.settings_logit: Information on learning status of hyperparameters. (zero-finlation component) \n
-  - learning.settings_nb: Information on learning status of hyperparameters. (count component) \n
   - mcmc.settings: Details on MCMC sampler. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n

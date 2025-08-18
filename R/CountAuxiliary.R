@@ -100,7 +100,7 @@ slice_r <- function(y, psi, r, a, b, steps, w, p.overrelax, acc){
         } else{
           R <- mid
         }
-        acc <- acc-1
+        acc <- acc - 1
         w <- w/2
       }
     }

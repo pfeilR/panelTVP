@@ -3,7 +3,6 @@ title: A Vignette for the \texttt{R} Package \texttt{panelTVP}
 author:
   - name: Roman Pfeiler
     email: roman.pfeiler@jku.at
-    correspondingauthor: true
   - name: Helga Wagner
     email: helga.wagner@jku.at
 address:
@@ -35,13 +34,17 @@ output:
 
 # Introduction
 
+```{r, echo=FALSE}
+library(panelTVP)
+```
+
 Panel data are commonly encountered in econometrics and the social sciences. When analyzing data from longitudinal studies, standard estimation techniques such as OLS (\textit{ordinary least squares}) are not appropriate as the repeated measurements of a subject are typically correlated. Therefore, models with random effects are used to account for the clustered data structure. 
 
 \texttt{panelTVP} makes it possible to estimate regression models with random effects and additionally allows the parameters to vary over time. To avoid overfitting, hierarchical shrinkage priors are considered. The method implemented in \texttt{panelTVP} was inspired by Bitto \& Frühwirth-Schnatter (2019) who discussed the use of shrinkage priors in time-varying parameter models for the analysis of time series data. Their method has later been implemented in the \texttt{R} package \texttt{shrinkTVP} (Knaus, Bitto-Nemling, Cadonna, Frühwirth-Schnatter, 2021), which was partly used for creating the algorithm in \texttt{panelTVP}. 
 
 The package supports Gaussian response data as well as binary (Probit and Logit link) and count outcomes. For analyzing count data, either a standard Negative Binomial or a Zero-Inflated Negative Binomial (ZINB) model can be fitted. Compared to a Poisson model, the use of the Negative Binomial distribution has the advantage that overdispersion can be handled more naturally through the overdispersion parameter of the Negative Binomial distribution.
 
-This vignette is structured as follows: Section 2 introduces the reader to the methodology. This includes the model, the prior distributions and basic information of the Markov Chain Monte Carlo (MCMC) sampler that is used in \texttt{panelTVP}. Details of the sampler are not discussed in this vignette. Section 3 provides a small case study for Gaussian response data, whereas Section 4 and 5 contain case studies for binary and count data, respectively. Section 6 concludes this vignette and provides a brief summary of the content in the package, which is followed by a discussion on the limitations of the package.
+This vignette is structured as follows: Section 2 introduces the reader to the methodology. This includes the model, the prior distributions and basic information of the Markov Chain Monte Carlo (MCMC) sampler that is used in \texttt{panelTVP}. Details of the sampler are not discussed in this vignette. Section 3 provides a small case study for Gaussian response data, whereas Section 4 and 5 contain case studies for binary and count data, respectively. Section 6 presents a small simulation study, which illustrates how to simulate data using a function of the package. Moreover, the data are simulated with missings in the response variable and, thus, it is also demonstrated how the package handles this situation. Finally, Section 7 concludes this vignette and provides a brief summary of the content in the package.
 
 # Methodology
 
@@ -240,17 +243,169 @@ An MCMC scheme for sampling the parameters of a Bayesian Zero-Inflated Negative 
 \end{enumerate}
 Note that the at-risk indicators are only updated for observations for which $\text{y}_{it} = 0$. For observations with a positive count, $\text{w}_{it} = 1$ in all iterations of the MCMC sampler.
 
-
 # Basic structure of \texttt{panelTVP}
 
+Time-varying parameter models for panel data of varying response distributions can be fitted by using the package's main function \texttt{panelTVP::panelTVP()}. The basic structure of the function is as follows:
+
+```{r, eval = FALSE, highlight = FALSE}
+
+panelTVP(formula = NULL,
+         data = NULL,
+         id = NULL,
+         t = NULL,
+         model = NULL,
+         prior.reg,
+         prior.var,
+         prior.load,
+         prior.reg_zinb.count,
+         prior.load_zinb.count,
+         prior.reg_zinb.inflation,
+         prior.load_zinb.inflation,
+         mcmc.opt,
+         settings.NegBin,
+         HPD.coverage,
+         R.WAIC,
+         random.effects,
+         progress.bar)
+
+```
+
+## Essential arguments
+
+The \texttt{formula} argument is used for specifying the model frame and works in the same way as the \texttt{formula} argument of \texttt{lm()} and \texttt{glm()} when fitting a model to either a Gaussian, binary or Negative Binomial response. For a Zero-Inflated Negative Binomial outcome, the formula was inspired by the function \texttt{pscl::zeroinfl()}, which is used for fitting frequentist Zero-Inflated Negative Binomial models to cross-sectional data.
+
+The \texttt{data} argument expects a \texttt{data.frame} object that contains all the variables used in the \texttt{formula} argument.
+
+The arguments \texttt{id} and \texttt{t} are each vectors that are typically variables in the \texttt{data} object. The former is a subject-indicator, whereas the latter is a time-indicator. It is mandatory to specify those parameters and covariates in the \texttt{formula} argument are not allowed to be named either \texttt{id} or \texttt{t} to avoid confusion.
+
+The argument \texttt{model} defines the model that should be fitted to the data. This argument is a single character that is either \texttt{"Gaussian"} (for a Gaussian model), \texttt{"Probit"} (for a Probit model), \texttt{"Logit"} (for a Logit model), \texttt{"NegBin"} (for a Negative Binomial model) or \texttt{"ZINB"} (for a Zero-Inflated Negative Binomial model).
+
+Those four arguments constitute the bare minimum for fitting a time-varying parameter model to balanced panel data with \texttt{panelTVP()}, e.g., a Logit model can be fitted by using
+
+```{r, eval=F, highlight=F}
+
+panelTVP(formula = y ~ W1 + W2,
+         data = logit.data,
+         id = logit.data$id,
+         t = logit.data$t,
+         model = "Logit")
+
+```
+
+A Zero-Inflated Negative Binomial model with two linear predictors can be fitted by using
+
+```{r, eval=F, highlight=F}
+
+panelTVP(formula = y ~ W1.count + W2.count | W1.inflation,
+         data = zinb.data,
+         id = zinb.data$id,
+         t = zinb.data$t,
+         model = "ZINB")
+
+```
+
+Note that when you specify \texttt{model = "ZINB"}, then the \texttt{formula} argument consists of two parts: the count and the zero-inflation predictor. The two predictors are separated by the \texttt{|} sign. Moreover, it is possible to include the same set of covariates in both predictors. When all covariates in the data set should be included in both predictors, then you can write
+
+```{r, eval=F, highlight=F}
+
+panelTVP(formula = y ~ . | .,
+         data = zinb.data,
+         id = zinb.data$id,
+         t = zinb.data$t,
+         model = "ZINB")
+
+```
+
+This will also ignore the indicator variables \texttt{id} and \texttt{t} in your dataset, so you do not need to worry about excluding them.
+
+## Arguments for MCMC settings
+
+The arguments \texttt{mcmc.opt} and \texttt{settings.NegBin} both deal with MCMC settings and are expected to be lists that contain additional parameters. Note that the elements in a list can easily be changed without the need to copy the entire list elements. To illustrate this, we consider the argument \texttt{mcmc.opt} that is used for setting the options of the MCMC sampler. Its default arguments are:
+
+```{r, eval=F, highlight=F}
+
+mcmc.opt(chain.length = 12000, burnin = 2000, thin = 10, asis = TRUE)
+
+```
+
+The argument \texttt{chain.length} is the total number of MCMC draws, while \texttt{burnin} defines the burn-in period (i.e., per default, the first 2000 draws are discarded) and \texttt{thin} defines the thinning factor (i.e., per default, every tenth draws is used). Finally, \texttt{asis = TRUE} means that the optional ASIS (\textit{ancillarity sufficiency interweaving strategy}) step is used during MCMC sampling, which can increase sampling efficiency. Based on our simulations, we always recommend using ASIS as its computational burden is low and the gain in sampling efficiency can be tremendous. For more details on ASIS see, e.g., Yu and Meng (2011), Kastner and Frühwirth-Schnatter (2014) or Bitto and Frühwirth-Schnatter (2019). 
+
+Suppose that we want to change the burnin in period to a higher value - say 4000. Then we can modify the list argument \texttt{mcmc.opt} in the following way:
+
+```{r, highlight=F}
+
+args <- rlang::fn_fmls(panelTVP) # extracts arguments of panelTVP
+args.mcmc <- as.list(args$mcmc.opt) # selects mcmc.opt and converts it into a list
+utils::modifyList(args.mcmc, list(burnin = 4000)) # this gives the altered list
+
+```
+
+Alternatively, modification of elements in a list can also be done in a more condensed way:
+
+```{r, highlight=F}
+utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$mcmc.opt),
+                  list(burnin = 4000))
+```
+
+The argument \texttt{settings.NegBin} is a list that is only used when fitting a model to a count response variable. Its default structure is as follows:
+
+```{r, eval=F, highlight=F}
+
+settings.NegBin = list(alpha.r = 2, beta.r = 1, expansion.steps = 10,               
+                       width = 1, p.overrelax = 0, accuracy.overrelax = 10)
+
+```
+
+The six arguments of \texttt{settings.NegBin} are used for Slice sampling of the dispersion parameter $r$ of the Negative Binomial distribution. The arguments \texttt{alpha.r} and \texttt{beta.r} are shape and rate parameter of the Gamma prior on $r$, respectively. The argument \texttt{expansion.steps} defines the number of steps used in the stepping-out phase of the Slice sampler, while the \texttt{width} parameter defines the length of the slice interval. Those four arguments are required to perform standard Slice sampling. The standard Slice sampler can be extended to an overrelaxed Slice sampler, where the additional overrelaxation phase aims at increasing sampling efficiency by suppressing the random walk behavior of the Markov Chain. The accuracy of this procedure is governed by the argument \texttt{accuracy.overrelax}, which is the tuning parameter for mid-point refinement of the overrelaxed Slice sampler. If the accuracy limit is too small then the drawn value might not be in the Slice region, whereas high accuracy values will increase the computational burden of the sampler. Finally, the argument \texttt{p.overrelax} is the probability of performing an overrelaxed step. Hence, if \texttt{p.overrelax = 0} then no overrelaxation will be done and instead standard Slice sampling will be used. When overrelaxation is desired, then we recommend relatively high values, e.g., \texttt{p.overrelax = 0.95}. For details on the Slice sampler see the seminal paper Neal (2003).
+ 
+## Arguments for prior specification
+
+
+
+## Additional arguments
+
+There are four remaining arguments of the function \texttt{panelTVP}, which will be covered in this subsection. 
+
+The first one is \texttt{HPD.coverage}, which is the coverage probability of Bayesian highest posterior density intervals for the parameters with a $95 \; \%$ coverage as default. 
+
+The argument \texttt{random.effects} is a Boolean indicating whether you want to include a random effects / factor structure in your model to account for unobserved heterogeneity. Random effects are usually included in panel models and, thus, \texttt{random.effects = TRUE} is the default setting.
+
+The argument \texttt{R.WAIC} relates to the computation of the Widely Applicable Information Criterion (WAIC), where the marginal WAIC is computed on the basis of \texttt{R.WAIC} replicated datasets, see, e.g., Quintero and Lesaffre (2018) for details on the replication method and a discussion on the conditional and marginal WAIC for longitudinal models. 
+
+Finally, the argument \texttt{progress.bar} is a Boolean that is set to \texttt{FALSE} as default and, thus, the progress of the sampler will not be printed out on the \texttt{R}-console. Change it to \texttt{TRUE} to keep track of the sampling progress.
+
+## Output 
 
 # Analyzing Gaussian response data
 
-
 # Analyzing binary response data
 
+In this section we focus on the analysis of binary outcomes using the Logit model. A corresponding Probit regression model can easily be set up by changing the \texttt{model} argument accordingly and, thus, will not be discussed here.
+
+For demonstration, we will use the Marijuana dataset that is contained in the \texttt{panelTVP} package. This dataset is a pre-processed subset of the \textit{National Longitudinal Longitudinal Survey of Youth 1997} and contains data of the first seven waves of this study. The response variable is \texttt{Used.Mari.Since.DLI} and indicates whether the person has consumed Marijuana since the last interview date. For the first wave the question was, if the person has ever consumed Marijuana in his/her life. The goal is to explain the probability of drug consumption as a function of covariates and to assess whether effects of covariates are subject to temporal change.
+
+To get an overview of the data, the first 10 rows are given in the following:
+
+```{r, highlight=F}
+head(Marijuana, 10)
+```
+
+
+
+```{r, eval=F, highlight=F}
+f.logit <- Used.Mari.Since.DLI ~ Sex + Baseline.Age_c + Residence + Bullied.Before.12 + Ethnicity
+mari.vignette <- panelTVP(formula = f.logit,
+                          data = Marijuana,
+                          id = Marijuana$id,
+                          t = Marijuana$t,
+                          model = "Logit")
+```
 
 # Analyzing zero-inflated and overdispersed count response data
+
+
+# Analyzing simulated data with missing data
+
 
 # Conclusion
 

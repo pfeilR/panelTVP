@@ -5,7 +5,7 @@
 \alias{Marijuana}
 \title{Marijuana dataset for binary panel models}
 \format{
-An object of class \code{data.frame} with 32263 rows and 10 columns.
+An object of class \code{data.frame} with 32263 rows and 9 columns.
 }
 \source{
 For more details, please visit the offical website of the dataset \url{https://www.nlsinfo.org/}
@@ -33,7 +33,9 @@ drug application. The actual study comprises a total of 20 waves.
 \item{Age}{age of the respondent (numeric variable)}
 \item{Residence}{does the respondent live in an urban or rural environment (factor variable)}
 \item{t}{time index (numeric variable)}
-\item{id}{respondent identifier (numeric variable)}
+\item{id}{respondent identifier (numeric variable); note that some id's
+are missing as some original respondents did not met the inclusion
+requirements}
 \item{Baseline.Age_c}{centered age at first panel wave, i.e.,
 a value of 0 means that the person was 12 years old at study begin (numeric variable)}
 \item{Used.Mari.Since.DLI}{has the respondent consumed Marijuana since the last interview /

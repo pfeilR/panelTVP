@@ -18,7 +18,9 @@
 #'   \item{Age}{age of the respondent (numeric variable)}
 #'   \item{Residence}{does the respondent live in an urban or rural environment (factor variable)}
 #'   \item{t}{time index (numeric variable)}
-#'   \item{id}{respondent identifier (numeric variable)}
+#'   \item{id}{respondent identifier (numeric variable); note that some id's
+#'    are missing as some original respondents did not met the inclusion
+#'    requirements}
 #'   \item{Baseline.Age_c}{centered age at first panel wave, i.e.,
 #'    a value of 0 means that the person was 12 years old at study begin (numeric variable)}
 #'   \item{Used.Mari.Since.DLI}{has the respondent consumed Marijuana since the last interview /
@@ -64,7 +66,9 @@
 #'   \item{t}{time index (numeric variable)}
 #'   \item{Gross.Family.Income_log}{gross family income of the last year on
 #'   the log-scale (numeric variable)}
-#'   \item{id}{respondent identifier (numeric variable)}
+#'   \item{id}{respondent identifier (numeric variable); note that some id's
+#'    are missing as some original respondents did not met the inclusion
+#'    requirements}
 #'   \item{Baseline.Age_c}{centered baseline age, i.e., a person with a value of 0
 #'    was 32 years old in 2015 (numeric variable)}
 #' }

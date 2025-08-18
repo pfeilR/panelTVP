@@ -393,7 +393,7 @@ crafti <- function(X, posterior, by = NULL, ntime){
   }
   namesbeta <- colnames(X)
   if(by == "timepoint"){
-    cnames <- rep(c(namesbeta, "\u03BB"), times = ntime)
+    cnames <- rep(c(namesbeta, "Factor Loading"), times = ntime)
   } else{
     cnames <- rep(paste0("t=",1:ntime), times = ncov+1) # +1 for factor loading
   }
@@ -406,7 +406,7 @@ crafti <- function(X, posterior, by = NULL, ntime){
       names(res)[t] <- paste("Regression Effects and Factor Loading at Time", t)
     }
   } else{
-    covnames <- c(namesbeta, "\u03BB")
+    covnames <- c(namesbeta, "Factor Loading")
     for(i in 1:(ncov+1)){ # +1 for factor loading
       res[[i]] <- d[d[,"cov"] == i, 1:4]
       names(res)[i] <- covnames[i]

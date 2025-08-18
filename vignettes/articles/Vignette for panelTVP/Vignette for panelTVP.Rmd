@@ -30,6 +30,9 @@ output:
   rticles::elsevier_article:
     keep_tex: true
     citation_package: natbib
+    latex_engine: lualatex
+header-includes:
+  - \newcommand{\pandocbounded}[1]{#1}
 ---
 
 # Introduction
@@ -44,7 +47,7 @@ Panel data are commonly encountered in econometrics and the social sciences. Whe
 
 The package supports Gaussian response data as well as binary (Probit and Logit link) and count outcomes. For analyzing count data, either a standard Negative Binomial or a Zero-Inflated Negative Binomial (ZINB) model can be fitted. Compared to a Poisson model, the use of the Negative Binomial distribution has the advantage that overdispersion can be handled more naturally through the overdispersion parameter of the Negative Binomial distribution.
 
-This vignette is structured as follows: Section 2 introduces the reader to the methodology. This includes the model, the prior distributions and basic information of the Markov Chain Monte Carlo (MCMC) sampler that is used in \texttt{panelTVP}. Details of the sampler are not discussed in this vignette. Section 3 provides a small case study for Gaussian response data, whereas Section 4 and 5 contain case studies for binary and count data, respectively. Section 6 presents a small simulation study, which illustrates how to simulate data using a function of the package. Moreover, the data are simulated with missings in the response variable and, thus, it is also demonstrated how the package handles this situation. Finally, Section 7 concludes this vignette and provides a brief summary of the content in the package.
+This vignette is structured as follows: Section 2 introduces the reader to the methodology. This includes the model, the prior distributions and basic information of the Markov Chain Monte Carlo (MCMC) sampler that is used in \texttt{panelTVP}. Details of the sampler are not discussed in this vignette. Section 3 provides a small case study for Gaussian response data, whereas Section 4 and 5 contain case studies for binary and count data, respectively. Section 6 presents a small simulation study, which illustrates how to simulate data using a function of the package. Moreover, the estimated effects are compared for two different prior specifications to demonstrate the usefulness of the package. Finally, Section 7 concludes this vignette and provides a brief summary of the content in the package.
 
 # Methodology
 
@@ -106,7 +109,7 @@ A major advantage when using the non-centered model representation is that the p
 \end{equation*}
 where the scale parameters of the stochastic processes $\theta_1,\dots\theta_d,\psi$ have support on $\mathbb{R}$ and are therefore defined as the positive and negative square root of the variance parameters $\theta^2_1,\dots,\theta^2_d,\psi^2.$  
 
-Hyperparameters of the model are either fixed or sampled using Metropolis-Hastings udpates.
+Hyperparameters of the model are either fixed or sampled using Metropolis-Hastings updates.
 
 ## Pólya-Gamma data augmentation
 
@@ -382,7 +385,7 @@ Finally, the argument \texttt{progress.bar} is a Boolean that is set to \texttt{
 
 In this section we focus on the analysis of binary outcomes using the Logit model. A corresponding Probit regression model can easily be set up by changing the \texttt{model} argument accordingly and, thus, will not be discussed here.
 
-For demonstration, we will use the Marijuana dataset that is contained in the \texttt{panelTVP} package. This dataset is a pre-processed subset of the \textit{National Longitudinal Longitudinal Survey of Youth 1997} and contains data of the first seven waves of this study. The response variable is \texttt{Used.Mari.Since.DLI} and indicates whether the person has consumed Marijuana since the last interview date. For the first wave the question was, if the person has ever consumed Marijuana in his/her life. The goal is to explain the probability of drug consumption as a function of covariates and to assess whether effects of covariates are subject to temporal change.
+For demonstration, we will use the Marijuana dataset that is contained in the \texttt{panelTVP} package. This dataset is a pre-processed subset of the \textit{National Longitudinal Longitudinal Survey of Youth 1997} and contains data of the first seven waves of this study. The response variable is \texttt{Used.Mari.Since.DLI} and indicates if the person has consumed Marijuana since the last interview date. A one means that the person has consumed the drug. For the first wave the question was, if the person has ever consumed Marijuana in his/her life. The goal is to explain the probability of drug consumption as a function of covariates and to assess whether effects of covariates are subject to temporal change.
 
 To get an overview of the data, the first 10 rows are given in the following:
 
@@ -390,7 +393,9 @@ To get an overview of the data, the first 10 rows are given in the following:
 head(Marijuana, 10)
 ```
 
+The variable \texttt{Bullied.Before.12} indicates whether the person was a victim of bullying before the age of 12. The variable \texttt{Residence} gives information on the location where the person lives in and is either \texttt{Urban} or \texttt{Rural}. Finally, the variable \texttt{Baseline.Age\_c} is a centered version of the person's baseline age, i.e., the age in the first survey round in 1997.
 
+A Bayesian Logit model with time-varying parameters and shrinkage priors on the effects can be estimated as follows:
 
 ```{r, eval=F, highlight=F}
 f.logit <- Used.Mari.Since.DLI ~ Sex + Baseline.Age_c + Residence + Bullied.Before.12 + Ethnicity
@@ -399,6 +404,28 @@ mari.vignette <- panelTVP(formula = f.logit,
                           id = Marijuana$id,
                           t = Marijuana$t,
                           model = "Logit")
+```
+
+```{r, echo=F}
+
+mari.vignette <- readRDS("C:/Users/AK119624/Desktop/Dissertation/Paper 1/Real Analysis/marihuana_packageData/mari.res.Rdata")
+
+```
+
+The estimated effects can again be summarized in a table
+
+```{r}
+
+summary(mari.vignette)
+
+```
+
+or displayed graphically 
+
+```{r myplot, out.width="0.7\\linewidth"}
+
+plot(mari.vignette, nplots = 2)
+
 ```
 
 # Analyzing zero-inflated and overdispersed count response data

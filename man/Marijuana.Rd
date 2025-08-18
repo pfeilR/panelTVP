@@ -5,7 +5,7 @@
 \alias{Marijuana}
 \title{Marijuana dataset for binary panel models}
 \format{
-An object of class \code{data.frame} with 32263 rows and 9 columns.
+An object of class \code{data.frame} with 32263 rows and 10 columns.
 }
 \source{
 For more details, please visit the offical website of the dataset \url{https://www.nlsinfo.org/}

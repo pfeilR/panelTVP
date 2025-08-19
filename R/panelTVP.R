@@ -674,11 +674,11 @@ panelTVP <- function(formula = NULL,
   prior.load_logit <- prior.load_zinb.inflation
 
   # model aliases
-  if(tolower(method) %in% c("gaussian", "normal")) method <- "Gaussian"
-  if(tolower(method) == "probit") method <- "Probit"
-  if(tolower(method) == "logit") method <- "Logit"
-  if(tolower(method) == "negbin") method <- "NegBin"
-  if(tolower(method) == "zinb") method <- "ZINB"
+  if(tolower(model) %in% c("gaussian", "normal")) model <- "Gaussian"
+  if(tolower(model) == "probit") model <- "Probit"
+  if(tolower(model) == "logit") model <- "Logit"
+  if(tolower(model) == "negbin") model <- "NegBin"
+  if(tolower(model) == "zinb") model <- "ZINB"
 
   # input checks
   check.panelTVP(formula, data, id, t, model, prior.reg, prior.var, prior.load,

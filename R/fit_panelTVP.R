@@ -30,6 +30,7 @@ fit_panelTVP <- function(formula,
 
   mf <- model.frame(formula = formula, data = dat, drop.unused.levels = TRUE)
   y <- model.response(mf)
+  y <- as.numeric(y) # to be safe
   mt <- attr(mf, "terms")
   x <- model.matrix(mt, mf)
 

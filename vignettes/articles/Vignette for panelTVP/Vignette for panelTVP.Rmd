@@ -48,7 +48,7 @@ Panel data are commonly encountered in econometrics and the social sciences. Whe
 
 The package supports Gaussian response data as well as binary (Probit and Logit link) and count outcomes. For analyzing count data, either a standard Negative Binomial or a Zero-Inflated Negative Binomial (ZINB) model can be fitted. Compared to a Poisson model, the use of the Negative Binomial distribution has the advantage that overdispersion can be handled more naturally through the overdispersion parameter of the Negative Binomial distribution.
 
-This vignette is structured as follows: Section 2 introduces the reader to the methodology. This includes the model, the prior distributions and basic information of the Markov Chain Monte Carlo (MCMC) sampler that is used in \texttt{panelTVP}. Details of the sampler are not discussed in this vignette. Section 3 provides a small case study for Gaussian response data, whereas Section 4 and 5 contain case studies for binary and count data, respectively. Section 6 presents a small simulation study, which illustrates how to simulate data using a function of the package. Moreover, the estimated effects are compared for two different prior specifications to demonstrate the usefulness of the package. Finally, Section 7 concludes this vignette and provides a brief summary of the content in the package.
+This vignette is structured as follows: Section 2 introduces the reader to the methodology. This includes the model, the prior distributions and basic information of the Markov Chain Monte Carlo (MCMC) sampler that is used in \texttt{panelTVP}. Details of the sampler are not discussed in this vignette. Section 3 provides a small case study for Gaussian response data, whereas Section 4 and 5 contain case studies for binary and count data, respectively. Finally, Section 6 concludes this vignette and provides a brief summary of the content in the package.
 
 # Methodology
 
@@ -563,9 +563,27 @@ pp$predictive.summary
 
 ```
 
-The matrix \texttt{posterior.predictive} is of dimension $N_{new} \times (M\cdot \texttt{n.replicates})$, where $N_{new}$ is the number of new data points. Due to marginalization, there are \texttt{n.replicates} samples for each draw of the Markov Chain. The posterior predictive distribution may then be visualized as
+The matrix \texttt{predictive.distribution} contains the posterior predictive distribution and is of dimension $N_{new} \times M$, where $N_{new}$ is the number of new data points.
 
+```{r highlight=F}
 
+par(mfrow = c(2,1))
+
+hist(pp$predictive.distribution[1,], 
+     main = "Predictive Distribution of First New Subject",
+     xlab = "log(Gross.Family.Income)",
+     xlim = c(10.8,12.2),
+     breaks = 25)
+
+hist(pp$predictive.distribution[2,], 
+     main = "Predictive Distribution of Second New Subject",
+     xlab = "log(Gross.Family.Income)",
+     xlim = c(10.8,12.2),
+     breaks = 25)
+
+layout(1)
+
+```
 
 # Analyzing binary response data
 
@@ -624,11 +642,51 @@ plot(logit.vignette, nplots = 2)
 
 HIER NOCH INTERPRETATION DER EFFEKT HINGEBEN !!!!
 
-# Analyzing zero-inflated and overdispersed count response data
+# Analyzing synthetic zero-inflated and overdispersed count response data
 
+In this section we describe how zero-inflated and overdispersed count data can be analyzed with the \texttt{panelTVP()} function. We consider synthetic data that we simulate using the function \texttt{sim\_panelTVP()}. As missing values in the response variable are supported and imputed in a data augmentation step by \texttt{panelTVP()}, we will manually set values of the response variable at missing. Finally, we compare our shrinkage prior approach to an unstructured approach, where independent Normal priors are placed on the regression effects and the factor loadings.
 
-# Analyzing simulated data with missing data
+The function \texttt{sim\_panelTVP} has the following structure:
 
+```{r highlight=F}
+
+sim_panelTVP(n, Tmax, model,
+             beta = NULL, theta = NULL,
+             lambda = NULL, psi = NULL,
+             beta_zinb.count = NULL, theta_zinb.count = NULL,
+             lambda_zinb.count = NULL, psi_zinb.count = NULL,
+             beta_zinb.inflation = NULL, theta_zinb.inflation = NULL,
+             lambda_zinb.inflation = NULL, psi_zinb.inflation = NULL, 
+             r = NULL, sigma2 = NULL)
+
+```
+
+Argument \texttt{n} is the number of subjects, whereas \texttt{Tmax} is the total number of repeated measurements or time points. Both parameters expect numeric scalars. The argument \texttt{model} defines the model from which data are simulated. This argument expects one of the following character strings \texttt{"Gaussian"}, \texttt{"Probit"}, \texttt{"Logit"}, \texttt{"NegBin"}, \texttt{"ZINB"}. No aliases were given so the user is not allowed to deviate from these naming conventions. 
+
+The regression effects and the factor loadings are then simulated from the first-order random walks that were already discussed in the theoretical chapter of this vignette.
+
+```{r highlight=F}
+
+sim.zinb <- sim_panelTVP(n = 1000, Tmax = 4, model = "ZINB",
+                         beta_zinb.count = c(0.5,0,-0.2),
+                         theta_zinb.count = c(0.1,0,0),
+                         lambda_zinb.count = 0.3,
+                         psi_zinb.count = 0,
+                         beta_zinb.inflation = c(0.9,0.1,0),
+                         theta_zinb.inflation = c(0.05,0,0),
+                         lambda_zinb.inflation = 0.8,
+                         psi_zinb.inflation = 0.1,
+                         r = 2)
+
+shrink.zinb <- panelTVP(y ~ W1.nb + W2.nb | W1.logit + W2.logit,
+                        data = sim.zinb$observed,
+                        t = sim.zinb$observed$t,
+                        id = sim.zinb$observed$id,
+                        model = "ZINB",
+                        mcmc.opt = list(chain.length = 1000, burnin = 500, thin = 10, asis = T),
+                        progress.bar = T)
+
+```
 
 # Conclusion
 

@@ -1370,14 +1370,85 @@ are made for a specific time point that is specified in the argument
 prediction intervals are obtained as well with coverage probability that
 can be defined by using the argument \texttt{coverage}. The argument
 \texttt{pop.pred} is a Boolean and indicates whether the posterior
-predictive distribution of new data should be based on the population or
-include random effects / factors as well. If \texttt{pop.pred = TRUE},
-then the subject-specific factors are integrated out as for new data
-subject-specific information is not available. For marginalization,
-\texttt{n.replicates} samples are drawn, where the latent factors are
-simulated from the prior. Therefore, the accuracy of marginalization
-increases as \texttt{n.replicates} increases - at the cost of increased
-computational complexity.
+predictive distribution of new data should be based on the population
+level or if random effects / factors should be included as well. If
+\texttt{pop.pred = TRUE}, then the subject-specific factors are
+integrated out as for new data subject-specific information is not
+available. For marginalization, \texttt{n.replicates} samples are drawn,
+where the latent factors are simulated from the prior. Therefore, the
+accuracy of marginalization increases as \texttt{n.replicates} increases
+- at the cost of increased computational complexity.
+
+In the following, the prediction task is briefly demonstrated. Suppose
+we want to make predictions for a specific time point for two new
+subjects for our income data. For this, we first set up the new design
+matrix and then run the \texttt{predict()} function:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{names.orig \textless{}{-} colnames(Gauss.vignette$data$X)}
+
+\NormalTok{X.new \textless{}{-} data.frame(Intercept = c(1,1),}
+\NormalTok{                    Sex = c(0,1),}
+\NormalTok{                    Baseline.Age\_c = c(12,16),}
+\NormalTok{                    EthnicityHispanic = c(1,0),}
+\NormalTok{                    EthnicityMixed = c(0,0),}
+\NormalTok{                    highschool = c(1,0),}
+\NormalTok{                    college = c(0,1),}
+\NormalTok{                    Hours.Worked = c(0,1))}
+\NormalTok{colnames(X.new) \textless{}{-} names.orig}
+
+\NormalTok{pp \textless{}{-} predict(object = Gauss.vignette,}
+\NormalTok{              X.new = X.new,}
+\NormalTok{              timepoint = 4)}
+\end{Highlighting}
+\end{Shaded}
+
+The object \texttt{pp} is a list consisting of two matrices. The matrix
+\texttt{predictive.summary} contains summary statistics derived from the
+predictive distribution, i.e.,
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pp$predictive.summary}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         LO     mean       UP
+## 1 11.10293 11.32383 11.55978
+## 2 11.21312 11.48770 11.74663
+\end{verbatim}
+
+The matrix \texttt{predictive.distribution} contains the posterior
+predictive distribution and is of dimension \(N_{new} \times M\), where
+\(N_{new}\) is the number of new data points.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{par(mfrow = c(2,1))}
+
+\NormalTok{hist(pp$predictive.distribution[1,], }
+\NormalTok{     main = "Predictive Distribution of First New Subject",}
+\NormalTok{     xlab = "log(Gross.Family.Income)",}
+\NormalTok{     xlim = c(10.8,12.2),}
+\NormalTok{     breaks = 25)}
+
+\NormalTok{hist(pp$predictive.distribution[2,], }
+\NormalTok{     main = "Predictive Distribution of Second New Subject",}
+\NormalTok{     xlab = "log(Gross.Family.Income)",}
+\NormalTok{     xlim = c(10.8,12.2),}
+\NormalTok{     breaks = 25)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-26-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{layout(1)}
+\end{Highlighting}
+\end{Shaded}
 
 \section{Analyzing binary response
 data}\label{analyzing-binary-response-data}
@@ -1601,25 +1672,25 @@ or displayed graphically
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-29-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-32-1.pdf}}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-29-2.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-32-2.pdf}}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-29-3.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-32-3.pdf}}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-29-4.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-32-4.pdf}}
 
 HIER NOCH INTERPRETATION DER EFFEKT HINGEBEN !!!!
 

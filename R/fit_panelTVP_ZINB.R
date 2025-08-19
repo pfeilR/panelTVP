@@ -45,6 +45,7 @@ fit_panelTVP_ZINB <- function(formula,
   mt_logit <- attr(mf_logit, "terms")
   x_logit <- model.matrix(mt_logit, mf_logit)
   y <- model.response(mf_nb)
+  y <- as.numeric(y) # to be safe
   tind <- data$t
   Tmax <- max(tind)
   id <- data$id

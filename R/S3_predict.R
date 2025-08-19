@@ -397,8 +397,8 @@ pred.helper <- function(model, X.new, timepoint,
   if(cla == "panelTVP.Gaussian") sigma2 <- model$mcmc[,"sigma2"]
   if(cla == "panelTVP.NegBin") r <- model$mcmc[,"r"]
   LO <- numeric(n); UP <- numeric(n)
+  y.future <- matrix(nrow = n, ncol = S)
   if(pop.pred){
-    y.future <- matrix(nrow = n, ncol = S)
     mcmc.eta <- matrix(nrow = n, ncol = S)
     for(s in 1:S){
       mcmc.eta[, s] <- X.new %*% mcmc.beta[s,]
@@ -416,7 +416,6 @@ pred.helper <- function(model, X.new, timepoint,
       }
     }
   } else{
-    y.future <- matrix(nrow = n, ncol = S * n.replicates)
     for(s in 1:S){
       eta.replicant <- matrix(nrow = n, ncol = n.replicates)
       y.replicant <- matrix(nrow = n, ncol = n.replicates)
@@ -437,8 +436,7 @@ pred.helper <- function(model, X.new, timepoint,
           y.replicant[, replicant] <- MASS::rnegbin(n, mu = r[s] * exp(eta.replicant[, replicant]), theta = r[s])
         }
       }
-      col.idx <- 1+(n.replicates*(s-1))
-      y.future[,col.idx:(col.idx+(n.replicates-1))] <- y.replicant
+      y.future[, s] <- rowMeans(y.replicant)
     }
   }
 
@@ -482,8 +480,8 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
   }
   r <- model$mcmc_nb[,"r"]
   LO <- numeric(n); UP <- numeric(n)
+  y.future <- matrix(nrow = n, ncol = S)
   if(pop.pred){
-    y.future <- matrix(nrow = n, ncol = S)
     mcmc.eta_nb <- matrix(nrow = n, ncol = S)
     mcmc.eta_logit <- matrix(nrow = n, ncol = S)
     for(s in 1:S){
@@ -496,7 +494,6 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
       y.future[, s] <- y.draw
     }
   } else{
-    y.future <- matrix(nrow = n, ncol = S * n.replicates)
     for(s in 1:S){
       eta_nb.replicant <- matrix(nrow = n, ncol = n.replicates)
       eta_logit.replicant <- matrix(nrow = n, ncol = n.replicates)
@@ -516,8 +513,7 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
         y.draw[idx] <- MASS::rnegbin(sum(idx), mu = r[s] * exp(eta_nb.replicant[idx,replicant]), theta = r[s])
         y.replicant[,replicant] <- y.draw
       }
-      col.idx <- 1+(n.replicates*(s-1))
-      y.future[,col.idx:(col.idx+(n.replicates-1))] <- y.replicant
+      y.future[, s] <- rowMeans(y.replicant)
     }
   }
 

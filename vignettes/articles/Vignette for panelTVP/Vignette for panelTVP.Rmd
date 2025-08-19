@@ -555,6 +555,18 @@ pp <- predict(object = Gauss.vignette,
 
 ```
 
+The object \texttt{pp} is a list consisting of two matrices. The matrix \texttt{predictive.summary} contains summary statistics derived from the predictive distribution, i.e., 
+
+```{r highlight=F}
+
+pp$predictive.summary
+
+```
+
+The matrix \texttt{posterior.predictive} is of dimension $N_{new} \times (M\cdot \texttt{n.replicates})$, where $N_{new}$ is the number of new data points. Due to marginalization, there are \texttt{n.replicates} samples for each draw of the Markov Chain. The posterior predictive distribution may then be visualized as
+
+
+
 # Analyzing binary response data
 
 In this section we focus on the analysis of binary outcomes using the Logit model. A corresponding Probit regression model can easily be set up by changing the \texttt{model} argument accordingly and, thus, will not be discussed here.

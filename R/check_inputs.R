@@ -381,6 +381,10 @@ check.predict <- function(model, X.new, timepoint, coverage, pop.pred, n.replica
     stop("Argument 'timepoint' must be a single integer. If you want predictions for multiple time points, please call the predict function multiple times.")
   }
 
+  if(!timepoint %in% unique(model$data$timeidx)){
+    stop("Argument 'timepoint' must contain a time point for which the parameters were learned.")
+  }
+
   if(is.null(coverage) || !is.numeric(coverage) || length(coverage) != 1 || !is.finite(coverage) || coverage < 0 || coverage > 1){
     stop("Argument 'coverage' must be a single numeric value between 0 and 1.")
   }

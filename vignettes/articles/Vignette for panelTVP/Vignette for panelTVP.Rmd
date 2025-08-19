@@ -38,6 +38,7 @@ header-includes:
 # Introduction
 
 ```{r, echo=FALSE}
+# install_github("pfeilR/panelTVP")
 library(panelTVP)
 ```
 
@@ -281,7 +282,7 @@ The \texttt{data} argument expects a \texttt{data.frame} object that contains al
 
 The arguments \texttt{id} and \texttt{t} are each vectors that are typically variables in the \texttt{data} object. The former is a subject-indicator, whereas the latter is a time-indicator. It is mandatory to specify those parameters and covariates in the \texttt{formula} argument are not allowed to be named either \texttt{id} or \texttt{t} to avoid confusion.
 
-The argument \texttt{model} defines the model that should be fitted to the data. This argument is a single character that is either \texttt{"Gaussian"} (for a Gaussian model), \texttt{"Probit"} (for a Probit model), \texttt{"Logit"} (for a Logit model), \texttt{"NegBin"} (for a Negative Binomial model) or \texttt{"ZINB"} (for a Zero-Inflated Negative Binomial model).
+The argument \texttt{model} defines the model that should be fitted to the data. This argument is a single character that is either \texttt{"Gaussian"} (for a Gaussian model), \texttt{"Probit"} (for a Probit model), \texttt{"Logit"} (for a Logit model), \texttt{"NegBin"} (for a Negative Binomial model) or \texttt{"ZINB"} (for a Zero-Inflated Negative Binomial model). The character string you pass to the \texttt{model} argument is not restricted to case sensitivity, i.e., it is possible to write \texttt{model = "Logit"}, \texttt{model = "loGiT"} etc. Moreover, you can use \texttt{model = "Normal"} as an alias for \texttt{model = "Gaussian"} to fit a Gaussian / Normal model.
 
 Those four arguments constitute the bare minimum for fitting a time-varying parameter model to balanced panel data with \texttt{panelTVP()}, e.g., a Logit model can be fitted by using
 
@@ -450,7 +451,7 @@ or by time point
 summary(Gauss.vignette, by = "timepoint")
 ```
 
-Effect plots can be easily obtained via
+Effect plots can be easily obtained as
 
 ```{r myplot, out.width="0.7\\linewidth"}
 
@@ -460,11 +461,97 @@ plot(Gauss.vignette, nplots = 2)
 
 The first effect plot is always the random effect or the factor loading, which is followed by the global intercept. Afterwards, the time-varying effects of covariates are given. Based on the results we observe an increase in the overall income level over time and a significant decrease for the women. Hence, the interviewed women have ceteris paribus a lower gross family income than men and this effect is more pronounced as they get older. The other effect estimates are shrunken to time-invariance. We see that people with a high school or college degree earn on average more money (or at least have a higher family income) than people with no completed degree. Furthermore, working at least 30 hours yields to an increase in the gross family income compared to people who work less than 30 hours.
 
-Aside from the inspection of the time-varying parameters, Bayesian inference with MCMC requires proper evaluation of the generated Markov Chains. The remaining MCMC draws after applying burnin and thinning for all parameters can be accessed via
+Aside from the inspection of the time-varying parameters, Bayesian inference with MCMC requires proper evaluation of the generated Markov Chains. The remaining MCMC draws after applying burnin and thinning for all parameters are stored in the matrix \texttt{mcmc}, i.e.,
 
 ```{r highlight=F}
 
 head(Gauss.vignette$mcmc, 4)
+
+```
+
+The first columns are the sampled draws of the time-varying regression effects and, thus, the most interesting parameters. The first covariate is usually the global intercept. When using a random walk shrinkage prior, you also get the "fixed" effects or starting values of the random walks, which are in this case \texttt{beta1}$,\dots,$\texttt{beta8}, as well as the scale parameters of the random walks, which are in this case \texttt{theta1}$,\dots,$\texttt{theta8}. The next parameters are the hyperparameters of the shrinkage priors, which are in this case \texttt{tau21}$,\dots,$\texttt{tau28}, \texttt{xi21}$,\dots,$\texttt{xi28}, \texttt{a.tau}, \texttt{a.xi}, \texttt{kappa.tau}, \texttt{kappa.xi}. As we have fitted a Normal regression model, the homoscedastic error variance \texttt{sigma2} is also contained in the matrix. For a count regression model, the dispersion parameter of the Negative Binomial distribution will be included instead. The remaining parameters then relate to the factor loadings, but are otherwise similar to the corresponding parameters for the regression part of the model.
+
+The chains can then be analyzed to assess convergence to the stationary distributions. For visual diagnostics, traceplots and plots of the ACFs are useful, e.g.,
+
+```{r highlight=F}
+
+par(mfrow = c(2,2))
+plot(Gauss.vignette$mcmc[,"beta_t11"], type = "l", 
+     main = "Trace of beta_t11 (Intercept at t = 1)", xlab = "", ylab = "")
+acf(Gauss.vignette$mcmc[,"beta_t11"],
+    main = "ACF of beta_t11 (Intercept at t = 1)")
+plot(Gauss.vignette$mcmc[,"lambda_t1"], type = "l", 
+     main = "Trace of lambda_t1 (Loading at t = 1)", xlab = "", ylab = "")
+acf(Gauss.vignette$mcmc[,"lambda_t1"],
+    main = "ACF of lambda_t1 (Loading at t = 1)")
+layout(1)
+
+```
+
+A quantity for summarizing the information in a correlated sample in a single number is the effective sample size (ESS), which is defined as
+
+\begin{equation*}
+ \text{ESS} = \frac{M}{1+2\sum_{s=1}^\infty \rho_s}, 
+\end{equation*}
+where $M$ is the length of the chain (after burn-in and thinning) and $\rho_s$ is the autocorrelation of the chain at lag $s$. The ESS can be interpreted as the number of independent draws that is equivalent to $M$ MCMC draws. This parameter-specific quantity can be computed as 
+
+```{r highlight=F}
+
+LaplacesDemon::ESS(Gauss.vignette$mcmc[,"lambda_t1"])
+
+```
+
+As the length of the Markov Chain is $M = 1000$, we conclude that enough information was used for estimating the factor loading at the first time point.
+
+Finally, it should be mentioned how samples from the posterior predictive distribution can be obtained for the models fitted with \texttt{panelTVP()}. The object \texttt{posterior.predictive} contains $M$ draws from the posterior predictive distribution of the fitted values, i.e., the values of the response variable that were used for training the model. The object is a matrix where each row corresponds to an observation in the training data and each column to a draw of the Markov Chain (after burn-in and thinning).
+
+```{r highlight=F}
+
+dim(Gauss.vignette$posterior.predictive)
+
+```
+
+The posterior predictive distribution of the training data can be used for posterior predictive checks (PPC). Functions to perform PPC are, e.g., available in the \texttt{bayesplot} package. One way of assessing the fit of a Bayesian model is to superimpose the density of the original data with the $M$ densities of the posterior predictive distribution.
+
+```{r highlight=F}
+
+bayesplot::ppc_dens_overlay(y = Income$Gross.Family.Income_log,
+                            yrep = t(Gauss.vignette$posterior.predictive))
+
+```
+
+Although the predicted densities are close to the density of the training data, we see that the pronounced peak at a log-income value of around $11.5$ is not fully captured. Moreover, information on the small peak located at the right tail of the distribution is not contained in the posterior predictive distributions. 
+
+It is also possible to make predictions for new data using the S3 function \texttt{predict()}. This function has the following structure:
+
+```{r eval = F, highlight=F}
+
+predict(object, X.new, timepoint, coverage = 0.95,
+        pop.pred = FALSE, n.replicates = 100, ...)
+
+```
+
+The argument \texttt{object} is an object that is returned by \texttt{panelTVP()}. The argument \texttt{X.new} is a \texttt{matrix} or a \texttt{data.frame} object, which contains the new data. Predictions are made for a specific time point that is specified in the argument \texttt{timepoint}. In addition to point predictions, Bayesian HPD prediction intervals are obtained as well with coverage probability that can be defined by using the argument \texttt{coverage}. The argument \texttt{pop.pred} is a Boolean and indicates whether the posterior predictive distribution of new data should be based on the population level or if random effects / factors should be included as well. If \texttt{pop.pred = TRUE}, then the subject-specific factors are integrated out as for new data subject-specific information is not available. For marginalization, \texttt{n.replicates} samples are drawn, where the latent factors are simulated from the prior. Therefore, the accuracy of marginalization increases as \texttt{n.replicates} increases - at the cost of increased computational complexity.
+
+In the following, the prediction task is briefly demonstrated. Suppose we want to make predictions for a specific time point for two new subjects for our income data. For this, we first set up the new design matrix and then run the \texttt{predict()} function:
+
+```{r highlight=F}
+
+names.orig <- colnames(Gauss.vignette$data$X)
+
+X.new <- data.frame(Intercept = c(1,1),
+                    Sex = c(0,1),
+                    Baseline.Age_c = c(12,16),
+                    EthnicityHispanic = c(1,0),
+                    EthnicityMixed = c(0,0),
+                    highschool = c(1,0),
+                    college = c(0,1),
+                    Hours.Worked = c(0,1))
+colnames(X.new) <- names.orig
+
+pp <- predict(object = Gauss.vignette,
+              X.new = X.new,
+              timepoint = 4)
 
 ```
 

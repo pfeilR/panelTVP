@@ -556,7 +556,11 @@ the data. This argument is a single character that is either
 \texttt{"Gaussian"} (for a Gaussian model), \texttt{"Probit"} (for a
 Probit model), \texttt{"Logit"} (for a Logit model), \texttt{"NegBin"}
 (for a Negative Binomial model) or \texttt{"ZINB"} (for a Zero-Inflated
-Negative Binomial model).
+Negative Binomial model). The character string you pass to the
+\texttt{model} argument is not restricted to case sensitivity, i.e., it
+is possible to write \texttt{model = "Logit"}, \texttt{model = "loGiT"}
+etc. Moreover, you can use \texttt{model = "Normal"} as an alias for
+\texttt{model = "Gaussian"} to fit a Gaussian / Normal model.
 
 Those four arguments constitute the bare minimum for fitting a
 time-varying parameter model to balanced panel data with
@@ -1111,7 +1115,7 @@ or by time point
 ## Factor Loading                                      0.5672 0.0119
 \end{verbatim}
 
-Effect plots can be easily obtained via
+Effect plots can be easily obtained as
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1161,7 +1165,7 @@ people who work less than 30 hours.
 Aside from the inspection of the time-varying parameters, Bayesian
 inference with MCMC requires proper evaluation of the generated Markov
 Chains. The remaining MCMC draws after applying burnin and thinning for
-all parameters can be accessed via
+all parameters are stored in the matrix \texttt{mcmc}, i.e.,
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1236,6 +1240,144 @@ all parameters can be accessed via
 ## [3,]  0.007318261  0.1190598 0.009182661     1 16.354238412      1  106.1703867
 ## [4,]  0.005572515  9.0650754 1.031545035     1  0.283040547      1    0.5351148
 \end{verbatim}
+
+The first columns are the sampled draws of the time-varying regression
+effects and, thus, the most interesting parameters. The first covariate
+is usually the global intercept. When using a random walk shrinkage
+prior, you also get the ``fixed'' effects or starting values of the
+random walks, which are in this case
+\texttt{beta1}\(,\dots,\)\texttt{beta8}, as well as the scale parameters
+of the random walks, which are in this case
+\texttt{theta1}\(,\dots,\)\texttt{theta8}. The next parameters are the
+hyperparameters of the shrinkage priors, which are in this case
+\texttt{tau21}\(,\dots,\)\texttt{tau28},
+\texttt{xi21}\(,\dots,\)\texttt{xi28}, \texttt{a.tau}, \texttt{a.xi},
+\texttt{kappa.tau}, \texttt{kappa.xi}. As we have fitted a Normal
+regression model, the homoscedastic error variance \texttt{sigma2} is
+also contained in the matrix. For a count regression model, the
+dispersion parameter of the Negative Binomial distribution will be
+included instead. The remaining parameters then relate to the factor
+loadings, but are otherwise similar to the corresponding parameters for
+the regression part of the model.
+
+The chains can then be analyzed to assess convergence to the stationary
+distributions. For visual diagnostics, traceplots and plots of the ACFs
+are useful, e.g.,
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{par(mfrow = c(2,2))}
+\NormalTok{plot(Gauss.vignette$mcmc[,"beta\_t11"], type = "l", }
+\NormalTok{     main = "Trace of beta\_t11 (Intercept at t = 1)", xlab = "", ylab = "")}
+\NormalTok{acf(Gauss.vignette$mcmc[,"beta\_t11"],}
+\NormalTok{    main = "ACF of beta\_t11 (Intercept at t = 1)")}
+\NormalTok{plot(Gauss.vignette$mcmc[,"lambda\_t1"], type = "l", }
+\NormalTok{     main = "Trace of lambda\_t1 (Loading at t = 1)", xlab = "", ylab = "")}
+\NormalTok{acf(Gauss.vignette$mcmc[,"lambda\_t1"],}
+\NormalTok{    main = "ACF of lambda\_t1 (Loading at t = 1)")}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-19-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{layout(1)}
+\end{Highlighting}
+\end{Shaded}
+
+A quantity for summarizing the information in a correlated sample in a
+single number is the effective sample size (ESS), which is defined as
+
+\begin{equation*}
+ \text{ESS} = \frac{M}{1+2\sum_{s=1}^\infty \rho_s}, 
+\end{equation*} where \(M\) is the length of the chain (after burn-in
+and thinning) and \(\rho_s\) is the autocorrelation of the chain at lag
+\(s\). The ESS can be interpreted as the number of independent draws
+that is equivalent to \(M\) MCMC draws. This parameter-specific quantity
+can be computed as
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{LaplacesDemon::ESS(Gauss.vignette$mcmc[,"lambda\_t1"])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 872.7779
+\end{verbatim}
+
+As the length of the Markov Chain is \(M = 1000\), we conclude that
+enough information was used for estimating the factor loading at the
+first time point.
+
+Finally, it should be mentioned how samples from the posterior
+predictive distribution can be obtained for the models fitted with
+\texttt{panelTVP()}. The object \texttt{posterior.predictive} contains
+\(M\) draws from the posterior predictive distribution of the fitted
+values, i.e., the values of the response variable that were used for
+training the model. The object is a matrix where each row corresponds to
+an observation in the training data and each column to a draw of the
+Markov Chain (after burn-in and thinning).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dim(Gauss.vignette$posterior.predictive)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 8060 1000
+\end{verbatim}
+
+The posterior predictive distribution of the training data can be used
+for posterior predictive checks (PPC). Functions to perform PPC are,
+e.g., available in the \texttt{bayesplot} package. One way of assessing
+the fit of a Bayesian model is to superimpose the density of the
+original data with the \(M\) densities of the posterior predictive
+distribution.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{bayesplot::ppc\_dens\_overlay(y = Income$Gross.Family.Income\_log,}
+\NormalTok{                            yrep = t(Gauss.vignette$posterior.predictive))}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-22-1.pdf}}
+
+Although the predicted densities are close to the density of the
+training data, we see that the pronounced peak at a log-income value of
+around \(11.5\) is not fully captured. Moreover, information on the
+small peak located at the right tail of the distribution is not
+contained in the posterior predictive distributions.
+
+It is also possible to make predictions for new data using the S3
+function \texttt{predict()}. This function has the following structure:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{predict(object, X.new, timepoint, coverage = 0.95,}
+\NormalTok{        pop.pred = FALSE, n.replicates = 100, ...)}
+\end{Highlighting}
+\end{Shaded}
+
+The argument \texttt{object} is an object that is returned by
+\texttt{panelTVP()}. The argument \texttt{X.new} is a \texttt{matrix} or
+a \texttt{data.frame} object, which contains the new data. Predictions
+are made for a specific time point that is specified in the argument
+\texttt{timepoint}. In addition to point predictions, Bayesian HPD
+prediction intervals are obtained as well with coverage probability that
+can be defined by using the argument \texttt{coverage}. The argument
+\texttt{pop.pred} is a Boolean and indicates whether the posterior
+predictive distribution of new data should be based on the population or
+include random effects / factors as well. If \texttt{pop.pred = TRUE},
+then the subject-specific factors are integrated out as for new data
+subject-specific information is not available. For marginalization,
+\texttt{n.replicates} samples are drawn, where the latent factors are
+simulated from the prior. Therefore, the accuracy of marginalization
+increases as \texttt{n.replicates} increases - at the cost of increased
+computational complexity.
 
 \section{Analyzing binary response
 data}\label{analyzing-binary-response-data}
@@ -1459,25 +1601,25 @@ or displayed graphically
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-24-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-29-1.pdf}}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-24-2.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-29-2.pdf}}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-24-3.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-29-3.pdf}}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-24-4.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-29-4.pdf}}
 
 HIER NOCH INTERPRETATION DER EFFEKT HINGEBEN !!!!
 

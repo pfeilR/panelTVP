@@ -381,6 +381,93 @@ Finally, the argument \texttt{progress.bar} is a Boolean that is set to \texttt{
 
 # Analyzing Gaussian response data
 
+We now demonstrate the usage of the \texttt{panelTVP} package based on an application of a real-world dataset - the \texttt{Income} dataset, which is contained in the package and a subset of the \textit{National Longitudinal Longitudinal Survey of Youth 1997}. This survey started its first round in 1997, where most of the participants were children or young adults. As the goal of this illustration is to analyze income data, we do not focus on the first waves of the survey. Moreover, due to the availability of some variables we only focus on the last four waves of the study, i.e., survey rounds in the years 2015, 2017, 2019 and 2021.
+
+In the following, the first ten observations are printed out for a quick overview.
+
+```{r, highlight=F}
+
+head(Income, 10)
+
+```
+
+The variable \texttt{Edu} is a factor with levels "no degree", "high school degree" and "college degree", which refers to the highest completed degree of the person. \texttt{Hours.Worked} is a factor with levels "worked less than 30 hours" and "worked at least 30 hours". The variable \texttt{Baseline.Age\_c} is the centered version  of the baseline age of the person in the year 2015, i.e., the first study period considered in this specific subset of the survey. The variable \texttt{t} contains information the time point, whereas \texttt{id} is a subject indicator. Note that there are gaps in the ID enumeration, which is due to the fact that some subjects were removed for various reasons when the raw data were prepared for the purpose of creating this specific case study.
+
+The response variable of interest is gross family income on the log-scale (\texttt{Gross.Family.Income\_log}). A quick descriptive analysis gives insight into the distribution of this variable as a function of time.
+
+```{r, highlight=F}
+boxplot(Income$Gross.Family.Income_log ~ Income$Year,
+        xlab = "", ylab = "log(Gross.Family.Income)",
+        main = "Distribution of Income (log-scale) over Time")
+```
+
+The boxplots suggest that the income distribution differs by time point and, thus, some covariates may differ in their effects as well.
+
+The marginal distribution of the response by time point is given by
+
+```{r, highlight=F}
+Y <- sort(unique(Income$Year))
+par(mfrow = c(2,2))
+for(i in 1:4) hist(Income[Income$t == i,]$Gross.Family.Income_log, main = Y[i],
+                   xlab = "log(Gross.Family.Income)")
+layout(1)
+```
+
+Despite the slightly left-skewed marginal distribution of the response, we fit a Gaussian model with time-varying parameters by executing the following code:
+
+```{r, eval=F, highlight=F}
+f.Gauss <- Gross.Family.Income_log ~ Sex + Baseline.Age_c + Ethnicity + Edu + Hours.Worked
+Gauss.vignette <- panelTVP(formula = f.Gauss,
+                           data = Income,
+                           id = Income$id,
+                           t = Income$t,
+                           model = "Gaussian")
+```
+
+```{r, echo=F}
+Gauss.vignette <- readRDS("C:/Users/AK119624/Desktop/Dissertation/Paper 1/Real Analysis/income_packageData/Gauss.vignette.Rdata")
+```
+
+Information on the duration of the MCMC sampler can be accessed via
+
+```{r, highlight=F}
+
+Gauss.vignette$runtime
+
+``` 
+
+The model comprises a lot of parameters, but the most important ones are the time-varying regression effects and factor loadings. The S3 functions \texttt{summary()} and \texttt{plot()} can be used to show those effects in a table and in a plot, respectively. 
+
+When summarizing the results in a table, the user can order the results either by covariate
+
+```{r}
+summary(Gauss.vignette)
+```
+
+or by time point
+
+```{r}
+summary(Gauss.vignette, by = "timepoint")
+```
+
+Effect plots can be easily obtained via
+
+```{r myplot, out.width="0.7\\linewidth"}
+
+plot(Gauss.vignette, nplots = 2)
+
+```
+
+The first effect plot is always the random effect or the factor loading, which is followed by the global intercept. Afterwards, the time-varying effects of covariates are given. Based on the results we observe an increase in the overall income level over time and a significant decrease for the women. Hence, the interviewed women have ceteris paribus a lower gross family income than men and this effect is more pronounced as they get older. The other effect estimates are shrunken to time-invariance. We see that people with a high school or college degree earn on average more money (or at least have a higher family income) than people with no completed degree. Furthermore, working at least 30 hours yields to an increase in the gross family income compared to people who work less than 30 hours.
+
+Aside from the inspection of the time-varying parameters, Bayesian inference with MCMC requires proper evaluation of the generated Markov Chains. The remaining MCMC draws after applying burnin and thinning for all parameters can be accessed via
+
+```{r highlight=F}
+
+head(Gauss.vignette$mcmc, 4)
+
+```
+
 # Analyzing binary response data
 
 In this section we focus on the analysis of binary outcomes using the Logit model. A corresponding Probit regression model can easily be set up by changing the \texttt{model} argument accordingly and, thus, will not be discussed here.
@@ -399,34 +486,44 @@ A Bayesian Logit model with time-varying parameters and shrinkage priors on the 
 
 ```{r, eval=F, highlight=F}
 f.logit <- Used.Mari.Since.DLI ~ Sex + Baseline.Age_c + Residence + Bullied.Before.12 + Ethnicity
-mari.vignette <- panelTVP(formula = f.logit,
-                          data = Marijuana,
-                          id = Marijuana$id,
-                          t = Marijuana$t,
-                          model = "Logit")
+logit.vignette <- panelTVP(formula = f.logit,
+                           data = Marijuana,
+                           id = Marijuana$id,
+                           t = Marijuana$t,
+                           model = "Logit")
 ```
 
 ```{r, echo=F}
 
-mari.vignette <- readRDS("C:/Users/AK119624/Desktop/Dissertation/Paper 1/Real Analysis/marihuana_packageData/mari.res.Rdata")
+logit.vignette <- readRDS("C:/Users/AK119624/Desktop/Dissertation/Paper 1/Real Analysis/marihuana_packageData/mari.res.Rdata")
+
+```
+
+The total runtime of the sampler was considerably longer than for the Gaussian model. This is due to the fact that the Logit model requires sampling of Pólya-Gamma weights in each step of the sampler.
+
+```{r, highlight=F}
+
+logit.vignette$runtime
 
 ```
 
 The estimated effects can again be summarized in a table
 
-```{r}
+```{r, highlight=F}
 
-summary(mari.vignette)
+summary(logit.vignette)
 
-```
+``` 
 
 or displayed graphically 
 
-```{r myplot, out.width="0.7\\linewidth"}
+```{r}
 
-plot(mari.vignette, nplots = 2)
+plot(logit.vignette, nplots = 2)
 
 ```
+
+HIER NOCH INTERPRETATION DER EFFEKT HINGEBEN !!!!
 
 # Analyzing zero-inflated and overdispersed count response data
 

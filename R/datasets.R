@@ -70,7 +70,7 @@
 #'    are missing as some original respondents did not met the inclusion
 #'    requirements}
 #'   \item{Baseline.Age_c}{centered baseline age, i.e., a person with a value of 0
-#'    was 32 years old in 2015 (numeric variable)}
+#'    was 30 years old in 2015 (numeric variable)}
 #' }
 #' @references Bureau of Labor Statistics, U.S. Department of Labor.
 #'  National Longitudinal Survey of Youth 1997 cohort, 1997-2021 (rounds 1-20).

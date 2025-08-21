@@ -156,7 +156,7 @@ For modelling both zero-inflated and overdispersed count data, we assume that th
 $\text{y}_{it}$ is a realization of a mixture distribution with a point mass at zero (for the structural zeros) and a standard Negative Binomial count model for observations that are at-risk,
 i.e., this includes both at-risk zeros and positive counts. The ZINB model can, thus, be stated as
 \begin{equation*}
- \text{y}_{it}|r,\mu_{it},w_{it} \sim (1-\pi_{it}) \cdot \mathbb{I}_{(w_{it} = 0)} + \pi_{it} \cdot \mathcal{NB}(\mu_{it},r) \mathbb{I}_{(w_{it}=1)},
+ \text{y}_{it}|r,\mu_{it},w_{it} \sim (1-\pi_{it}) \cdot \mathbb{I}_{(w_{it} = 0)} + \pi_{it} \cdot \mathcal{NB}(\mu_{it},r) \cdot \mathbb{I}_{(w_{it}=1)},
 \end{equation*}
 where ${w_{it}}$ is a latent at-risk indicator such that with probability ${1-\pi_{it}, w_{it} = 0}$ and with probability ${\pi_{it}, w_{it} = 1}$, and ${\mu_{it}}$ is the mean of the Negative Binomial distribution, as defined previously.
 
@@ -227,7 +227,6 @@ Bayesian inference in the Negative Binomial model also requires a Pólya-Gamma d
     \item Sample the dispersion parameter $r$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the factors $\mathbf{f}$, the loadings $\boldsymbol{\lambda}$ and the weights $\boldsymbol{\omega}$ using univariate Slice sampling. 
 \end{enumerate}
 
-
 ### Zero-Inflated Negative Binomial model
 
 As the Zero-Inflated Negative Binomial model consists of two sub-models, i.e., a Logit model for the zero-inflation component and a Negative Binomial model for the count component, the MCMC sampler is basically a combination of the two sampling schemes for Logit and Negative Binomial regression with an additional step for sampling the latent at-risk indicators. As a consequence, we have two separate linear predictors with time-varying regression and random effects, i.e.,
@@ -241,7 +240,7 @@ The same set of covariates can be used for modelling both components of the Zero
 
 An MCMC scheme for sampling the parameters of a Bayesian Zero-Inflated Negative Binomial panel model then involves looping over the following steps:
 \begin{enumerate}
-    \item Sample the latent at-risk indicators ${w}_1,\dots,{w}_n$ conditional on all model parameters.
+    \item Sample the latent at-risk indicators ${w}_{11},\dots,{w}_{nT}$ conditional on all model parameters.
     \item Update the parameters in the predictor of the zero-inflation component $\eta_{it}^{\text{logit}}$ by using the data augmentation sampler of the Logit model.
     \item For all observations that are currently in the at-risk class, i.e. for which $w_{it}=1$, update the parameters in the predictor of the count component $\eta_{it}^{\text{nb}}$ and the dispersion parameter of the Negative Binomial distribution $r$ by using the data augmentation sampler of the Negative Binomial model as well as the Slice sampler, respectively.
 \end{enumerate}
@@ -308,7 +307,7 @@ panelTVP(formula = y ~ W1.count + W2.count | W1.inflation,
 
 ```
 
-Note that when you specify \texttt{model = "ZINB"}, then the \texttt{formula} argument consists of two parts: the count and the zero-inflation predictor. The two predictors are separated by the \texttt{|} sign. Moreover, it is possible to include the same set of covariates in both predictors. When all covariates in the data set should be included in both predictors, then you can write
+Note that when you specify \texttt{model = "ZINB"}, then the \texttt{formula} argument consists of two parts: the count and the zero-inflation predictor. The two predictors are separated by the \texttt{|} sign. Moreover, it is possible to include the same set of covariates in both predictors. When all covariates in the dataset should be included in both predictors, then you can write
 
 ```{r, eval=F, highlight=F}
 
@@ -332,7 +331,7 @@ mcmc.opt(chain.length = 12000, burnin = 2000, thin = 10, asis = TRUE)
 
 ```
 
-The argument \texttt{chain.length} is the total number of MCMC draws, while \texttt{burnin} defines the burn-in period (i.e., per default, the first 2000 draws are discarded) and \texttt{thin} defines the thinning factor (i.e., per default, every tenth draws is used). Finally, \texttt{asis = TRUE} means that the optional ASIS (\textit{ancillarity sufficiency interweaving strategy}) step is used during MCMC sampling, which can increase sampling efficiency. Based on our simulations, we always recommend using ASIS as its computational burden is low and the gain in sampling efficiency can be tremendous. For more details on ASIS see, e.g., Yu and Meng (2011), Kastner and Frühwirth-Schnatter (2014) or Bitto and Frühwirth-Schnatter (2019). 
+The argument \texttt{chain.length} is the total number of MCMC draws, while \texttt{burnin} defines the burn-in period (i.e., per default, the first 2000 draws are discarded) and \texttt{thin} defines the thinning factor (i.e., per default, every tenth draw is used). Finally, \texttt{asis = TRUE} means that the optional ASIS (\textit{ancillarity sufficiency interweaving strategy}) step is used during MCMC sampling, which can increase sampling efficiency. Based on our simulations, we always recommend using ASIS as its computational burden is low and the gain in sampling efficiency can be tremendous. For more details on ASIS see, e.g., Yu and Meng (2011), Kastner and Frühwirth-Schnatter (2014) or Bitto and Frühwirth-Schnatter (2019). 
 
 Suppose that we want to change the burnin in period to a higher value - say 4000. Then we can modify the list argument \texttt{mcmc.opt} in the following way:
 
@@ -364,8 +363,16 @@ The six arguments of \texttt{settings.NegBin} are used for Slice sampling of the
  
 ## Arguments for prior specification
 
+The arguments of \texttt{panelTVP()} that start with \texttt{prior.} are used for the specification of prior distributions for the model parameters. Each argument is a list that consists of several arguments. For fitting Gaussian, binary or Negative Binomial models the arguments \texttt{prior.reg} and \texttt{prior.load} are relevant. The former argument contains prior settings for the parameters of the regression part of the model, whereas the latter contains the corresponding parameters for the factor part of the model. For Gaussian models \texttt{prior.var} is also important as this argument is related to the prior for the homoscedastic error variance. When fitting a Zero-Inflated Negative Binomial (ZINB) model, the arguments \texttt{prior.reg\_zinb.count}, \texttt{prior.load\_zinb.count}, \texttt{prior.reg\_zinb.inflation} and \texttt{prior.load\_zinb.inflation} are relevant. Those arguments are essentially duplicated versions of \texttt{prior.reg} and \texttt{prior.load}, but allow for different prior specifications for the count and zero-inflated component of the ZINB model, respectively. Details on the prior settings can be found by calling
 
+```{r eval=F, highlight=F}
 
+help(panelTVP)
+
+```
+
+However, the \texttt{type} argument is very important and should, thus, be discussed in this vignette as well. With this argument, users can select among priors. For the regression part, this argument is either \texttt{type = "ind"}, \texttt{type = "rw-t0"} or \texttt{type = "rw-t1"}. The first option places an independent Normal prior on the regression parameters, whereas the remaining two place random walk shrinkage priors on the regression parameters. The only difference between the shrinkage priors is that the random walk will start at $T=0$ when \texttt{"rw-t0"} is selected and will start at $T=1$ when \texttt{"rw-t1"} is used. For the priors on the factor loadings, \texttt{type = "cps"} is also supported. This will assume a compound-symmetric covariance structure and, thus, random effects will then be assumed  as time-invariant a priori.
+ 
 ## Additional arguments
 
 There are four remaining arguments of the function \texttt{panelTVP}, which will be covered in this subsection. 
@@ -377,8 +384,6 @@ The argument \texttt{random.effects} is a Boolean indicating whether you want to
 The argument \texttt{R.WAIC} relates to the computation of the Widely Applicable Information Criterion (WAIC), where the marginal WAIC is computed on the basis of \texttt{R.WAIC} replicated datasets, see, e.g., Quintero and Lesaffre (2018) for details on the replication method and a discussion on the conditional and marginal WAIC for longitudinal models. 
 
 Finally, the argument \texttt{progress.bar} is a Boolean that is set to \texttt{FALSE} as default and, thus, the progress of the sampler will not be printed out on the \texttt{R}-console. Change it to \texttt{TRUE} to keep track of the sampling progress.
-
-## Output 
 
 # Analyzing Gaussian response data
 
@@ -439,13 +444,11 @@ Gauss.vignette$runtime
 
 The model comprises a lot of parameters, but the most important ones are the time-varying regression effects and factor loadings. The S3 functions \texttt{summary()} and \texttt{plot()} can be used to show those effects in a table and in a plot, respectively. 
 
-When summarizing the results in a table, the user can order the results either by covariate
+When summarizing the results in a table, the user can order the results either by covariate or by time point, i.e.,
 
 ```{r}
 summary(Gauss.vignette)
 ```
-
-or by time point
 
 ```{r}
 summary(Gauss.vignette, by = "timepoint")
@@ -502,6 +505,14 @@ LaplacesDemon::ESS(Gauss.vignette$mcmc[,"lambda_t1"])
 ```
 
 As the length of the Markov Chain is $M = 1000$, we conclude that enough information was used for estimating the factor loading at the first time point.
+
+The variables are coded in the order of their inclusion in the \texttt{formula} argument. For \texttt{summary()} and \texttt{plot()} the actual variable labels are used. However, this is not the case for, e.g., the \texttt{mcmc} object. For this, the object \texttt{variable.codes} was created, which maps the variable labels to their codes, i.e.,
+
+```{r highlight=F}
+
+Gauss.vignette$variable.codes
+
+```
 
 Finally, it should be mentioned how samples from the posterior predictive distribution can be obtained for the models fitted with \texttt{panelTVP()}. The object \texttt{posterior.predictive} contains $M$ draws from the posterior predictive distribution of the fitted values, i.e., the values of the response variable that were used for training the model. The object is a matrix where each row corresponds to an observation in the training data and each column to a draw of the Markov Chain (after burn-in and thinning).
 
@@ -640,15 +651,15 @@ plot(logit.vignette, nplots = 2)
 
 ```
 
-HIER NOCH INTERPRETATION DER EFFEKT HINGEBEN !!!!
+Based on the estimated effects, we see an increase in the probability of Marijuana consumption over time - although the probability is, in general, quite low. The effect of baseline age decreases almost linearly over time and is close to zero in the second half of the study period. People who live in urban areas are more likely to consume Marijuana than those who live in rural areas. Moreover, this effect increases after the third time point. If a person was bullied before the age of 12, he or she has a higher probability of consuming Marijuana. This effect remains constant over the study period. The ethnicity also influences the consumption behavior and women are less likely to consume Marijuana than men. Finally, the factor loading increases linearly until the fifth panel wave and afterwards decreases linearly. Hence, the degree of between-subject heterogeneity varies over time.
 
 # Analyzing synthetic zero-inflated and overdispersed count response data
 
-In this section we describe how zero-inflated and overdispersed count data can be analyzed with the \texttt{panelTVP()} function. We consider synthetic data that we simulate using the function \texttt{sim\_panelTVP()}. As missing values in the response variable are supported and imputed in a data augmentation step by \texttt{panelTVP()}, we will manually set values of the response variable at missing. Finally, we compare our shrinkage prior approach to an unstructured approach, where independent Normal priors are placed on the regression effects and the factor loadings.
+In this section we describe how zero-inflated and overdispersed count data can be analyzed with the \texttt{panelTVP()} function. We consider synthetic data that we simulate using the function \texttt{sim\_panelTVP()} and compare our shrinkage prior approach to an unstructured approach, where independent Normal priors are placed on the regression effects and the factor loadings. 
 
 The function \texttt{sim\_panelTVP} has the following structure:
 
-```{r highlight=F}
+```{r eval = F, highlight=F}
 
 sim_panelTVP(n, Tmax, model,
              beta = NULL, theta = NULL,
@@ -663,10 +674,17 @@ sim_panelTVP(n, Tmax, model,
 
 Argument \texttt{n} is the number of subjects, whereas \texttt{Tmax} is the total number of repeated measurements or time points. Both parameters expect numeric scalars. The argument \texttt{model} defines the model from which data are simulated. This argument expects one of the following character strings \texttt{"Gaussian"}, \texttt{"Probit"}, \texttt{"Logit"}, \texttt{"NegBin"}, \texttt{"ZINB"}. No aliases were given so the user is not allowed to deviate from these naming conventions. 
 
-The regression effects and the factor loadings are then simulated from the first-order random walks that were already discussed in the theoretical chapter of this vignette.
+The regression effects and the factor loadings are then simulated from the first-order random walks that were already discussed in the theoretical chapter of this vignette. The parameter \texttt{beta} is the vector of "fixed effects", whereas \texttt{theta} is the vector of scale parameters for  the random walks of the regression effects. \texttt{lambda} and \texttt{psi} are both scalars and the starting value as well as the scale parameter of the random walk for the factor loading, respectively. As there are two linear predictors in the Zero-Inflated Negative Binomial model, there are also two sets of random walk parameters. The arguments ending at \texttt{inflation} are the parameters for the Logit component, whereas the arguments  ending at \texttt{count} are the parameters  for the Negative Binomial component.
 
-```{r highlight=F}
+Finally, the arguments \texttt{r} and \texttt{sigma2} refer to the dispersion parameter of the Negative Binomial distribution and the homoscedastic error variance of the Normal distribution, respectively. 
 
+In the following code chunck, data from a Zero-Inflated Negative Binomial panel model are simulated and then analyzed with a random walk shrinkage prior and an independence prior, respectively.
+
+```{r eval = F, highlight=F}
+
+set.seed(21)
+
+# generation of synthetic data
 sim.zinb <- sim_panelTVP(n = 1000, Tmax = 4, model = "ZINB",
                          beta_zinb.count = c(0.5,0,-0.2),
                          theta_zinb.count = c(0.1,0,0),
@@ -678,17 +696,72 @@ sim.zinb <- sim_panelTVP(n = 1000, Tmax = 4, model = "ZINB",
                          psi_zinb.inflation = 0.1,
                          r = 2)
 
+# analysis with shrinkage prior
 shrink.zinb <- panelTVP(y ~ W1.nb + W2.nb | W1.logit + W2.logit,
                         data = sim.zinb$observed,
                         t = sim.zinb$observed$t,
                         id = sim.zinb$observed$id,
-                        model = "ZINB",
-                        mcmc.opt = list(chain.length = 1000, burnin = 500, thin = 10, asis = T),
-                        progress.bar = T)
+                        model = "ZINB")
+
+# modifying settings in preparation for independence prior
+prior.reg_zinb.count <-
+  utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg_zinb.count),
+                  list(type = "ind"))
+
+prior.load_zinb.count <-
+  utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.load_zinb.count),
+                  list(type = "ind"))
+
+prior.reg_zinb.inflation <-
+  utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg_zinb.inflation),
+                  list(type = "ind"))
+
+prior.load_zinb.inflation <-
+  utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.load_zinb.inflation),
+                  list(type = "ind"))
+
+# analysis with independence prior
+ind.zinb <- panelTVP(y ~ W1.nb + W2.nb | W1.logit + W2.logit,
+                     data = sim.zinb$observed,
+                     t = sim.zinb$observed$t,
+                     id = sim.zinb$observed$id,
+                     prior.reg_zinb.count = prior.reg_zinb.count,
+                     prior.load_zinb.count = prior.load_zinb.count,
+                     prior.reg_zinb.inflation = prior.reg_zinb.inflation,
+                     prior.load_zinb.inflation = prior.load_zinb.inflation,
+                     model = "ZINB")
+
+```
+
+```{r, echo=F}
+
+sim.zinb <- readRDS("sim.zinb.Rdata")
+shrink.zinb <- readRDS("shrink.zinb.Rdata")
+ind.zinb <- readRDS("ind.zinb.Rdata")
 
 ```
 
 # Conclusion
+
+```{r, highlight=F}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

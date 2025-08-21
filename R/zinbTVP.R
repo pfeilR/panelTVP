@@ -91,7 +91,7 @@ zinbTVP <- function(df,
 
       # Sampling of latent at-risk indicators ----------------------------------
 
-      risk <- stepRisk(y = df$y, miss = miss, eta_nb = c(eta_nb), eta_logit = c(eta_logit), r = r)
+      risk <- stepRisk(y = df$y, miss = miss, eta_nb = eta_nb, eta_logit = eta_logit, r = r)
       mcmc_risk[i,] <- risk
 
       # Logit Component --------------------------------------------------------

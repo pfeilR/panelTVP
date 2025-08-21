@@ -178,12 +178,8 @@ basic information of the Markov Chain Monte Carlo (MCMC) sampler that is
 used in \texttt{panelTVP}. Details of the sampler are not discussed in
 this vignette. Section 3 provides a small case study for Gaussian
 response data, whereas Section 4 and 5 contain case studies for binary
-and count data, respectively. Section 6 presents a small simulation
-study, which illustrates how to simulate data using a function of the
-package. Moreover, the estimated effects are compared for two different
-prior specifications to demonstrate the usefulness of the package.
-Finally, Section 7 concludes this vignette and provides a brief summary
-of the content in the package.
+and count data, respectively. Finally, Section 6 concludes this vignette
+and provides a brief summary of the content in the package.
 
 \section{Methodology}\label{methodology}
 
@@ -359,7 +355,7 @@ point mass at zero (for the structural zeros) and a standard Negative
 Binomial count model for observations that are at-risk, i.e., this
 includes both at-risk zeros and positive counts. The ZINB model can,
 thus, be stated as \begin{equation*}
- \text{y}_{it}|r,\mu_{it},w_{it} \sim (1-\pi_{it}) \cdot \mathbb{I}_{(w_{it} = 0)} + \pi_{it} \cdot \mathcal{NB}(\mu_{it},r) \mathbb{I}_{(w_{it}=1)},
+ \text{y}_{it}|r,\mu_{it},w_{it} \sim (1-\pi_{it}) \cdot \mathbb{I}_{(w_{it} = 0)} + \pi_{it} \cdot \mathcal{NB}(\mu_{it},r) \cdot \mathbb{I}_{(w_{it}=1)},
 \end{equation*} where \({w_{it}}\) is a latent at-risk indicator such
 that with probability \({1-\pi_{it}, w_{it} = 0}\) and with probability
 \({\pi_{it}, w_{it} = 1}\), and \({\mu_{it}}\) is the mean of the
@@ -593,8 +589,8 @@ Note that when you specify \texttt{model = "ZINB"}, then the
 \texttt{formula} argument consists of two parts: the count and the
 zero-inflation predictor. The two predictors are separated by the
 \texttt{|} sign. Moreover, it is possible to include the same set of
-covariates in both predictors. When all covariates in the data set
-should be included in both predictors, then you can write
+covariates in both predictors. When all covariates in the dataset should
+be included in both predictors, then you can write
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -628,7 +624,7 @@ options of the MCMC sampler. Its default arguments are:
 The argument \texttt{chain.length} is the total number of MCMC draws,
 while \texttt{burnin} defines the burn-in period (i.e., per default, the
 first 2000 draws are discarded) and \texttt{thin} defines the thinning
-factor (i.e., per default, every tenth draws is used). Finally,
+factor (i.e., per default, every tenth draw is used). Finally,
 \texttt{asis = TRUE} means that the optional ASIS
 (\textit{ancillarity sufficiency interweaving strategy}) step is used
 during MCMC sampling, which can increase sampling efficiency. Based on
@@ -730,6 +726,45 @@ on the Slice sampler see the seminal paper Neal (2003).
 \subsection{Arguments for prior
 specification}\label{arguments-for-prior-specification}
 
+The arguments of \texttt{panelTVP()} that start with \texttt{prior.} are
+used for the specification of prior distributions for the model
+parameters. Each argument is a list that consists of several arguments.
+For fitting Gaussian, binary or Negative Binomial models the arguments
+\texttt{prior.reg} and \texttt{prior.load} are relevant. The former
+argument contains prior settings for the parameters of the regression
+part of the model, whereas the latter contains the corresponding
+parameters for the factor part of the model. For Gaussian models
+\texttt{prior.var} is also important as this argument is related to the
+prior for the homoscedastic error variance. When fitting a Zero-Inflated
+Negative Binomial (ZINB) model, the arguments
+\texttt{prior.reg\_zinb.count}, \texttt{prior.load\_zinb.count},
+\texttt{prior.reg\_zinb.inflation} and
+\texttt{prior.load\_zinb.inflation} are relevant. Those arguments are
+essentially duplicated versions of \texttt{prior.reg} and
+\texttt{prior.load}, but allow for different prior specifications for
+the count and zero-inflated component of the ZINB model, respectively.
+Details on the prior settings can be found by calling
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{help(panelTVP)}
+\end{Highlighting}
+\end{Shaded}
+
+However, the \texttt{type} argument is very important and should, thus,
+be discussed in this vignette as well. With this argument, users can
+select among priors. For the regression part, this argument is either
+\texttt{type = "ind"}, \texttt{type = "rw-t0"} or
+\texttt{type = "rw-t1"}. The first option places an independent Normal
+prior on the regression parameters, whereas the remaining two place
+random walk shrinkage priors on the regression parameters. The only
+difference between the shrinkage priors is that the random walk will
+start at \(T=0\) when \texttt{"rw-t0"} is selected and will start at
+\(T=1\) when \texttt{"rw-t1"} is used. For the priors on the factor
+loadings, \texttt{type = "cps"} is also supported. This will assume a
+compound-symmetric covariance structure and, thus, random effects will
+then be assumed as time-invariant a priori.
+
 \subsection{Additional arguments}\label{additional-arguments}
 
 There are four remaining arguments of the function \texttt{panelTVP},
@@ -755,8 +790,6 @@ Finally, the argument \texttt{progress.bar} is a Boolean that is set to
 \texttt{FALSE} as default and, thus, the progress of the sampler will
 not be printed out on the \texttt{R}-console. Change it to \texttt{TRUE}
 to keep track of the sampling progress.
-
-\subsection{Output}\label{output}
 
 \section{Analyzing Gaussian response
 data}\label{analyzing-gaussian-response-data}
@@ -832,7 +865,7 @@ function of time.
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-11-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-12-1.pdf}}
 
 The boxplots suggest that the income distribution differs by time point
 and, thus, some covariates may differ in their effects as well.
@@ -848,7 +881,7 @@ The marginal distribution of the response by time point is given by
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-12-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-13-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -889,7 +922,7 @@ functions \texttt{summary()} and \texttt{plot()} can be used to show
 those effects in a table and in a plot, respectively.
 
 When summarizing the results in a table, the user can order the results
-either by covariate
+either by covariate or by time point, i.e.,
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1000,8 +1033,6 @@ either by covariate
 ## t=3      0.5147         0.5369      0.5591 0.0117
 ## t=4      0.5208         0.5432      0.5672 0.0119
 \end{verbatim}
-
-or by time point
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1278,7 +1309,7 @@ are useful, e.g.,
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-19-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-20-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1310,6 +1341,31 @@ can be computed as
 As the length of the Markov Chain is \(M = 1000\), we conclude that
 enough information was used for estimating the factor loading at the
 first time point.
+
+The variables are coded in the order of their inclusion in the
+\texttt{formula} argument. For \texttt{summary()} and \texttt{plot()}
+the actual variable labels are used. However, this is not the case for,
+e.g., the \texttt{mcmc} object. For this, the object
+\texttt{variable.codes} was created, which maps the variable labels to
+their codes, i.e.,
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Gauss.vignette$variable.codes}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      variable                                         effect 
+## [1,] "(Intercept)"                                    "beta1"
+## [2,] "Sexfemale"                                      "beta2"
+## [3,] "Baseline.Age_c"                                 "beta3"
+## [4,] "EthnicityHispanic"                              "beta4"
+## [5,] "EthnicityMixed Race / Non-Black / Non-Hispanic" "beta5"
+## [6,] "Eduhigh school degree"                          "beta6"
+## [7,] "Educollege degree"                              "beta7"
+## [8,] "Hours.Workedworked at least 30 hours"           "beta8"
+\end{verbatim}
 
 Finally, it should be mentioned how samples from the posterior
 predictive distribution can be obtained for the models fitted with
@@ -1344,7 +1400,7 @@ distribution.
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-22-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-24-1.pdf}}
 
 Although the predicted densities are close to the density of the
 training data, we see that the pronounced peak at a log-income value of
@@ -1416,8 +1472,8 @@ predictive distribution, i.e.,
 
 \begin{verbatim}
 ##         LO     mean       UP
-## 1 11.10293 11.32383 11.55978
-## 2 11.21312 11.48770 11.74663
+## 1 11.10627 11.32484 11.56774
+## 2 11.24773 11.48769 11.80698
 \end{verbatim}
 
 The matrix \texttt{predictive.distribution} contains the posterior
@@ -1442,7 +1498,7 @@ predictive distribution and is of dimension \(N_{new} \times M\), where
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-26-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-28-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1672,33 +1728,149 @@ or displayed graphically
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-32-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-1.pdf}}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-32-2.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-2.pdf}}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-32-3.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-3.pdf}}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-32-4.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-4.pdf}}
 
-HIER NOCH INTERPRETATION DER EFFEKT HINGEBEN !!!!
+Based on the estimated effects, we see an increase in the probability of
+Marijuana consumption over time - although the probability is, in
+general, quite low. The effect of baseline age decreases almost linearly
+over time and is close to zero in the second half of the study period.
+People who live in urban areas are more likely to consume Marijuana than
+those who live in rural areas. Moreover, this effect increases after the
+third time point. If a person was bullied before the age of 12, he or
+she has a higher probability of consuming Marijuana. This effect remains
+constant over the study period. The ethnicity also influences the
+consumption behavior and women are less likely to consume Marijuana than
+men. Finally, the factor loading increases linearly until the fifth
+panel wave and afterwards decreases linearly. Hence, the degree of
+between-subject heterogeneity varies over time.
 
-\section{Analyzing zero-inflated and overdispersed count response
-data}\label{analyzing-zero-inflated-and-overdispersed-count-response-data}
+\section{Analyzing synthetic zero-inflated and overdispersed count
+response
+data}\label{analyzing-synthetic-zero-inflated-and-overdispersed-count-response-data}
 
-\section{Analyzing simulated data with missing
-data}\label{analyzing-simulated-data-with-missing-data}
+In this section we describe how zero-inflated and overdispersed count
+data can be analyzed with the \texttt{panelTVP()} function. We consider
+synthetic data that we simulate using the function
+\texttt{sim\_panelTVP()} and compare our shrinkage prior approach to an
+unstructured approach, where independent Normal priors are placed on the
+regression effects and the factor loadings.
+
+The function \texttt{sim\_panelTVP} has the following structure:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sim\_panelTVP(n, Tmax, model,}
+\NormalTok{             beta = NULL, theta = NULL,}
+\NormalTok{             lambda = NULL, psi = NULL,}
+\NormalTok{             beta\_zinb.count = NULL, theta\_zinb.count = NULL,}
+\NormalTok{             lambda\_zinb.count = NULL, psi\_zinb.count = NULL,}
+\NormalTok{             beta\_zinb.inflation = NULL, theta\_zinb.inflation = NULL,}
+\NormalTok{             lambda\_zinb.inflation = NULL, psi\_zinb.inflation = NULL, }
+\NormalTok{             r = NULL, sigma2 = NULL)}
+\end{Highlighting}
+\end{Shaded}
+
+Argument \texttt{n} is the number of subjects, whereas \texttt{Tmax} is
+the total number of repeated measurements or time points. Both
+parameters expect numeric scalars. The argument \texttt{model} defines
+the model from which data are simulated. This argument expects one of
+the following character strings \texttt{"Gaussian"}, \texttt{"Probit"},
+\texttt{"Logit"}, \texttt{"NegBin"}, \texttt{"ZINB"}. No aliases were
+given so the user is not allowed to deviate from these naming
+conventions.
+
+The regression effects and the factor loadings are then simulated from
+the first-order random walks that were already discussed in the
+theoretical chapter of this vignette. The parameter \texttt{beta} is the
+vector of ``fixed effects'', whereas \texttt{theta} is the vector of
+scale parameters for the random walks of the regression effects.
+\texttt{lambda} and \texttt{psi} are both scalars and the starting value
+as well as the scale parameter of the random walk for the factor
+loading, respectively. As there are two linear predictors in the
+Zero-Inflated Negative Binomial model, there are also two sets of random
+walk parameters. The arguments ending at \texttt{inflation} are the
+parameters for the Logit component, whereas the arguments ending at
+\texttt{count} are the parameters for the Negative Binomial component.
+
+Finally, the arguments \texttt{r} and \texttt{sigma2} refer to the
+dispersion parameter of the Negative Binomial distribution and the
+homoscedastic error variance of the Normal distribution, respectively.
+
+In the following code chunck, data from a Zero-Inflated Negative
+Binomial panel model are simulated and then analyzed with a random walk
+shrinkage prior and an independence prior, respectively.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{set.seed(21)}
+
+\NormalTok{\# generation of synthetic data}
+\NormalTok{sim.zinb \textless{}{-} sim\_panelTVP(n = 1000, Tmax = 4, model = "ZINB",}
+\NormalTok{                         beta\_zinb.count = c(0.5,0,{-}0.2),}
+\NormalTok{                         theta\_zinb.count = c(0.1,0,0),}
+\NormalTok{                         lambda\_zinb.count = 0.3,}
+\NormalTok{                         psi\_zinb.count = 0,}
+\NormalTok{                         beta\_zinb.inflation = c(0.9,0.1,0),}
+\NormalTok{                         theta\_zinb.inflation = c(0.05,0,0),}
+\NormalTok{                         lambda\_zinb.inflation = 0.8,}
+\NormalTok{                         psi\_zinb.inflation = 0.1,}
+\NormalTok{                         r = 2)}
+
+\NormalTok{\# analysis with shrinkage prior}
+\NormalTok{shrink.zinb \textless{}{-} panelTVP(y \textasciitilde{} W1.nb + W2.nb | W1.logit + W2.logit,}
+\NormalTok{                        data = sim.zinb$observed,}
+\NormalTok{                        t = sim.zinb$observed$t,}
+\NormalTok{                        id = sim.zinb$observed$id,}
+\NormalTok{                        model = "ZINB")}
+
+\NormalTok{\# modifying settings in preparation for independence prior}
+\NormalTok{prior.reg\_zinb.count \textless{}{-}}
+\NormalTok{  utils::modifyList(as.list(rlang::fn\_fmls(panelTVP)$prior.reg\_zinb.count),}
+\NormalTok{                  list(type = "ind"))}
+
+\NormalTok{prior.load\_zinb.count \textless{}{-}}
+\NormalTok{  utils::modifyList(as.list(rlang::fn\_fmls(panelTVP)$prior.load\_zinb.count),}
+\NormalTok{                  list(type = "ind"))}
+
+\NormalTok{prior.reg\_zinb.inflation \textless{}{-}}
+\NormalTok{  utils::modifyList(as.list(rlang::fn\_fmls(panelTVP)$prior.reg\_zinb.inflation),}
+\NormalTok{                  list(type = "ind"))}
+
+\NormalTok{prior.load\_zinb.inflation \textless{}{-}}
+\NormalTok{  utils::modifyList(as.list(rlang::fn\_fmls(panelTVP)$prior.load\_zinb.inflation),}
+\NormalTok{                  list(type = "ind"))}
+
+\NormalTok{\# analysis with independence prior}
+\NormalTok{ind.zinb \textless{}{-} panelTVP(y \textasciitilde{} W1.nb + W2.nb | W1.logit + W2.logit,}
+\NormalTok{                     data = sim.zinb$observed,}
+\NormalTok{                     t = sim.zinb$observed$t,}
+\NormalTok{                     id = sim.zinb$observed$id,}
+\NormalTok{                     prior.reg\_zinb.count = prior.reg\_zinb.count,}
+\NormalTok{                     prior.load\_zinb.count = prior.load\_zinb.count,}
+\NormalTok{                     prior.reg\_zinb.inflation = prior.reg\_zinb.inflation,}
+\NormalTok{                     prior.load\_zinb.inflation = prior.load\_zinb.inflation,}
+\NormalTok{                     model = "ZINB")}
+\end{Highlighting}
+\end{Shaded}
+
 
 \renewcommand\refname{Conclusion}
 \bibliography{mybibfile.bib}

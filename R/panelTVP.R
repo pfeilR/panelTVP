@@ -687,7 +687,7 @@ panelTVP <- function(formula = NULL,
                  random.effects, progress.bar)
 
   # ordering dataset and removing gaps in id
-  data$id <- as.integer(factor(id))
+  data$id <- as.numeric(factor(id))
   data$t <- t
   data <- data[order(data$t, data$id),]
 

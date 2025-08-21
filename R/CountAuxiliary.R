@@ -146,16 +146,11 @@ slice_r <- function(y, psi, r, a, b, steps, w, p.overrelax, acc){
 
 stepRisk <- function(y, miss, eta_nb, eta_logit, r){
 
-  relevant.obs <- (y == 0 | miss)
-  p.risk <- pmax(1e-4, pmin(1-1e-4, plogis(eta_logit[relevant.obs])))
-  v <- pmax(1e-4, pmin(1-1e-4, 1 - plogis(eta_nb[relevant.obs])))
-  risk <- as.logical(ifelse(relevant.obs,
-                            rbinom(length(eta_logit[relevant.obs]),
-                                   size = 1,
-                                   prob = (p.risk * v^r) / (1 - p.risk * (1 - v^r))
-                                   ),
-                            1)
-                     )
+  p.risk <- plogis(eta_logit)
+  v <- 1 - plogis(eta_nb)
+  risk <- as.logical(ifelse(y == 0 | miss,
+                            rbinom(nrow(eta_logit), size = 1, prob =
+                                     pmax(0, pmin(1, (p.risk * v^r) / (1 - p.risk * (1 - v^r))))), 1))
 
   return(risk)
 

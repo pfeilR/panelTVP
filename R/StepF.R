@@ -38,14 +38,7 @@ stepF <- function(response,
   alpha_lambda <- load.draws$alpha
   prior.load <- load.draws$pri.lambda
 
-  # Step F3: signswitch for factor ---------------------------------------------
-
-  signsw <- base::sample(x = c(-1,1), size = 1, replace = TRUE)
-  lambda <- lambda*signsw
-  fi <- fi*signsw
-  alpha_lambda <- alpha_lambda*signsw
-
-  # Step F4: Identification ----------------------------------------------------
+  # Step F3: Identification ----------------------------------------------------
 
   if(lambda[1] < 0){
     lambda <- -lambda

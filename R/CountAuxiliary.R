@@ -149,9 +149,17 @@ stepRisk <- function(y, miss, eta_nb, eta_logit, r){
 
   p.risk <- plogis(eta_logit)
   v <- 1 - plogis(eta_nb)
+
+  denom <- 1 - p.risk * (1 - v^r)
+  denom[abs(denom) < 1e-12] <- 1e-12
+
+  prob_raw <- (p.risk * v^r) / denom
+  prob <- pmin(pmax(prob_raw, 0), 1)
+  prob[!is.finite(prob)] <- 0
+
   risk <- as.logical(ifelse(y == 0 | miss,
-                            rbinom(nrow(eta_logit), size = 1, prob =
-                                     pmax(0, pmin(1, (p.risk * v^r) / (1 - p.risk * (1 - v^r))))), 1))
+                            rbinom(nrow(eta_logit), size = 1, prob = prob),
+                            1))
 
   return(risk)
 

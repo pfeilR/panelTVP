@@ -237,7 +237,12 @@ AWOL_fac <- function(yf, fi, Time, psi, pri.type, hyp.c, sgma2){
   cv <- matrix(psi*crossprod(fi,matrix(yh, nrow=n, ncol=Time))/sgma2, ncol=1)
   if(pri.type=="rw1"){cv=c(0,cv)}
 
-  Oinv <- solve(Omega)
+  Oinv <- tryCatch(
+    solve(Omega),
+    error = function(e) {
+      MASS::ginv(Omega)
+    }
+  )
   m <- Oinv%*%cv
   lambda_tilde <- mvtnorm::rmvnorm(n=1, mean = m, sigma = Oinv)
 

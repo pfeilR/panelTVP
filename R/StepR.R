@@ -396,7 +396,7 @@ sample_alpha <- function(y, d, Z, A0, sigma2){
     A012 %*% chol2inv(base::chol(At_star)) %*% A012
   }, error = function(e){
     warning("Error in chol2inv: StepR2.R")
-    A012 %*% base::solve(At_star) %*% A012
+    A012 %*% MASS::ginv(At_star) %*% A012
   })
 
   # create the mean vector a
@@ -422,7 +422,7 @@ sample_alpha.PG <- function(z, d, Z, A0, W){
     A012 %*% right
   }, error = function(e){
     warning("Error in chol2inv: StepR2.R")
-    right <- exvatools::multd(base::solve(At_star), A012)
+    right <- exvatools::multd(MASS::ginv(At_star), A012)
     A012 %*% right
   })
 

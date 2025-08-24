@@ -98,7 +98,8 @@ zinbTVP <- function(df,
 
       # Step U
 
-      omega_logit <- pgdraw::pgdraw(b = 1, c = eta_logit)
+      # omega_logit <- pgdraw::pgdraw(b = 1, c = eta_logit)
+      omega_logit <- BayesLogit::rpg.gamma(length(df$y), 1, eta_logit, trunc = 100)
       W.sparse_logit <- Matrix::Diagonal(n = length(omega_logit), x = omega_logit)
       W.dense_logit <- matrix(omega_logit, nrow = df$n, ncol = df$Tmax)
       z_logit <- (risk-1/2)/omega_logit
@@ -177,7 +178,8 @@ zinbTVP <- function(df,
       # Step U
 
       omega_nb <- vector(mode = "numeric", length = length(df$y))
-      omega_nb[risk] <- BayesLogit::rpg(n.risk, y.risk + r, matrix(eta_nb[risk,]))
+      # omega_nb[risk] <- BayesLogit::rpg(n.risk, y.risk + r, matrix(eta_nb[risk,]))
+      omega_nb[risk] <- BayesLogit::rpg.gamma(n.risk, y.risk + r, matrix(eta_nb[risk,]), trunc = 100)
       W.sparse_nb <- Matrix::Diagonal(n = length(omega_nb), x = omega_nb)
       W.dense_nb <- matrix(omega_nb, nrow = df$n, ncol = df$Tmax)
       z_nb <- ifelse(risk, (df$y-r)/(2*omega_nb), 0)

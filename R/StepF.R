@@ -381,8 +381,12 @@ AWOL_fac.PG <- function(z, fi, Time, psi, pri.type, hyp.c, W.dense){
 
   if(pri.type=="rw1"){cv=c(0,cv)}
 
-  # Oinv <- solve(Omega) added on 24.08.25
-  Oinv <- MASS::ginv(Omega)
+  Oinv <- tryCatch(
+    solve(Omega),
+    error = function(e) {
+      MASS::ginv(Omega)
+    }
+  )
   m <- Oinv%*%cv
   lambda_tilde <- mvtnorm::rmvnorm(n=1, mean = m, sigma = Oinv)
 

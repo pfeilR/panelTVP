@@ -240,7 +240,7 @@ AWOL_fac <- function(yf, fi, Time, psi, pri.type, hyp.c, sgma2){
   Oinv <- tryCatch(
     solve(Omega),
     error = function(e) {
-      MASS::ginv(Omega)
+      MASS::ginv(as.matrix(Omega))
     }
   )
   m <- Oinv%*%cv
@@ -389,7 +389,7 @@ AWOL_fac.PG <- function(z, fi, Time, psi, pri.type, hyp.c, W.dense){
   Oinv <- tryCatch(
     solve(Omega),
     error = function(e) {
-      MASS::ginv(Omega)
+      MASS::ginv(as.matrix(Omega))
     }
   )
   m <- Oinv%*%cv

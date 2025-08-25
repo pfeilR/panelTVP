@@ -177,7 +177,10 @@ zinbTVP <- function(df,
       # Step U
 
       omega_nb <- vector(mode = "numeric", length = length(df$y))
-      omega_nb[risk] <- BayesLogit::rpg(n.risk, y.risk + r, matrix(eta_nb[risk,]))
+      # omega_nb[risk] <- BayesLogit::rpg(n.risk, y.risk + r, matrix(eta_nb[risk,]))
+      omega_nb[risk] <- efficient_PG_sampling(n = n.risk,
+                                              h = y.risk + r,
+                                              z = c(eta_nb[risk,]))
       W.sparse_nb <- Matrix::Diagonal(n = length(omega_nb), x = omega_nb)
       W.dense_nb <- matrix(omega_nb, nrow = df$n, ncol = df$Tmax)
       z_nb <- ifelse(risk, (df$y-r)/(2*omega_nb), 0)

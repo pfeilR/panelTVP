@@ -73,7 +73,10 @@ NegBinTVP <- function(df,
       if(i == 1){
         omega <- rep(1, length(df$y))
       } else{
-        omega <- NB.para(y = df$y, eta = eta, r.old = r[i], sample.omega = TRUE)
+        # omega <- NB.para(y = df$y, eta = eta, r.old = r[i], sample.omega = TRUE)
+        omega <- efficient_PG_sampling(n = length(df$y),
+                                       h = df$y + r[i],
+                                       z = c(eta))
       }
       W.sparse <- Matrix::Diagonal(n = length(omega), x = omega)
       W.dense <- matrix(omega, nrow = df$n, ncol = df$Tmax)

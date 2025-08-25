@@ -3,7 +3,6 @@ NB.para <- function(y,
                     r.old = NULL,
                     omega.old = NULL,
                     sample.r = FALSE,
-                    sample.omega = FALSE,
                     compute.z = FALSE,
                     r.alpha = NULL,
                     r.beta = NULL,
@@ -23,13 +22,6 @@ NB.para <- function(y,
                       steps = expansion.steps, w = width, p.overrelax = p.overrelax,
                       acc = accuracy.overrelax)
     return(r.next)
-
-  }
-
-  if(sample.omega){
-
-    omega <- BayesLogit::rpg(num = nn, h = as.numeric(y + r.old), z = eta)
-    return(omega)
 
   }
 
@@ -163,3 +155,26 @@ stepRisk <- function(y, miss, eta_nb, eta_logit, r){
   return(risk)
 
 }
+
+efficient_PG_sampling <- function(n, h, z){
+
+  n <- length(h)
+  PG <- numeric(n)
+  idx_sp <- h >= 1
+  idx_small <- h < 1
+
+  # Saddlepoint approximation for h >= 1
+  if(any(idx_sp)){
+    PG[idx_sp] <- BayesLogit::rpg.sp(sum(idx_sp), h = h[idx_sp], z = z[idx_sp])
+  }
+
+  # Standard hybrid rpg for h < 1
+  if(any(idx_small)){
+    PG[idx_small] <- BayesLogit::rpg(sum(idx_small), h = h[idx_small], z = z[idx_small])
+  }
+
+  return(PG)
+
+}
+
+

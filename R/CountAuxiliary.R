@@ -28,8 +28,7 @@ NB.para <- function(y,
 
   if(sample.omega){
 
-    # omega <- BayesLogit::rpg(num = nn, h = as.numeric(y + r.old), z = eta)
-    omega <- BayesLogit::rpg.gamma(num = nn, h = as.numeric(y + r.old), z = eta, trunc = 100)
+    omega <- BayesLogit::rpg(num = nn, h = as.numeric(y + r.old), z = eta)
     return(omega)
 
   }

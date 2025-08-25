@@ -237,12 +237,7 @@ AWOL_fac <- function(yf, fi, Time, psi, pri.type, hyp.c, sgma2){
   cv <- matrix(psi*crossprod(fi,matrix(yh, nrow=n, ncol=Time))/sgma2, ncol=1)
   if(pri.type=="rw1"){cv=c(0,cv)}
 
-  Oinv <- tryCatch(
-    solve(Omega),
-    error = function(e) {
-      MASS::ginv(as.matrix(Omega))
-    }
-  )
+  Oinv <- solve(Omega)
   m <- Oinv%*%cv
   lambda_tilde <- mvtnorm::rmvnorm(n=1, mean = m, sigma = Oinv)
 
@@ -386,12 +381,7 @@ AWOL_fac.PG <- function(z, fi, Time, psi, pri.type, hyp.c, W.dense){
 
   if(pri.type=="rw1"){cv=c(0,cv)}
 
-  Oinv <- tryCatch(
-    solve(Omega),
-    error = function(e) {
-      MASS::ginv(as.matrix(Omega))
-    }
-  )
+  Oinv <- solve(Omega)
   m <- Oinv%*%cv
   lambda_tilde <- mvtnorm::rmvnorm(n=1, mean = m, sigma = Oinv)
 

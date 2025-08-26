@@ -325,7 +325,7 @@ For other response distributions, this is ignored. The arguments are:
 \item \code{alpha.r}: shape parameter of Gamma proposal
 \item \code{beta.r}: rate parameter of Gamma proposal
 \item \code{expansion.steps}: number of steps in stepping-out phase
-\item \code{width}: width of the slice interval
+\item \code{width}: width of the slice interval (on the log-scale of r)
 \item \code{p.overrelax}: probability of performing an overrelaxation step;
 performing overrelaxation might increase sampling efficiency; when overrelaxation
 should not be used, set \code{p.overrelax = 0}

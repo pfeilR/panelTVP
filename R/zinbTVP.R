@@ -171,19 +171,20 @@ zinbTVP <- function(df,
                                p.overrelax = settings.NegBin$p.overrelax,
                                accuracy.overrelax = settings.NegBin$accuracy.overrelax)
       r <- sample.r.list$r
+      r <- r
 
       # Negative Binomial Component --------------------------------------------
 
       # Step U
 
       omega_nb <- vector(mode = "numeric", length = length(df$y))
-      # omega_nb[risk] <- BayesLogit::rpg(n.risk, y.risk + r, matrix(eta_nb[risk,]))
       omega_nb[risk] <- efficient_PG_sampling(n = n.risk,
                                               h = y.risk + r,
                                               z = c(eta_nb[risk,]))
       W.sparse_nb <- Matrix::Diagonal(n = length(omega_nb), x = omega_nb)
       W.dense_nb <- matrix(omega_nb, nrow = df$n, ncol = df$Tmax)
-      z_nb <- ifelse(risk, (df$y-r)/(2*omega_nb), 0)
+      z_nb <- vector(mode = "numeric", length = length(df$y))
+      z_nb[risk] <- (df$y[risk]-r) / (2*omega_nb[risk])
 
       # Step R
 

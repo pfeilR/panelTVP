@@ -674,12 +674,17 @@ panelTVP <- function(formula = NULL,
   prior.load_logit <- prior.load_zinb.inflation
 
   # model aliases
-  if(is.null(model)) stop("Argument 'model' must be specified.")
-  if(tolower(model) %in% c("gaussian", "normal")) model <- "Gaussian"
-  if(tolower(model) == "probit") model <- "Probit"
-  if(tolower(model) == "logit") model <- "Logit"
-  if(tolower(model) == "negbin") model <- "NegBin"
-  if(tolower(model) == "zinb") model <- "ZINB"
+  if(is.null(model) || length(model) != 1)
+    stop("Argument 'model' must be either 'Gaussian', 'Normal', 'Probit', 'Logit', 'NegBin' or 'ZINB'.")
+  model <- switch(tolower(model),
+                  gaussian = "Gaussian",
+                  normal   = "Gaussian",
+                  probit   = "Probit",
+                  logit    = "Logit",
+                  negbin   = "NegBin",
+                  zinb     = "ZINB",
+                  stop("Unknown model specified.")
+  )
 
   # input checks
   check.panelTVP(formula, data, id, t, model, prior.reg, prior.var, prior.load,

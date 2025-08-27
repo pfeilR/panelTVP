@@ -174,12 +174,13 @@ Negative Binomial distribution.
 
 This vignette is structured as follows: Section 2 introduces the reader
 to the methodology. This includes the model, the prior distributions and
-basic information of the Markov Chain Monte Carlo (MCMC) sampler that is
+basic information on the Markov Chain Monte Carlo (MCMC) sampler that is
 used in \texttt{panelTVP}. Details of the sampler are not discussed in
 this vignette. Section 3 provides a small case study for Gaussian
 response data, whereas Section 4 and 5 contain case studies for binary
-and count data, respectively. Finally, Section 6 concludes this vignette
-and provides a brief summary of the content in the package.
+and count data, respectively. The count data analysis is based on
+simulated data. Finally, Section 6 concludes this vignette and provides
+a brief summary of the content in the package.
 
 \section{Methodology}\label{methodology}
 
@@ -287,7 +288,7 @@ representation of binary choice models. For Logit models, their sampler
 cannot be used due to the non-Gaussianity of errors in the latent
 utility representation of the Logit model. However, Polson, Scott and
 Windle (2013) introduced an efficient data augmentation scheme for
-posterior inference in models with binomial likelihoods. Their method
+posterior inference in models with Binomial likelihoods. Their method
 can be used for Bayesian inference in Logit and Negative Binomial
 regression models and is briefly outlined in the following as it is also
 used in the \texttt{panelTVP} package.
@@ -300,8 +301,10 @@ Pólya-Gamma distribution with parameters \(b > 0\) and
     \omega \overset{D}{=} \frac{1}{2\pi^2}\sum_{k=1}^\infty \frac{g_k}{(k-1/2)^2+c^2/(4\pi^2)},
 \end{equation*} where \(g_k \sim \mathcal{G}(b,1)\) are independent
 Gamma random variables. Algorithms for sampling from the Pólya-Gamma
-distribution are implemented in the \texttt{R}-package
-\texttt{BayesLogit} (Polson, Scott and Windle, 2013).
+distribution are implemented in the \texttt{R} packages
+\texttt{BayesLogit} (Polson, Scott and Windle, 2013) and \texttt{pgdraw}
+(Makalic and Schmidt, 2016), where the latter contains an efficient
+implementation for Logit models.
 
 Polson, Scott and Windle (2013) established the following integral
 identity \begin{equation}
@@ -325,7 +328,7 @@ Pólya-Gamma distribution as well, which makes Gibbs sampling feasible.
 In order to perform inference in the Bayesian Negative Binomial model,
 we first consider a specific parameterization of the Negative Binomial
 distribution, where \begin{equation*}
- p(\text{y}_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t) \propto \Bigl(1-\frac{\exp(\eta_{it})}{1+\exp(\eta_{it})}\Bigr)^r \Bigl(\frac{\exp(\eta_{it})}{1+\exp(\eta_{it})}\Bigr)^{\text{y}_{it}} = \frac{(\exp(\eta_{it}))^{\text{y}_{it}}}{(1+\exp(\eta_{it}))^{\text{y}_{it} + r}}
+ p(\text{y}_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t) \propto \Bigl(1-\frac{\exp(\eta_{it})}{1+\exp(\eta_{it})}\Bigr)^r \Bigl(\frac{\exp(\eta_{it})}{1+\exp(\eta_{it})}\Bigr)^{\text{y}_{it}} = \frac{(\exp(\eta_{it}))^{\text{y}_{it}}}{(1+\exp(\eta_{it}))^{\text{y}_{it} + r}}.
 \end{equation*} Using this parameterization, the conditional moments are
 then given by \begin{equation*}
  \mathbb{E}(\text{y}_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t) \equiv \mu_{it} = r  \exp(\eta_{it}), \quad \mathbb{V}(\text{y}_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t) = r \exp(\eta_{it}) (1 + \exp(\eta_{it})).
@@ -349,10 +352,10 @@ zeros: structural and at-risk zeros. A structural zero belongs to an
 observation that is not at risk of experiencing the event, whereas an
 at-risk zero belongs to an observation that is at-risk of experiencing
 the event but has for some reason a zero recorded. It is therefore
-assumed that the outcome in the Zero-Inflated Negative Binomial model
-\(\text{y}_{it}\) is a realization of a mixture distribution with a
-point mass at zero (for the structural zeros) and a standard Negative
-Binomial count model for observations that are at-risk, i.e., this
+assumed that the outcome in the Zero-Inflated Negative Binomial (ZINB)
+model \(\text{y}_{it}\) is a realization of a mixture distribution with
+a point mass at zero (for the structural zeros) and a standard Negative
+Binomial count model for observations that are at risk, i.e., this
 includes both at-risk zeros and positive counts. The ZINB model can,
 thus, be stated as \begin{equation*}
  \text{y}_{it}|r,\mu_{it},w_{it} \sim (1-\pi_{it}) \cdot \mathbb{I}_{(w_{it} = 0)} + \pi_{it} \cdot \mathcal{NB}(\mu_{it},r) \cdot \mathbb{I}_{(w_{it}=1)},
@@ -375,7 +378,7 @@ Zero-Inflated Negative Binomial regression see Neelon, 2019).
 \subsection{MCMC sampling schemes}\label{mcmc-sampling-schemes}
 
 In the following, the general sampling steps for the various regression
-models in \texttt{panelTVP} are briefly outlined. Details on the
+models in \texttt{panelTVP} are outlined briefly. Details on the
 sampling steps are omitted in this vignette. For the sampling steps, we
 define \(\boldsymbol{\lambda} = (\lambda_1,\dots,\lambda_T)^\top,\)
 \(\mathbf{f} = (f_1,\dots,f_n)^\top,\)
@@ -431,11 +434,11 @@ the Probit panel data model involves looping over the following steps:
 \subsubsection{Logit model}\label{logit-model}
 
 Bayesian inference in the Logit model requires a Pólya-Gamma data
-augmentation step. Hence, Gibbs sampling involves looping over the
-following steps:
+augmentation step (see Subsection 2.2). Hence, Gibbs sampling involves
+looping over the following steps:
 
 \begin{enumerate}
-    \item Sample $\omega_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t \sim \mathcal{PG}(1, \eta_{it})$ and define the new response as $\text{y}_{it}^* \equiv (\text{y}_{it}-1/2)/\omega_{it}\; \forall i,t$.
+    \item Sample $\omega_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t \sim \mathcal{PG}(1, \eta_{it})$ and define the new response as $\text{y}_{it}^* \equiv (\text{y}_{it}-1/2)/\omega_{it}$.
     \item Sample the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T$ the factors $\mathbf{f},$ the loadings $\boldsymbol{\lambda}$ and the weights $\boldsymbol{\omega}$ from the posterior of a Normal regression model with response $\text{y}_{it}^*-f_i\lambda_t.$
     \item Sample the factors $\mathbf{f}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the loadings $\boldsymbol{\lambda}$ and the weights $\boldsymbol{\omega}$ from the posterior of a Normal regression model with response  $\text{y}_{it}^*-\textbf{x}_{it}^\top \boldsymbol{\beta}_t$.
     \item Sample the loadings $\boldsymbol{\lambda}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the factors $\mathbf{f}$ and the weights $\boldsymbol{\omega}$ from the posterior of a Normal regression model with response  $\text{y}_{it}^*-\textbf{x}_{it}^\top \boldsymbol{\beta}_t.$
@@ -444,20 +447,21 @@ following steps:
 \subsubsection{Negative Binomial model}\label{negative-binomial-model}
 
 Bayesian inference in the Negative Binomial model also requires a
-Pólya-Gamma data augmentation step and an additional step to sample the
-dispersion parameter of the Negative Binomial distribution. The
-dispersion parameter could be sampled by Metropolis-Hastings, but we
-achieved better results with univariate Slice sampling. In this MCMC
-technique, the parameter of interest is drawn uniformly from a region
-under the graph of its posterior distribution. The Slice sampler, thus,
-requires less tuning than the Metropolis-Hastings sampler. Moreover, the
-random walk behavior of the chain can be suppressed by adding an
-overrelaxation step (see Neal (2003) for further details on Slice
-sampling). Posterior inference in the Negative Binomial model then
-involves looping over the following steps:
+Pólya-Gamma data augmentation step (see Subsection 2.2) and an
+additional step to sample the dispersion parameter of the Negative
+Binomial distribution. The dispersion parameter could be sampled by
+Metropolis-Hastings, but we achieved better results in terms of sampling
+efficiency with univariate Slice sampling. In this MCMC technique, the
+parameter of interest is drawn uniformly from a region under the graph
+of its posterior distribution. The Slice sampler, thus, requires less
+tuning than the Metropolis-Hastings sampler. Moreover, the random walk
+behavior of the chain can be suppressed by adding an overrelaxation step
+(see Neal (2003) for further details on Slice sampling). Using a Gamma
+prior for the dispersion parameter, posterior inference then involves
+looping over the following steps:
 
 \begin{enumerate}
-    \item Sample $\omega_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t,\text{y}_{it}, r \sim \mathcal{PG}(\text{y}_{it}+r, \eta_{it})$ and define the new response as $\text{y}_{it}^* \equiv (\text{y}_{it}-r)/(2\omega_{it})\; \forall i,t$.
+    \item Sample $\omega_{it}|\textbf{x}_{it},\boldsymbol{\beta}_t,f_i,\lambda_t,\text{y}_{it}, r \sim \mathcal{PG}(\text{y}_{it}+r, \eta_{it})$ and define the new response as $\text{y}_{it}^* \equiv (\text{y}_{it}-r)/(2\omega_{it})$.
     \item Sample the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T$ the factors $\mathbf{f},$ the loadings $\boldsymbol{\lambda},$ the weights $\boldsymbol{\omega}$ and the dispersion parameter $r$ from the posterior of a Normal regression model with response $\text{y}_{it}^*-f_i\lambda_t.$
     \item Sample the factors $\mathbf{f}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the loadings $\boldsymbol{\lambda},$ the weights $\boldsymbol{\omega}$ and the dispersion parameter $r$ from the posterior of a Normal regression model with response  $\text{y}_{it}^*-\textbf{x}_{it}^\top \boldsymbol{\beta}_t$.
     \item Sample the loadings $\boldsymbol{\lambda}$ conditional on the covariates $\textbf{X}_1,\dots,\textbf{X}_T,$ the regression effects $\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T,$ the factors $\mathbf{f},$ the weights $\boldsymbol{\omega}$ and the dispersion parameter $r$ from the posterior of a Normal regression model with response  $\text{y}_{it}^*-\textbf{x}_{it}^\top \boldsymbol{\beta}_t.$
@@ -487,9 +491,9 @@ Negative Binomial panel model then involves looping over the following
 steps:
 
 \begin{enumerate}
-    \item Sample the latent at-risk indicators ${w}_1,\dots,{w}_n$ conditional on all model parameters.
+    \item Sample the latent at-risk indicators ${w}_{11},\dots,{w}_{nT}$ conditional on all model parameters.
     \item Update the parameters in the predictor of the zero-inflation component $\eta_{it}^{\text{logit}}$ by using the data augmentation sampler of the Logit model.
-    \item For all observations that are currently in the at-risk class, i.e. for which $w_{it}=1$, update the parameters in the predictor of the count component $\eta_{it}^{\text{nb}}$ and the dispersion parameter of the Negative Binomial distribution $r$ by using the data augmentation sampler of the Negative Binomial model as well as the Slice sampler, respectively.
+    \item For all observations that are currently in the at-risk class, i.e., for which $w_{it}=1$, update the parameters in the predictor of the count component $\eta_{it}^{\text{nb}}$ and the dispersion parameter of the Negative Binomial distribution $r$ by using the data augmentation sampler of the Negative Binomial model as well as the Slice sampler, respectively.
 \end{enumerate}
 
 Note that the at-risk indicators are only updated for observations for
@@ -612,8 +616,8 @@ The arguments \texttt{mcmc.opt} and \texttt{settings.NegBin} both deal
 with MCMC settings and are expected to be lists that contain additional
 parameters. Note that the elements in a list can easily be changed
 without the need to copy the entire list elements. To illustrate this,
-we consider the argument \texttt{mcmc.opt} that is used for setting the
-options of the MCMC sampler. Its default arguments are:
+we consider the argument \texttt{mcmc.opt} that is used for specifying
+general options of the MCMC sampler. Its default arguments are:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -706,20 +710,21 @@ distribution. The arguments \texttt{alpha.r} and \texttt{beta.r} are
 shape and rate parameter of the Gamma prior on \(r\), respectively. The
 argument \texttt{expansion.steps} defines the number of steps used in
 the stepping-out phase of the Slice sampler, while the \texttt{width}
-parameter defines the length of the slice interval. Those four arguments
-are required to perform standard Slice sampling. The standard Slice
-sampler can be extended to an overrelaxed Slice sampler, where the
-additional overrelaxation phase aims at increasing sampling efficiency
-by suppressing the random walk behavior of the Markov Chain. The
-accuracy of this procedure is governed by the argument
+parameter defines the length of the slice interval. For this it is
+important to note that the width is based on the log-scale of \(r\).
+Those four arguments are required to perform standard Slice sampling.
+The standard Slice sampler can be extended to an overrelaxed Slice
+sampler, where the additional overrelaxation phase aims at increasing
+sampling efficiency by suppressing the random walk behavior of the
+Markov Chain. The accuracy of this procedure is governed by the argument
 \texttt{accuracy.overrelax}, which is the tuning parameter for mid-point
 refinement of the overrelaxed Slice sampler. If the accuracy limit is
-too small then the drawn value might not be in the Slice region, whereas
-high accuracy values will increase the computational burden of the
-sampler. Finally, the argument \texttt{p.overrelax} is the probability
-of performing an overrelaxed step. Hence, if \texttt{p.overrelax = 0}
-then no overrelaxation will be done and instead standard Slice sampling
-will be used. When overrelaxation is desired, then we recommend
+too small then the sampled values might not be in the Slice region,
+whereas high accuracy values will increase the computational burden of
+the sampler. Finally, the argument \texttt{p.overrelax} is the
+probability of performing an overrelaxed step. Hence, if
+\texttt{p.overrelax = 0} then no overrelaxation will be done and instead
+standard Slice sampling will be used. For overrelaxation we recommend
 relatively high values, e.g., \texttt{p.overrelax = 0.95}. For details
 on the Slice sampler see the seminal paper Neal (2003).
 
@@ -728,8 +733,8 @@ specification}\label{arguments-for-prior-specification}
 
 The arguments of \texttt{panelTVP()} that start with \texttt{prior.} are
 used for the specification of prior distributions for the model
-parameters. Each argument is a list that consists of several arguments.
-For fitting Gaussian, binary or Negative Binomial models the arguments
+parameters. Each argument is a list that contains several arguments. For
+fitting Gaussian, binary or Negative Binomial models the arguments
 \texttt{prior.reg} and \texttt{prior.load} are relevant. The former
 argument contains prior settings for the parameters of the regression
 part of the model, whereas the latter contains the corresponding
@@ -797,13 +802,13 @@ data}\label{analyzing-gaussian-response-data}
 We now demonstrate the usage of the \texttt{panelTVP} package based on
 an application of a real-world dataset - the \texttt{Income} dataset,
 which is contained in the package and a subset of the
-\textit{National Longitudinal Longitudinal Survey of Youth 1997}. This
-survey started its first round in 1997, where most of the participants
-were children or young adults. As the goal of this illustration is to
-analyze income data, we do not focus on the first waves of the survey.
-Moreover, due to the availability of some variables we only focus on the
-last four waves of the study, i.e., survey rounds in the years 2015,
-2017, 2019 and 2021.
+\textit{National Longitudinal Survey of Youth 1997}. This survey started
+its first round in 1997, where most of the participants were children or
+young adults. As the goal of this illustration is to analyze income
+data, we do not focus on the first waves of the survey. Moreover, due to
+the availability of some variables we only focus on the last four waves
+of the study, i.e., survey rounds in the years 2015, 2017, 2019 and
+2021.
 
 In the following, the first ten observations are printed out for a quick
 overview.
@@ -846,13 +851,13 @@ levels ``worked less than 30 hours'' and ``worked at least 30 hours''.
 The variable \texttt{Baseline.Age\_c} is the centered version of the
 baseline age of the person in the year 2015, i.e., the first study
 period considered in this specific subset of the survey. The variable
-\texttt{t} contains information the time point, whereas \texttt{id} is a
-subject indicator. Note that there are gaps in the ID enumeration, which
-is due to the fact that some subjects were removed for various reasons
-when the raw data were prepared for the purpose of creating this
+\texttt{t} contains information on the time point, whereas \texttt{id}
+is a subject indicator. Note that there are gaps in the ID enumeration,
+which is due to the fact that some subjects were removed for various
+reasons when the raw data were prepared for the purpose of creating this
 specific case study.
 
-The response variable of interest is gross family income on the
+The response variable of interest is the gross family income on the
 log-scale (\texttt{Gross.Family.Income\_log}). A quick descriptive
 analysis gives insight into the distribution of this variable as a
 function of time.
@@ -926,7 +931,7 @@ either by covariate or by time point, i.e.,
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{summary}\NormalTok{(Gauss.vignette)}
+\NormalTok{summary(Gauss.vignette)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1036,7 +1041,7 @@ either by covariate or by time point, i.e.,
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{summary}\NormalTok{(Gauss.vignette, }\AttributeTok{by =} \StringTok{"timepoint"}\NormalTok{)}
+\NormalTok{summary(Gauss.vignette, by = "timepoint")}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1150,7 +1155,7 @@ Effect plots can be easily obtained as
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{plot}\NormalTok{(Gauss.vignette, }\AttributeTok{nplots =} \DecValTok{2}\NormalTok{)}
+\NormalTok{plot(Gauss.vignette, nplots = 2)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1183,20 +1188,20 @@ Effect plots can be easily obtained as
 The first effect plot is always the random effect or the factor loading,
 which is followed by the global intercept. Afterwards, the time-varying
 effects of covariates are given. Based on the results we observe an
-increase in the overall income level over time and a significant
-decrease for the women. Hence, the interviewed women have ceteris
-paribus a lower gross family income than men and this effect is more
-pronounced as they get older. The other effect estimates are shrunken to
-time-invariance. We see that people with a high school or college degree
-earn on average more money (or at least have a higher family income)
-than people with no completed degree. Furthermore, working at least 30
-hours yields to an increase in the gross family income compared to
-people who work less than 30 hours.
+increase in the overall income level over time and a decrease for the
+women. Hence, the interviewed women have ceteris paribus a lower gross
+family income than men and this effect is more pronounced as they get
+older. The other effect estimates are shrunken to time-invariance. We
+see that people with a high school or college degree earn on average
+more money (or at least have a higher family income) than people with no
+completed degree. Furthermore, working at least 30 hours yields an
+increase in the gross family income compared to people who work less
+than 30 hours.
 
 Aside from the inspection of the time-varying parameters, Bayesian
 inference with MCMC requires proper evaluation of the generated Markov
-Chains. The remaining MCMC draws after applying burnin and thinning for
-all parameters are stored in the matrix \texttt{mcmc}, i.e.,
+Chains. The remaining MCMC draws after burn-in and thinning for all
+parameters are stored in the matrix \texttt{mcmc}, i.e.,
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1286,8 +1291,8 @@ hyperparameters of the shrinkage priors, which are in this case
 \texttt{kappa.tau}, \texttt{kappa.xi}. As we have fitted a Normal
 regression model, the homoscedastic error variance \texttt{sigma2} is
 also contained in the matrix. For a count regression model, the
-dispersion parameter of the Negative Binomial distribution will be
-included instead. The remaining parameters then relate to the factor
+dispersion parameter \texttt{r} of the Negative Binomial distribution
+will be included instead. The remaining parameters relate to the factor
 loadings, but are otherwise similar to the corresponding parameters for
 the regression part of the model.
 
@@ -1428,7 +1433,7 @@ can be defined by using the argument \texttt{coverage}. The argument
 \texttt{pop.pred} is a Boolean and indicates whether the posterior
 predictive distribution of new data should be based on the population
 level or if random effects / factors should be included as well. If
-\texttt{pop.pred = TRUE}, then the subject-specific factors are
+\texttt{pop.pred = FALSE}, then the subject-specific factors are
 integrated out as for new data subject-specific information is not
 available. For marginalization, \texttt{n.replicates} samples are drawn,
 where the latent factors are simulated from the prior. Therefore, the
@@ -1437,8 +1442,8 @@ accuracy of marginalization increases as \texttt{n.replicates} increases
 
 In the following, the prediction task is briefly demonstrated. Suppose
 we want to make predictions for a specific time point for two new
-subjects for our income data. For this, we first set up the new design
-matrix and then run the \texttt{predict()} function:
+subjects for our \texttt{Income} data. For this, we first set up the new
+design matrix and then run the \texttt{predict()} function:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1472,8 +1477,8 @@ predictive distribution, i.e.,
 
 \begin{verbatim}
 ##         LO     mean       UP
-## 1 11.10627 11.32484 11.56774
-## 2 11.24773 11.48769 11.80698
+## 1 11.09476 11.32202 11.56590
+## 2 11.24418 11.48579 11.78983
 \end{verbatim}
 
 The matrix \texttt{predictive.distribution} contains the posterior
@@ -1514,17 +1519,17 @@ Logit model. A corresponding Probit regression model can easily be set
 up by changing the \texttt{model} argument accordingly and, thus, will
 not be discussed here.
 
-For demonstration, we will use the Marijuana dataset that is contained
-in the \texttt{panelTVP} package. This dataset is a pre-processed subset
-of the \textit{National Longitudinal Longitudinal Survey of Youth 1997}
-and contains data of the first seven waves of this study. The response
-variable is \texttt{Used.Mari.Since.DLI} and indicates if the person has
-consumed Marijuana since the last interview date. A one means that the
-person has consumed the drug. For the first wave the question was, if
-the person has ever consumed Marijuana in his/her life. The goal is to
-explain the probability of drug consumption as a function of covariates
-and to assess whether effects of covariates are subject to temporal
-change.
+For demonstration, we will use the \texttt{Marijuana} dataset that is
+contained in the \texttt{panelTVP} package. This dataset is a
+pre-processed subset of the
+\textit{National Longitudinal Survey of Youth 1997} and contains data of
+the first seven waves of this study. The response variable is
+\texttt{Used.Mari.Since.DLI} and indicates if the person has consumed
+Marijuana since the last interview date. A one means that the person has
+consumed the drug. For the first wave the question was, if the person
+has ever consumed Marijuana in his/her life. The goal is to explain the
+probability of Marijuana consumption as a function of covariates and to
+assess whether effects of covariates are subject to temporal change.
 
 To get an overview of the data, the first 10 rows are given in the
 following:
@@ -1565,7 +1570,7 @@ a victim of bullying before the age of 12. The variable
 \texttt{Residence} gives information on the location where the person
 lives in and is either \texttt{Urban} or \texttt{Rural}. Finally, the
 variable \texttt{Baseline.Age\_c} is a centered version of the person's
-baseline age, i.e., the age in the first survey round in 1997.
+baseline age at study begin.
 
 A Bayesian Logit model with time-varying parameters and shrinkage priors
 on the effects can be estimated as follows:
@@ -1724,29 +1729,29 @@ or displayed graphically
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{plot}\NormalTok{(logit.vignette, }\AttributeTok{nplots =} \DecValTok{2}\NormalTok{)}
+\NormalTok{plot(logit.vignette, nplots = 2)}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-1.pdf}}
+\includegraphics[width=0.7\linewidth]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-1}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-2.pdf}}
+\includegraphics[width=0.7\linewidth]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-2}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-3.pdf}}
+\includegraphics[width=0.7\linewidth]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-3}
 
 \begin{verbatim}
 ## The plots are out there, hit [Return] to see ...
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-4.pdf}}
+\includegraphics[width=0.7\linewidth]{Vignette-for-panelTVP_files/figure-latex/unnamed-chunk-34-4}
 
 Based on the estimated effects, we see an increase in the probability of
 Marijuana consumption over time - although the probability is, in
@@ -1756,9 +1761,9 @@ People who live in urban areas are more likely to consume Marijuana than
 those who live in rural areas. Moreover, this effect increases after the
 third time point. If a person was bullied before the age of 12, he or
 she has a higher probability of consuming Marijuana. This effect remains
-constant over the study period. The ethnicity also influences the
-consumption behavior and women are less likely to consume Marijuana than
-men. Finally, the factor loading increases linearly until the fifth
+constant over the study period. The person's ethnicity also influences
+the consumption behavior and women are less likely to consume Marijuana
+than men. Finally, the factor loading increases linearly until the fifth
 panel wave and afterwards decreases linearly. Hence, the degree of
 between-subject heterogeneity varies over time.
 
@@ -1773,7 +1778,7 @@ synthetic data that we simulate using the function
 unstructured approach, where independent Normal priors are placed on the
 regression effects and the factor loadings.
 
-The function \texttt{sim\_panelTVP} has the following structure:
+The function \texttt{sim\_panelTVP()} has the following structure:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1791,11 +1796,11 @@ The function \texttt{sim\_panelTVP} has the following structure:
 Argument \texttt{n} is the number of subjects, whereas \texttt{Tmax} is
 the total number of repeated measurements or time points. Both
 parameters expect numeric scalars. The argument \texttt{model} defines
-the model from which data are simulated. This argument expects one of
-the following character strings \texttt{"Gaussian"}, \texttt{"Probit"},
-\texttt{"Logit"}, \texttt{"NegBin"}, \texttt{"ZINB"}. No aliases were
-given so the user is not allowed to deviate from these naming
-conventions.
+the model from which data are to be simulated. This argument expects one
+of the following character strings \texttt{"Gaussian"},
+\texttt{"Probit"}, \texttt{"Logit"}, \texttt{"NegBin"}, \texttt{"ZINB"}.
+No aliases were given so the user is not allowed to deviate from these
+naming conventions.
 
 The regression effects and the factor loadings are then simulated from
 the first-order random walks that were already discussed in the
@@ -1818,61 +1823,6 @@ In the following code chunck, data from a Zero-Inflated Negative
 Binomial panel model are simulated and then analyzed with a random walk
 shrinkage prior and an independence prior, respectively.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{set.seed(21)}
-
-\NormalTok{\# generation of synthetic data}
-\NormalTok{sim.zinb \textless{}{-} sim\_panelTVP(n = 1000, Tmax = 4, model = "ZINB",}
-\NormalTok{                         beta\_zinb.count = c(0.5,0,{-}0.2),}
-\NormalTok{                         theta\_zinb.count = c(0.1,0,0),}
-\NormalTok{                         lambda\_zinb.count = 0.3,}
-\NormalTok{                         psi\_zinb.count = 0,}
-\NormalTok{                         beta\_zinb.inflation = c(0.9,0.1,0),}
-\NormalTok{                         theta\_zinb.inflation = c(0.05,0,0),}
-\NormalTok{                         lambda\_zinb.inflation = 0.8,}
-\NormalTok{                         psi\_zinb.inflation = 0.1,}
-\NormalTok{                         r = 2)}
-
-\NormalTok{\# analysis with shrinkage prior}
-\NormalTok{shrink.zinb \textless{}{-} panelTVP(y \textasciitilde{} W1.nb + W2.nb | W1.logit + W2.logit,}
-\NormalTok{                        data = sim.zinb$observed,}
-\NormalTok{                        t = sim.zinb$observed$t,}
-\NormalTok{                        id = sim.zinb$observed$id,}
-\NormalTok{                        model = "ZINB")}
-
-\NormalTok{\# modifying settings in preparation for independence prior}
-\NormalTok{prior.reg\_zinb.count \textless{}{-}}
-\NormalTok{  utils::modifyList(as.list(rlang::fn\_fmls(panelTVP)$prior.reg\_zinb.count),}
-\NormalTok{                  list(type = "ind"))}
-
-\NormalTok{prior.load\_zinb.count \textless{}{-}}
-\NormalTok{  utils::modifyList(as.list(rlang::fn\_fmls(panelTVP)$prior.load\_zinb.count),}
-\NormalTok{                  list(type = "ind"))}
-
-\NormalTok{prior.reg\_zinb.inflation \textless{}{-}}
-\NormalTok{  utils::modifyList(as.list(rlang::fn\_fmls(panelTVP)$prior.reg\_zinb.inflation),}
-\NormalTok{                  list(type = "ind"))}
-
-\NormalTok{prior.load\_zinb.inflation \textless{}{-}}
-\NormalTok{  utils::modifyList(as.list(rlang::fn\_fmls(panelTVP)$prior.load\_zinb.inflation),}
-\NormalTok{                  list(type = "ind"))}
-
-\NormalTok{\# analysis with independence prior}
-\NormalTok{ind.zinb \textless{}{-} panelTVP(y \textasciitilde{} W1.nb + W2.nb | W1.logit + W2.logit,}
-\NormalTok{                     data = sim.zinb$observed,}
-\NormalTok{                     t = sim.zinb$observed$t,}
-\NormalTok{                     id = sim.zinb$observed$id,}
-\NormalTok{                     prior.reg\_zinb.count = prior.reg\_zinb.count,}
-\NormalTok{                     prior.load\_zinb.count = prior.load\_zinb.count,}
-\NormalTok{                     prior.reg\_zinb.inflation = prior.reg\_zinb.inflation,}
-\NormalTok{                     prior.load\_zinb.inflation = prior.load\_zinb.inflation,}
-\NormalTok{                     model = "ZINB")}
-\end{Highlighting}
-\end{Shaded}
-
-
-\renewcommand\refname{Conclusion}
 \bibliography{mybibfile.bib}
 
 

@@ -674,6 +674,7 @@ panelTVP <- function(formula = NULL,
   prior.load_logit <- prior.load_zinb.inflation
 
   # model aliases
+  if(is.null(model)) stop("Argument 'model' must be specified.")
   if(tolower(model) %in% c("gaussian", "normal")) model <- "Gaussian"
   if(tolower(model) == "probit") model <- "Probit"
   if(tolower(model) == "logit") model <- "Logit"

@@ -217,6 +217,11 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
 
   beta_lambda_rows <- c(grep("^beta_t\\d+", rownames(summary_table), value = TRUE),
                         grep("^lambda_t[0-9]+", rownames(summary_table), value = TRUE))
+  if(any(startsWith(beta_lambda_rows, "lambda"))){
+    randoms <- TRUE
+  } else{
+    randoms <- FALSE
+  }
   beta_lambda_data <- summary_table[beta_lambda_rows, , drop = FALSE]
   if(sum(startsWith(rownames(summary_table), "lambda_t")) == 1){ # cps
     beta_lambda_rows <- c(beta_lambda_rows, paste0("lambda_t",1:Tmax))
@@ -225,9 +230,17 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
     rownames(mat) <- paste0("lambda_t", 1:Tmax)
     beta_lambda_data <- rbind(beta_lambda_data, mat)
   }
-  index_df <- matrix(nrow = (ncol(X)+1)*Tmax, ncol = 2)
-  index_df[,1] <- c(rep(paste0("x",1:ncol(X)), each = Tmax), rep("Factor Loading", Tmax))
-  index_df[,2] <- rep(1:Tmax, ncol(X)+1)
+  if(randoms){
+    index_df <- matrix(nrow = (ncol(X)+1)*Tmax, ncol = 2)
+    index_df[,1] <- c(rep(paste0("x",1:ncol(X)), each = Tmax), rep("Factor Loading", Tmax))
+    index_df[,2] <- rep(1:Tmax, ncol(X)+1)
+    true_names <- c(colnames(X), "Random Effect")
+  } else{
+    index_df <- matrix(nrow = ncol(X)*Tmax, ncol = 2)
+    index_df[,1] <- c(rep(paste0("x",1:ncol(X)), each = Tmax))
+    index_df[,2] <- rep(1:Tmax, ncol(X))
+    true_names <- colnames(X)
+  }
   index_df <- as.data.frame(index_df)
   colnames(index_df) <- c("var", "time")
   index_df$time <- as.numeric(index_df$time)
@@ -237,7 +250,6 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
     mean  = beta_lambda_data[, "mean"],
     upper = beta_lambda_data[, "UP"]
   )
-  true_names <- c(colnames(X), "Random Effect")
   index_df$varname <- rep(true_names, each = Tmax)
   plot_df <- cbind(index_df, beta_lambda_df)
   plot_list <- dplyr::group_split(dplyr::group_by(plot_df, var))

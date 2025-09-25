@@ -376,6 +376,11 @@ crafti <- function(X, posterior, by = NULL, ntime){
   d <- posterior[,c(1,2,4,5)]
   colnames(d) <- c("Lower (HPD)", "Posterior Mean", "Upper (HPD)", "SD")
   d <- d[startsWith(rownames(d), "beta_t")|startsWith(rownames(d), "lambda_t"),]
+  if(any(startsWith(rownames(d), "lambda"))){
+    randoms <- TRUE
+  } else{
+    randoms <- FALSE
+  }
   ncov <- sum(startsWith(rownames(d), "beta_t"))/ntime
   d <- as.data.frame(d)
   if(nrow(d[startsWith(rownames(d), "lambda_t"),]) == 1){ # cps prior
@@ -384,8 +389,13 @@ crafti <- function(X, posterior, by = NULL, ntime){
     rownames(mat) <- paste0("lambda_t", 1:ntime)
     d <- rbind(d[!startsWith(rownames(d), "lambda_t"),], mat)
   }
-  d$time <- rep(1:ntime, times = ncov + 1)
-  d$cov <- c(rep(1:ncov, each = ntime), rep(ncov+1, ntime))
+  if(randoms){
+    d$time <- rep(1:ntime, times = ncov + 1)
+    d$cov <- c(rep(1:ncov, each = ntime), rep(ncov+1, ntime))
+  } else{
+    d$time <- rep(1:ntime, times = ncov)
+    d$cov <- c(rep(1:ncov, each = ntime))
+  }
   if(by == "timepoint"){
     d <- d[order(d$time,d$cov),]
   } else{
@@ -393,9 +403,17 @@ crafti <- function(X, posterior, by = NULL, ntime){
   }
   namesbeta <- colnames(X)
   if(by == "timepoint"){
-    cnames <- rep(c(namesbeta, "Factor Loading"), times = ntime)
+    if(randoms){
+      cnames <- rep(c(namesbeta, "Factor Loading"), times = ntime)
+    } else{
+      cnames <- rep(namesbeta, times = ntime)
+    }
   } else{
-    cnames <- rep(paste0("t=",1:ntime), times = ncov+1) # +1 for factor loading
+    if(randoms){
+      cnames <- rep(paste0("t=",1:ntime), times = ncov+1)
+    } else{
+      cnames <- rep(paste0("t=",1:ntime), times = ncov)
+    }
   }
   d <- as.matrix(d)
   rownames(d) <- cnames
@@ -403,13 +421,25 @@ crafti <- function(X, posterior, by = NULL, ntime){
   if(by == "timepoint"){
     for(t in 1:ntime){
       res[[t]] <- d[d[,"time"] == t, 1:4]
-      names(res)[t] <- paste("Regression Effects and Factor Loading at Time", t)
+      if(randoms){
+        names(res)[t] <- paste("Regression Effects and Factor Loading at Time", t)
+      } else{
+        names(res)[t] <- paste("Regression Effects at Time", t)
+      }
     }
   } else{
-    covnames <- c(namesbeta, "Factor Loading")
-    for(i in 1:(ncov+1)){ # +1 for factor loading
-      res[[i]] <- d[d[,"cov"] == i, 1:4]
-      names(res)[i] <- covnames[i]
+    if(randoms){
+      covnames <- c(namesbeta, "Factor Loading")
+      for(i in 1:(ncov+1)){
+        res[[i]] <- d[d[,"cov"] == i, 1:4]
+        names(res)[i] <- covnames[i]
+      }
+    } else{
+      covnames <- namesbeta
+      for(i in 1:ncov){
+        res[[i]] <- d[d[,"cov"] == i, 1:4]
+        names(res)[i] <- covnames[i]
+      }
     }
   }
   return(res)

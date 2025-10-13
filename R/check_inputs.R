@@ -232,33 +232,55 @@ check.hyper_double.positive <- function(x, argument){
 
 check.prior.reg <- function(prior.reg){
   if(is.null(prior.reg)) stop("Your regression prior setting is not allowed to be NULL.")
-  check.hyper_double.positive(prior.reg$d.tau, "d.tau in regression prior")
-  check.hyper_double.positive(prior.reg$e.tau, "e.tau in regression prior")
-  check.hyper_double.positive(prior.reg$d.xi, "d.xi in regression prior")
-  check.hyper_double.positive(prior.reg$e.xi, "e.xi in regression prior")
-  check.hyper_double.positive(prior.reg$b.tau, "b.tau in regression prior")
-  check.hyper_double.positive(prior.reg$nu.tau, "nu.tau in regression prior")
-  check.hyper_double.positive(prior.reg$b.xi, "b.xi in regression prior")
-  check.hyper_double.positive(prior.reg$nu.xi, "nu.xi in regression prior")
   check.hyper_double.positive(prior.reg$a.tau, "a.tau in regression prior")
-  check.hyper_double.positive(prior.reg$kappa.tau, "kappa.tau in regression prior")
   check.hyper_double.positive(prior.reg$a.xi, "a.xi in regression prior")
+  check.hyper_double.positive(prior.reg$alpha.a.tau, "alpha.a.tau in regression prior")
+  check.hyper_double.positive(prior.reg$alpha.a.xi, "alpha.a.xi in regression prior")
+  check.hyper_double.positive(prior.reg$beta.a.tau, "beta.a.tau in regression prior")
+  check.hyper_double.positive(prior.reg$beta.a.xi, "beta.a.xi in regression prior")
+  check.hyper_double.positive(prior.reg$iota.a.tau, "iota.a.tau in regression prior")
+  check.hyper_double.positive(prior.reg$iota.a.xi, "iota.a.xi in regression prior")
+  check.hyper_double.positive(prior.reg$c.tau, "c.tau in regression prior")
+  check.hyper_double.positive(prior.reg$c.xi, "c.xi in regression prior")
+  check.hyper_double.positive(prior.reg$alpha.c.tau, "alpha.c.tau in regression prior")
+  check.hyper_double.positive(prior.reg$alpha.c.xi, "alpha.c.xi in regression prior")
+  check.hyper_double.positive(prior.reg$beta.c.tau, "beta.c.tau in regression prior")
+  check.hyper_double.positive(prior.reg$beta.c.xi, "beta.c.xi in regression prior")
+  check.hyper_double.positive(prior.reg$iota.c.tau, "iota.c.tau in regression prior")
+  check.hyper_double.positive(prior.reg$iota.c.xi, "iota.c.xi in regression prior")
+  check.hyper_double.positive(prior.reg$kappa.tau, "kappa.tau in regression prior")
   check.hyper_double.positive(prior.reg$kappa.xi, "kappa.xi in regression prior")
-  check.hyper_double.positive(prior.reg$iota.tau, "iota.tau in regression prior")
-  check.hyper_double.positive(prior.reg$iota.xi, "iota.xi in regression prior")
+  check.hyper_double.positive(prior.reg$d.tau, "d.tau in regression prior")
+  check.hyper_double.positive(prior.reg$d.xi, "d.xi in regression prior")
+  check.hyper_double.positive(prior.reg$e.tau, "e.tau in regression prior")
+  check.hyper_double.positive(prior.reg$e.xi, "e.xi in regression prior")
   if(!is.logical(prior.reg$learn.a.tau) || length(prior.reg$learn.a.tau) > 1)
     stop("Argument learn.a.tau in regression prior must be a logical scalar.")
   if(!is.logical(prior.reg$learn.a.xi) || length(prior.reg$learn.a.xi) > 1)
     stop("Argument learn.a.xi in regression prior must be a logical scalar.")
+  if(!is.logical(prior.reg$learn.c.tau) || length(prior.reg$learn.c.tau) > 1)
+    stop("Argument learn.c.tau in regression prior must be a logical scalar.")
+  if(!is.logical(prior.reg$learn.c.xi) || length(prior.reg$learn.c.xi) > 1)
+    stop("Argument learn.c.xi in regression prior must be a logical scalar.")
   if(prior.reg$learn.a.tau){
-    if(is.null(prior.reg$target.rate.tau) ||!is.numeric(prior.reg$target.rate.tau) ||
-       prior.reg$target.rate.tau < 0 || prior.reg$target.rate.tau > 1)
-      stop("Argument target.rate.tau in regression prior must be valid probability when learning a.tau.")
+    if(is.null(prior.reg$target.rate.a.tau) ||!is.numeric(prior.reg$target.rate.a.tau) ||
+       prior.reg$target.rate.a.tau < 0 || prior.reg$target.rate.a.tau > 1)
+      stop("Argument target.rate.a.tau in regression prior must be valid probability when learning a.tau.")
   }
   if(prior.reg$learn.a.xi){
-    if(is.null(prior.reg$target.rate.xi) || !is.numeric(prior.reg$target.rate.xi) ||
-       prior.reg$target.rate.xi < 0 || prior.reg$target.rate.xi > 1)
-      stop("Argument target.rate.xi in regression prior must be valid probability when learning a.xi.")
+    if(is.null(prior.reg$target.rate.a.xi) || !is.numeric(prior.reg$target.rate.a.xi) ||
+       prior.reg$target.rate.a.xi < 0 || prior.reg$target.rate.a.xi > 1)
+      stop("Argument target.rate.a.xi in regression prior must be valid probability when learning a.xi.")
+  }
+  if(prior.reg$learn.c.tau){
+    if(is.null(prior.reg$target.rate.c.tau) ||!is.numeric(prior.reg$target.rate.c.tau) ||
+       prior.reg$target.rate.c.tau < 0 || prior.reg$target.rate.c.tau > 1)
+      stop("Argument target.rate.c.tau in regression prior must be valid probability when learning c.tau.")
+  }
+  if(prior.reg$learn.c.xi){
+    if(is.null(prior.reg$target.rate.c.xi) || !is.numeric(prior.reg$target.rate.c.xi) ||
+       prior.reg$target.rate.c.xi < 0 || prior.reg$target.rate.c.xi > 1)
+      stop("Argument target.rate.c.xi in regression prior must be valid probability when learning c.xi.")
   }
   if(is.null(prior.reg$learn.kappa.tau) || !is.logical(prior.reg$learn.kappa.tau) || length(prior.reg$learn.kappa.tau) != 1)
     stop("Argument learn.kappa.tau in regression prior must be a logical scalar.")
@@ -268,6 +290,18 @@ check.prior.reg <- function(prior.reg){
     stop("Argument type in regression prior must either be 'rw-t0', 'rw-t1' or 'ind'.")
   check.hyper_double.positive(prior.reg$c, "c in regression prior")
   check.hyper_double.positive(prior.reg$B0, "B0 in regression prior")
+  if(is.null(prior.reg$TG) || !is.logical(prior.reg$TG) || length(prior.reg$TG) != 1){
+    stop("Argument TG in regression prior must be a logical scalar.")
+  }
+  if(prior.reg$TG && prior.reg$type == "ind"){
+    warning("Triple Gamma shrinkage will not be applied as you have selected an independence prior.")
+  }
+  if(prior.reg$TG && (prior.reg$a.tau >= 0.5 || prior.reg$a.tau <= 0 ||
+                      prior.reg$a.xi >= 0.5 || prior.reg$a.xi <= 0 ||
+                      prior.reg$c.tau >= 0.5 || prior.reg$c.tau <= 0 ||
+                      prior.reg$c.xi >= 0.5 || prior.reg$c.xi <= 0)){
+    warning("Arguments 'a.tau', 'a.xi', 'c.tau' and 'c.xi' have support on (0, 0.5) when using the triple Gamma prior and when learning those parameters! Setting them at fixed values, e.g., for Strawderman-Berger prior is fine.")
+  }
 }
 
 check.prior.load <- function(prior.load){

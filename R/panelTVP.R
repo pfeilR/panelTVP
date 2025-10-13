@@ -19,40 +19,86 @@
 #' @param prior.reg a list of arguments for estimating the parameters of the regression
 #'  part of the model. This argument is ignored when \code{model = 'ZINB'}. The arguments are:
 #'   \itemize{
-#'    \item \code{d.tau}: shape parameter of Gamma prior for \eqn{\kappa^\tau}
-#'    \item \code{e.tau}: rate parameter of Gamma prior for \eqn{\kappa^\tau}
-#'    \item \code{d.xi}: shape parameter of Gamma prior for \eqn{\kappa^\xi}
-#'    \item \code{e.xi}: rate parameter of Gamma prior for \eqn{\kappa^\xi}
-#'    \item \code{b.tau}: part of the rate parameter of the Gamma prior for \eqn{a^\tau}
-#'    \item \code{nu.tau}: shape parameter of the Gamma prior for \eqn{a^\tau}
-#'    \item \code{b.xi}: part of the rate parameter of the Gamma prior for \eqn{a^\xi}
-#'    \item \code{nu.xi}: shape parameter of the Gamma prior for \eqn{a^\xi}
-#'    \item \code{a.tau}: shape parameter of the Gamma prior for \eqn{\tau^2_j}
-#'    \item \code{kappa.tau}: part of the rate parameter of the Gamma prior for \eqn{\tau^2_j}
-#'    \item \code{a.xi}: shape parameter of the Gamma prior for \eqn{\xi^2_j}
-#'    \item \code{kappa.xi}: part of the rate parameter of the Gamma prior for \eqn{\xi^2_j}
-#'    \item \code{iota.tau}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\tau}
-#'    \item \code{iota.xi}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\xi}
+#'    \item \code{a.tau}: hyperparameter for learning \eqn{\tau^2_j}
+#'     (double Gamma, triple Gamma)
+#'    \item \code{a.xi}: hyperparameter for learning \eqn{\xi^2_j}
+#'     (double Gamma, triple Gamma)
 #'    \item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.tau} used as starting value, if FALSE
 #'     \eqn{a^\tau =} \code{a.tau}
 #'    \item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.xi} used as starting value, if FALSE
 #'     \eqn{a^\xi =} \code{a.xi}
-#'    \item \code{tau.target.rate}: desired acceptance rate when updating
+#'     \item \code{alpha.a.tau}: hyperparameter for learning \eqn{a^\tau}
+#'      (double Gamma, triple Gamma)
+#'     \item \code{alpha.a.xi}: hyperparameter for learning \eqn{a^\xi}
+#'      (double Gamma, triple Gamma)
+#'     \item \code{beta.a.tau}: hyperparameter for learning \eqn{a^\tau}
+#'      (double Gamma, triple Gamma)
+#'     \item \code{beta.a.xi}: hyperparameter for learning \eqn{a^\xi}
+#'      (double Gamma, triple Gamma)
+#'    \item \code{iota.a.tau}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{a^\tau}
+#'    \item \code{iota.a.xi}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{a^\xi}
+#'    \item \code{target.rate.a.tau}: desired acceptance rate when updating
 #'     \eqn{a^\tau} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.a.tau = FALSE})
-#'    \item \code{xi.target.rate}: desired acceptance rate when updating
+#'    \item \code{target.rate.a.xi}: desired acceptance rate when updating
 #'     \eqn{a^\xi} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.a.xi = FALSE})
+#'    \item \code{c.tau:} shape parameter in the Gamma prior for \eqn{\kappa^\tau_j}
+#'     (only triple Gamma)
+#'    \item \code{c.xi:} shape parameter in the Gamma prior for \eqn{\kappa^\xi_j}
+#'     (only triple Gamma)
+#'    \item \code{learn.c.tau}: if TRUE \eqn{c^\tau} is updated using Metropolis-Hastings
+#'     with the value of argument \code{c.tau} used as starting value, if FALSE
+#'     \eqn{c^\tau =} \code{c.tau}
+#'    \item \code{learn.c.xi}: if TRUE \eqn{c^\xi} is updated using Metropolis-Hastings
+#'     with the value of argument \code{c.xi} used as starting value, if FALSE
+#'     \eqn{c^\xi =} \code{c.xi}
+#'     \item \code{alpha.c.tau}: hyperparameter for learning \eqn{c^\tau}
+#'      (only triple Gamma)
+#'     \item \code{alpha.c.xi}: hyperparameter for learning \eqn{c^\xi}
+#'      (only triple Gamma)
+#'     \item \code{beta.c.tau}: hyperparameter for learning \eqn{c^\tau}
+#'      (only triple Gamma)
+#'     \item \code{beta.c.xi}: hyperparameter for learning \eqn{c^\xi}
+#'      (only triple Gamma)
+#'    \item \code{iota.c.tau}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{c^\tau}
+#'    \item \code{iota.c.xi}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{c^\xi}
+#'    \item \code{target.rate.c.tau}: desired acceptance rate when updating
+#'     \eqn{c^\tau} using Metropolis-Hastings (argument is ignored when
+#'     \code{learn.c.tau = FALSE})
+#'    \item \code{target.rate.c.xi}: desired acceptance rate when updating
+#'     \eqn{c^\xi} using Metropolis-Hastings (argument is ignored when
+#'     \code{learn.c.xi = FALSE})
+#'    \item \code{kappa.tau}: hyperparameter for learning \eqn{\tau^2_j}
+#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     The component-specific parameters are learned automatically when triple
+#'     Gamma prior is selected.
+#'    \item \code{kappa.xi}: hyperparameter for learning \eqn{\xi^2_j}
+#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     The component-specific parameters are learned automatically when triple
+#'     Gamma prior is selected.
 #'    \item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.tau} used as starting value,
 #'     if FALSE \eqn{\kappa^\tau = } \code{kappa.tau}
 #'    \item \code{learn.kappa.xi}: if TRUE \eqn{\kappa^\xi} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.xi} used as starting value,
 #'     if FALSE \eqn{\kappa^\xi = } \code{kappa.xi}
+#'    \item \code{d.tau}: hyperparameter for learning \eqn{\kappa^\tau}
+#'     (only double Gamma)
+#'    \item \code{e.tau}: hyperparameter for learning \eqn{\kappa^\tau}
+#'     (double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+#'     this parameter is only the starting value as it is learned during MCMC
+#'    \item \code{d.xi}: hyperparameter for learning \eqn{\kappa^\xi}
+#'     (only double Gamma)
+#'    \item \code{e.xi}: hyperparameter for learning \eqn{\kappa^\xi}
+#'     (double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+#'     this parameter is only the starting value as it is learned during MCMC
 #'    \item \code{type}: the type of prior you want on your regression effects;
 #'     this argument is either "rw-t0" (shrinkage prior starting at T = 0),
 #'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior)
@@ -60,6 +106,9 @@
 #'     shrinkage prior (ignored when using independence prior)
 #'    \item \code{B0}: prior variance on the regression parameters when using
 #'     independence prior (ignored when using shrinkage prior)
+#'    \item \code{TG}: Boolean indicating whether triple Gamma prior should be used;
+#'     when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
+#'     prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
 #'   }
 #' @param prior.var a list of arguments for estimating the homoscedastic error variance
 #'  in a Gaussian / Normal model. For other models, this argument is ignored.
@@ -74,15 +123,11 @@
 #'   \item \code{c0}: shape parameter of Inverse-Gamma prior on \eqn{\sigma^2}
 #'    }
 #' @param prior.load a list of arguments for estimating the parameters of the factor
-#'  part of the model. This argument is ignored when \code{model = 'ZINB'}. The arguments are:
+#'  part of the model.  This argument is ignored when \code{model = 'ZINB'}. The arguments are:
 #'  \itemize{
-#'   \item \code{d.phi}: shape parameter of Gamma prior for \eqn{\kappa^\phi}
-#'   \item \code{e.phi}: rate parameter of Gamma prior for \eqn{\kappa^\phi}
-#'   \item \code{d.zeta}: shape parameter of Gamma prior for \eqn{\kappa^\zeta}
-#'   \item \code{e.zeta}: rate parameter of Gamma prior for \eqn{\kappa^\zeta}
-#'   \item \code{a.phi}: shape parameter of the Gamma prior for \eqn{\phi^2}
-#'   \item \code{kappa.phi}: part of the rate parameter of the Gamma prior for \eqn{\phi^2}
-#'   \item \code{a.zeta}: shape parameter of the Gamma prior for \eqn{\zeta^2}
+#'   \item \code{a.phi}: hyperparameter for learning \eqn{\phi^2}
+#'   \item \code{a.zeta}: hyperparameter for learning  \eqn{\zeta^2}
+#'   \item \code{kappa.phi}: hyperparameter for learning \eqn{\phi^2}
 #'   \item \code{kappa.zeta}: part of the rate parameter of the Gamma prior for \eqn{\zeta^2}
 #'   \item \code{learn.kappa.phi}: if TRUE \eqn{\kappa^\phi} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.phi} used as starting value,
@@ -90,6 +135,10 @@
 #'   \item \code{learn.kappa.zeta}: if TRUE \eqn{\kappa^\zeta} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.zeta} used as starting value,
 #'     if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta}
+#'   \item \code{d.phi}: hyperparameter for learning \eqn{\kappa^\phi}
+#'   \item \code{d.zeta}: hyperparameter for learning \eqn{\kappa^\zeta}
+#'   \item \code{e.phi}: hyperparameter for learning \eqn{\kappa^\phi}
+#'   \item \code{e.zeta}: hyperparameter for learning \eqn{\kappa^\zeta}
 #'   \item \code{type}: the type of prior you want on your regression effects;
 #'     this argument is either "cps" (compound symmetric), "rw-t0" (shrinkage prior starting at T = 0),
 #'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior)
@@ -99,153 +148,270 @@
 #'    prior (ignored when using shrinkage prior)
 #'  }
 #'  Note that for the factor model, the hyperparameters \code{a.phi} and
-#'  \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings
+#'  \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings.
+#'  There is also no triple Gamma prior as only one factor is present.
 #' @param prior.reg_zinb.count A list of arguments for estimating the parameters of the regression
 #'  part of the count model. This argument is only used when \code{model = 'ZINB'} and
 #'  otherwise ignored. The arguments are:
 #'   \itemize{
-#'    \item \code{d.tau}: shape parameter of Gamma prior for \eqn{\kappa^\tau} (count model)
-#'    \item \code{e.tau}: rate parameter of Gamma prior for \eqn{\kappa^\tau} (count model)
-#'    \item \code{d.xi}: shape parameter of Gamma prior for \eqn{\kappa^\xi} (count model)
-#'    \item \code{e.xi}: rate parameter of Gamma prior for \eqn{\kappa^\xi} (count model)
-#'    \item \code{b.tau}: part of the rate parameter of the Gamma prior for \eqn{a^\tau} (count model)
-#'    \item \code{nu.tau}: shape parameter of the Gamma prior for \eqn{a^\tau} (count model)
-#'    \item \code{b.xi}: part of the rate parameter of the Gamma prior for \eqn{a^\xi} (count model)
-#'    \item \code{nu.xi}: shape parameter of the Gamma prior for \eqn{a^\xi} (count model)
-#'    \item \code{a.tau}: shape parameter of the Gamma prior for \eqn{\tau^2_j} (count model)
-#'    \item \code{kappa.tau}: part of the rate parameter of the Gamma prior for \eqn{\tau^2_j} (count model)
-#'    \item \code{a.xi}: shape parameter of the Gamma prior for \eqn{\xi^2_j} (count model)
-#'    \item \code{kappa.xi}: part of the rate parameter of the Gamma prior for \eqn{\xi^2_j} (count model)
-#'    \item \code{iota.tau}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\tau} (count model)
-#'    \item \code{iota.xi}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\xi} (count model)
+#'    \item \code{a.tau}: hyperparameter for learning \eqn{\tau^2_j}
+#'     (double Gamma, triple Gamma) (count component)
+#'    \item \code{a.xi}: hyperparameter for learning \eqn{\xi^2_j}
+#'     (double Gamma, triple Gamma) (count component)
 #'    \item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.tau} used as starting value, if FALSE
-#'     \eqn{a^\tau =} \code{a.tau} (count model)
+#'     \eqn{a^\tau =} \code{a.tau} (count component)
 #'    \item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.xi} used as starting value, if FALSE
-#'     \eqn{a^\xi =} \code{a.xi} (count model)
-#'    \item \code{tau.target.rate}: desired acceptance rate when updating
+#'     \eqn{a^\xi =} \code{a.xi} (count component)
+#'     \item \code{alpha.a.tau}: hyperparameter for learning \eqn{a^\tau}
+#'      (double Gamma, triple Gamma) (count component)
+#'     \item \code{alpha.a.xi}: hyperparameter for learning \eqn{a^\xi}
+#'      (double Gamma, triple Gamma) (count component)
+#'     \item \code{beta.a.tau}: hyperparameter for learning \eqn{a^\tau}
+#'      (double Gamma, triple Gamma) (count component)
+#'     \item \code{beta.a.xi}: hyperparameter for learning \eqn{a^\xi}
+#'      (double Gamma, triple Gamma) (count component)
+#'    \item \code{iota.a.tau}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{a^\tau} (count component)
+#'    \item \code{iota.a.xi}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{a^\xi} (count component)
+#'    \item \code{target.rate.a.tau}: desired acceptance rate when updating
 #'     \eqn{a^\tau} using Metropolis-Hastings (argument is ignored when
-#'     \code{learn.a.tau = FALSE}) (count model)
-#'    \item \code{xi.target.rate}: desired acceptance rate when updating
+#'     \code{learn.a.tau = FALSE}) (count component)
+#'    \item \code{target.rate.a.xi}: desired acceptance rate when updating
 #'     \eqn{a^\xi} using Metropolis-Hastings (argument is ignored when
-#'     \code{learn.a.xi = FALSE}) (count model)
+#'     \code{learn.a.xi = FALSE}) (count component)
+#'    \item \code{c.tau:} shape parameter in the Gamma prior for \eqn{\kappa^\tau_j}
+#'     (only triple Gamma) (count component)
+#'    \item \code{c.xi:} shape parameter in the Gamma prior for \eqn{\kappa^\xi_j}
+#'     (only triple Gamma) (count component)
+#'    \item \code{learn.c.tau}: if TRUE \eqn{c^\tau} is updated using Metropolis-Hastings
+#'     with the value of argument \code{c.tau} used as starting value, if FALSE
+#'     \eqn{c^\tau =} \code{c.tau} (count component)
+#'    \item \code{learn.c.xi}: if TRUE \eqn{c^\xi} is updated using Metropolis-Hastings
+#'     with the value of argument \code{c.xi} used as starting value, if FALSE
+#'     \eqn{c^\xi =} \code{c.xi} (count component)
+#'     \item \code{alpha.c.tau}: hyperparameter for learning \eqn{c^\tau}
+#'      (only triple Gamma) (count component)
+#'     \item \code{alpha.c.xi}: hyperparameter for learning \eqn{c^\xi}
+#'      (only triple Gamma) (count component)
+#'     \item \code{beta.c.tau}: hyperparameter for learning \eqn{c^\tau}
+#'      (only triple Gamma) (count component)
+#'     \item \code{beta.c.xi}: hyperparameter for learning \eqn{c^\xi}
+#'      (only triple Gamma) (count component)
+#'    \item \code{iota.c.tau}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{c^\tau} (count component)
+#'    \item \code{iota.c.xi}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{c^\xi} (count component)
+#'    \item \code{target.rate.c.tau}: desired acceptance rate when updating
+#'     \eqn{c^\tau} using Metropolis-Hastings (argument is ignored when
+#'     \code{learn.c.tau = FALSE}) (count component)
+#'    \item \code{target.rate.c.xi}: desired acceptance rate when updating
+#'     \eqn{c^\xi} using Metropolis-Hastings (argument is ignored when
+#'     \code{learn.c.xi = FALSE}) (count component)
+#'    \item \code{kappa.tau}: hyperparameter for learning \eqn{\tau^2_j}
+#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     The component-specific parameters are learned automatically when triple
+#'     Gamma prior is selected. (count component)
+#'    \item \code{kappa.xi}: hyperparameter for learning \eqn{\xi^2_j}
+#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     The component-specific parameters are learned automatically when triple
+#'     Gamma prior is selected. (count component)
 #'    \item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.tau} used as starting value,
-#'     if FALSE \eqn{\kappa^\tau = } \code{kappa.tau} (count model)
+#'     if FALSE \eqn{\kappa^\tau = } \code{kappa.tau} (count component)
 #'    \item \code{learn.kappa.xi}: if TRUE \eqn{\kappa^\xi} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.xi} used as starting value,
-#'     if FALSE \eqn{\kappa^\xi = } \code{kappa.xi} (count model)
+#'     if FALSE \eqn{\kappa^\xi = } \code{kappa.xi} (count component)
+#'    \item \code{d.tau}: hyperparameter for learning \eqn{\kappa^\tau}
+#'     (only double Gamma) (count component)
+#'    \item \code{e.tau}: hyperparameter for learning \eqn{\kappa^\tau}
+#'     (double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+#'     this parameter is only the starting value as it is learned during MCMC
+#'      (count component)
+#'    \item \code{d.xi}: hyperparameter for learning \eqn{\kappa^\xi}
+#'     (only double Gamma) (count component)
+#'    \item \code{e.xi}: hyperparameter for learning \eqn{\kappa^\xi}
+#'     (double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+#'     this parameter is only the starting value as it is learned during MCMC
+#'     (count component)
 #'    \item \code{type}: the type of prior you want on your regression effects;
 #'     this argument is either "rw-t0" (shrinkage prior starting at T = 0),
-#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior) (count model)
-#'    \item \code{c}: prior parameter that scales the variance when using shrinkage prior
-#'    (ignored when using independence prior) (count model)
+#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior)
+#'      (count component)
+#'    \item \code{c}: prior parameter that scales the variance when using
+#'     shrinkage prior (ignored when using independence prior)
+#'      (count component)
 #'    \item \code{B0}: prior variance on the regression parameters when using
-#'     independence prior (ignored when using shrinkage prior) (count model)
+#'     independence prior (ignored when using shrinkage prior) (count component)
+#'    \item \code{TG}: Boolean indicating whether triple Gamma prior should be used;
+#'     when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
+#'     prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
+#'     (count component)
 #'   }
 #' @param prior.load_zinb.count A list of arguments for estimating the parameters of the factor
 #'  part of the count model. This argument is only used when \code{model = 'ZINB'} and
 #'  otherwise ignored. The arguments are:
 #'  \itemize{
-#'   \item \code{d.phi}: shape parameter of Gamma prior for \eqn{\kappa^\phi} (count model)
-#'   \item \code{e.phi}: rate parameter of Gamma prior for \eqn{\kappa^\phi} (count model)
-#'   \item \code{d.zeta}: shape parameter of Gamma prior for \eqn{\kappa^\zeta} (count model)
-#'   \item \code{e.zeta}: rate parameter of Gamma prior for \eqn{\kappa^\zeta} (count model)
-#'   \item \code{a.phi}: shape parameter of the Gamma prior for \eqn{\phi^2} (count model)
-#'   \item \code{kappa.phi}: part of the rate parameter of the Gamma prior for \eqn{\phi^2} (count model)
-#'   \item \code{a.zeta}: shape parameter of the Gamma prior for \eqn{\zeta^2} (count model)
-#'   \item \code{kappa.zeta}: part of the rate parameter of the Gamma prior for \eqn{\zeta^2} (count model)
+#'   \item \code{a.phi}: hyperparameter for learning \eqn{\phi^2} (count component)
+#'   \item \code{a.zeta}: hyperparameter for learning  \eqn{\zeta^2} (count component)
+#'   \item \code{kappa.phi}: hyperparameter for learning \eqn{\phi^2} (count component)
+#'   \item \code{kappa.zeta}: part of the rate parameter of the Gamma prior for \eqn{\zeta^2}
+#'    (count component)
 #'   \item \code{learn.kappa.phi}: if TRUE \eqn{\kappa^\phi} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.phi} used as starting value,
-#'     if FALSE \eqn{\kappa^\phi = } \code{kappa.phi} (count model)
+#'     if FALSE \eqn{\kappa^\phi = } \code{kappa.phi} (count component)
 #'   \item \code{learn.kappa.zeta}: if TRUE \eqn{\kappa^\zeta} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.zeta} used as starting value,
-#'     if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta} (count model)
+#'     if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta} (count component)
+#'   \item \code{d.phi}: hyperparameter for learning \eqn{\kappa^\phi} (count component)
+#'   \item \code{d.zeta}: hyperparameter for learning \eqn{\kappa^\zeta} (count component)
+#'   \item \code{e.phi}: hyperparameter for learning \eqn{\kappa^\phi} (count component)
+#'   \item \code{e.zeta}: hyperparameter for learning \eqn{\kappa^\zeta} (count component)
 #'   \item \code{type}: the type of prior you want on your regression effects;
 #'     this argument is either "cps" (compound symmetric), "rw-t0" (shrinkage prior starting at T = 0),
-#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior) (count model)
-#'   \item \code{c}: prior parameter that scales the variance when using
-#'     shrinkage prior (ignored when using cps or independence prior) (count model)
-#'   \item \code{L0}: prior variance on the factor loading (ignored when using shrinkage prior) (count model)
+#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior)
+#'      (count component)
+#'   \item \code{c}: prior parameter that scales the variance when using shrinkage prior
+#'    (ignored when using cps or independence prior) (count component)
+#'   \item \code{L0}: prior variance on the factor loading when using either cps or independence
+#'    prior (ignored when using shrinkage prior) (count component)
 #'  }
 #'  Note that for the factor model, the hyperparameters \code{a.phi} and
-#'  \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings
+#'  \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings.
+#'  There is also no triple Gamma prior as only one factor is present.
 #' @param prior.reg_zinb.inflation A list of arguments for estimating the parameters of the regression
 #'  part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
 #'  otherwise ignored. The arguments are:
 #'   \itemize{
-#'    \item \code{d.tau}: shape parameter of Gamma prior for \eqn{\kappa^\tau} (zero-inflation model)
-#'    \item \code{e.tau}: rate parameter of Gamma prior for \eqn{\kappa^\tau} (zero-inflation model)
-#'    \item \code{d.xi}: shape parameter of Gamma prior for \eqn{\kappa^\xi} (zero-inflation model)
-#'    \item \code{e.xi}: rate parameter of Gamma prior for \eqn{\kappa^\xi} (zero-inflation model)
-#'    \item \code{b.tau}: part of the rate parameter of the Gamma prior for \eqn{a^\tau} (zero-inflation model)
-#'    \item \code{nu.tau}: shape parameter of the Gamma prior for \eqn{a^\tau} (zero-inflation model)
-#'    \item \code{b.xi}: part of the rate parameter of the Gamma prior for \eqn{a^\xi} (zero-inflation model)
-#'    \item \code{nu.xi}: shape parameter of the Gamma prior for \eqn{a^\xi} (zero-inflation model)
-#'    \item \code{a.tau}: shape parameter of the Gamma prior for \eqn{\tau^2_j} (zero-inflation model)
-#'    \item \code{kappa.tau}: part of the rate parameter of the Gamma prior for \eqn{\tau^2_j} (zero-inflation model)
-#'    \item \code{a.xi}: shape parameter of the Gamma prior for \eqn{\xi^2_j} (zero-inflation model)
-#'    \item \code{kappa.xi}: part of the rate parameter of the Gamma prior for \eqn{\xi^2_j} (zero-inflation model)
-#'    \item \code{iota.tau}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\tau} (zero-inflation model)
-#'    \item \code{iota.xi}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\xi} (zero-inflation model)
+#'    \item \code{a.tau}: hyperparameter for learning \eqn{\tau^2_j}
+#'     (double Gamma, triple Gamma) (inflation component)
+#'    \item \code{a.xi}: hyperparameter for learning \eqn{\xi^2_j}
+#'     (double Gamma, triple Gamma) (inflation component)
 #'    \item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.tau} used as starting value, if FALSE
-#'     \eqn{a^\tau =} \code{a.tau} (zero-inflation model)
+#'     \eqn{a^\tau =} \code{a.tau} (inflation component)
 #'    \item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.xi} used as starting value, if FALSE
-#'     \eqn{a^\xi =} \code{a.xi} (zero-inflation model)
-#'    \item \code{tau.target.rate}: desired acceptance rate when updating
+#'     \eqn{a^\xi =} \code{a.xi} (inflation component)
+#'     \item \code{alpha.a.tau}: hyperparameter for learning \eqn{a^\tau}
+#'      (double Gamma, triple Gamma) (inflation component)
+#'     \item \code{alpha.a.xi}: hyperparameter for learning \eqn{a^\xi}
+#'      (double Gamma, triple Gamma) (inflation component)
+#'     \item \code{beta.a.tau}: hyperparameter for learning \eqn{a^\tau}
+#'      (double Gamma, triple Gamma) (inflation component)
+#'     \item \code{beta.a.xi}: hyperparameter for learning \eqn{a^\xi}
+#'      (double Gamma, triple Gamma) (inflation component)
+#'    \item \code{iota.a.tau}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{a^\tau} (inflation component)
+#'    \item \code{iota.a.xi}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{a^\xi} (inflation component)
+#'    \item \code{target.rate.a.tau}: desired acceptance rate when updating
 #'     \eqn{a^\tau} using Metropolis-Hastings (argument is ignored when
-#'     \code{learn.a.tau = FALSE}) (zero-inflation model)
-#'    \item \code{xi.target.rate}: desired acceptance rate when updating
+#'     \code{learn.a.tau = FALSE}) (inflation component)
+#'    \item \code{target.rate.a.xi}: desired acceptance rate when updating
 #'     \eqn{a^\xi} using Metropolis-Hastings (argument is ignored when
-#'     \code{learn.a.xi = FALSE}) (zero-inflation model)
+#'     \code{learn.a.xi = FALSE}) (inflation component)
+#'    \item \code{c.tau:} shape parameter in the Gamma prior for \eqn{\kappa^\tau_j}
+#'     (only triple Gamma) (inflation component)
+#'    \item \code{c.xi:} shape parameter in the Gamma prior for \eqn{\kappa^\xi_j}
+#'     (only triple Gamma) (inflation component)
+#'    \item \code{learn.c.tau}: if TRUE \eqn{c^\tau} is updated using Metropolis-Hastings
+#'     with the value of argument \code{c.tau} used as starting value, if FALSE
+#'     \eqn{c^\tau =} \code{c.tau} (inflation component)
+#'    \item \code{learn.c.xi}: if TRUE \eqn{c^\xi} is updated using Metropolis-Hastings
+#'     with the value of argument \code{c.xi} used as starting value, if FALSE
+#'     \eqn{c^\xi =} \code{c.xi} (inflation component)
+#'     \item \code{alpha.c.tau}: hyperparameter for learning \eqn{c^\tau}
+#'      (only triple Gamma) (inflation component)
+#'     \item \code{alpha.c.xi}: hyperparameter for learning \eqn{c^\xi}
+#'      (only triple Gamma) (inflation component)
+#'     \item \code{beta.c.tau}: hyperparameter for learning \eqn{c^\tau}
+#'      (only triple Gamma) (inflation component)
+#'     \item \code{beta.c.xi}: hyperparameter for learning \eqn{c^\xi}
+#'      (only triple Gamma) (inflation component)
+#'    \item \code{iota.c.tau}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{c^\tau} (inflation component)
+#'    \item \code{iota.c.xi}: proposal standard deviation for Metropolis-Hastings
+#'     updating of \eqn{c^\xi} (inflation component)
+#'    \item \code{target.rate.c.tau}: desired acceptance rate when updating
+#'     \eqn{c^\tau} using Metropolis-Hastings (argument is ignored when
+#'     \code{learn.c.tau = FALSE}) (inflation component)
+#'    \item \code{target.rate.c.xi}: desired acceptance rate when updating
+#'     \eqn{c^\xi} using Metropolis-Hastings (argument is ignored when
+#'     \code{learn.c.xi = FALSE}) (inflation component)
+#'    \item \code{kappa.tau}: hyperparameter for learning \eqn{\tau^2_j}
+#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     The component-specific parameters are learned automatically when triple
+#'     Gamma prior is selected. (inflation component)
+#'    \item \code{kappa.xi}: hyperparameter for learning \eqn{\xi^2_j}
+#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     The component-specific parameters are learned automatically when triple
+#'     Gamma prior is selected. (inflation component)
 #'    \item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.tau} used as starting value,
-#'     if FALSE \eqn{\kappa^\tau = } \code{kappa.tau} (zero-inflation model)
+#'     if FALSE \eqn{\kappa^\tau = } \code{kappa.tau} (inflation component)
 #'    \item \code{learn.kappa.xi}: if TRUE \eqn{\kappa^\xi} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.xi} used as starting value,
-#'     if FALSE \eqn{\kappa^\xi = } \code{kappa.xi} (zero-inflation model)
+#'     if FALSE \eqn{\kappa^\xi = } \code{kappa.xi} (inflation component)
+#'    \item \code{d.tau}: hyperparameter for learning \eqn{\kappa^\tau}
+#'     (only double Gamma) (inflation component)
+#'    \item \code{e.tau}: hyperparameter for learning \eqn{\kappa^\tau}
+#'     (double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+#'     this parameter is only the starting value as it is learned during MCMC
+#'      (inflation component)
+#'    \item \code{d.xi}: hyperparameter for learning \eqn{\kappa^\xi}
+#'     (only double Gamma) (inflation component)
+#'    \item \code{e.xi}: hyperparameter for learning \eqn{\kappa^\xi}
+#'     (double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+#'     this parameter is only the starting value as it is learned during MCMC
+#'     (inflation component)
 #'    \item \code{type}: the type of prior you want on your regression effects;
 #'     this argument is either "rw-t0" (shrinkage prior starting at T = 0),
-#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior) (zero-inflation model)
+#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior)
+#'      (inflation component)
 #'    \item \code{c}: prior parameter that scales the variance when using
-#'     shrinkage prior (ignored when using independence prior) (zero-inflation model)
+#'     shrinkage prior (ignored when using independence prior)
+#'      (inflation component)
 #'    \item \code{B0}: prior variance on the regression parameters when using
-#'     independence prior (ignored when using shrinkage prior) (zero-inflation model)
+#'     independence prior (ignored when using shrinkage prior) (inflation component)
+#'    \item \code{TG}: Boolean indicating whether triple Gamma prior should be used;
+#'     when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
+#'     prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
+#'     (inflation component)
 #'   }
 #' @param prior.load_zinb.inflation A list of arguments for estimating the parameters of the factor
 #'  part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
 #'  otherwise ignored. The arguments are:
 #'  \itemize{
-#'   \item \code{d.phi}: shape parameter of Gamma prior for \eqn{\kappa^\phi} (zero-inflation model)
-#'   \item \code{e.phi}: rate parameter of Gamma prior for \eqn{\kappa^\phi} (zero-inflation model)
-#'   \item \code{d.zeta}: shape parameter of Gamma prior for \eqn{\kappa^\zeta} (zero-inflation model)
-#'   \item \code{e.zeta}: rate parameter of Gamma prior for \eqn{\kappa^\zeta} (zero-inflation model)
-#'   \item \code{a.phi}: shape parameter of the Gamma prior for \eqn{\phi^2} (zero-inflation model)
-#'   \item \code{kappa.phi}: part of the rate parameter of the Gamma prior for \eqn{\phi^2} (zero-inflation model)
-#'   \item \code{a.zeta}: shape parameter of the Gamma prior for \eqn{\zeta^2} (zero-inflation model)
-#'   \item \code{kappa.zeta}: part of the rate parameter of the Gamma prior for \eqn{\zeta^2} (zero-inflation model)
+#'   \item \code{a.phi}: hyperparameter for learning \eqn{\phi^2} (inflation component)
+#'   \item \code{a.zeta}: hyperparameter for learning  \eqn{\zeta^2} (inflation component)
+#'   \item \code{kappa.phi}: hyperparameter for learning \eqn{\phi^2} (inflation component)
+#'   \item \code{kappa.zeta}: part of the rate parameter of the Gamma prior for \eqn{\zeta^2}
+#'    (inflation component)
 #'   \item \code{learn.kappa.phi}: if TRUE \eqn{\kappa^\phi} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.phi} used as starting value,
-#'     if FALSE \eqn{\kappa^\phi = } \code{kappa.phi} (zero-inflation model)
+#'     if FALSE \eqn{\kappa^\phi = } \code{kappa.phi} (inflation component)
 #'   \item \code{learn.kappa.zeta}: if TRUE \eqn{\kappa^\zeta} is sampled in a
 #'     Gibbs-step with the value of argument \code{kappa.zeta} used as starting value,
-#'     if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta} (zero-inflation model)
+#'     if FALSE \eqn{\kappa^\zeta = } \code{kappa.zeta} (inflation component)
+#'   \item \code{d.phi}: hyperparameter for learning \eqn{\kappa^\phi} (inflation component)
+#'   \item \code{d.zeta}: hyperparameter for learning \eqn{\kappa^\zeta} (inflation component)
+#'   \item \code{e.phi}: hyperparameter for learning \eqn{\kappa^\phi} (inflation component)
+#'   \item \code{e.zeta}: hyperparameter for learning \eqn{\kappa^\zeta} (inflation component)
 #'   \item \code{type}: the type of prior you want on your regression effects;
 #'     this argument is either "cps" (compound symmetric), "rw-t0" (shrinkage prior starting at T = 0),
-#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior) (zero-inflation model)
-#'   \item \code{c}: prior parameter that scales the variance when using
-#'    shrinkage prior (ignored when using cps or independence prior) (zero-inflation model)
-#'   \item \code{L0}: prior variance on the factor loading (ignored when using shrinkage prior) (zero-inflation model)
+#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior)
+#'      (inflation component)
+#'   \item \code{c}: prior parameter that scales the variance when using shrinkage prior
+#'    (ignored when using cps or independence prior) (inflation component)
+#'   \item \code{L0}: prior variance on the factor loading when using either cps or independence
+#'    prior (ignored when using shrinkage prior) (inflation component)
 #'  }
 #'  Note that for the factor model, the hyperparameters \code{a.phi} and
-#'  \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings
+#'  \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings.
+#'  There is also no triple Gamma prior as only one factor is present.
 #' @param mcmc.opt a list containing information on the overall sampler.
 #'  The arguments are:
 #'  \itemize{
@@ -324,7 +490,7 @@
 #'  prevents the model from overfitting, i.e., it is reasonable to assume that not
 #'  every covariate has a time-varying effect and without proper regularization
 #'  estimates are likely less stable.
-#'  The priors on the parameters are specified as
+#'  The priors on the parameters are specified as Normal-Gamma (or double Gamma)
 #'  \deqn{
 #'  \begin{aligned}
 #'    \theta_j|\xi_j^2 &\sim \mathcal{N}(0,\xi^2_j),
@@ -339,15 +505,13 @@
 #'    &\quad \phi^2|a^\phi, \kappa^\phi &\sim \mathcal{G}\left(a^\phi, \frac{a^\phi \kappa^\phi}{2}\right).
 #'  \end{aligned}
 #'  }
-#'  The hyperparameters \eqn{a^\zeta,a^\phi} in the factor part of the model are
-#'  held at fixed values,
-#'  whereas all the other hyperparameters may either be held
-#'  fixed or may be equipped with additional hyperpriors. In the latter case the
-#'  following hyperpriors are considered:
+#'
+#'  We follow Bitto and Frühwirth-Schnatter (2019) and assign the following prior
+#'  distributions on the parameters of the double Gamma prior
 #'  \deqn{
 #'  \begin{aligned}
-#'   \kappa^\xi|d^\xi,e^\xi& \sim \mathcal{G}(d^\xi,e^\xi), \quad  a^\xi|\nu^\xi,b^\xi \sim  \mathcal{G}(\nu^\xi, \nu^\xi b^\xi), \\
-#'   \kappa^\tau|d^\tau,e^\tau& \sim  \mathcal{G}(d^\tau,e^\tau), \quad a^\tau|\nu^\tau,b^\tau \sim  \mathcal{G}(\nu^\tau, \nu^\tau b^\tau), \\
+#'   \kappa^\xi|d^\xi,e^\xi& \sim \mathcal{G}(d^\xi,e^\xi), \quad  a^\xi|\alpha^\xi,\beta^\xi \sim  \mathcal{G}(\alpha^\xi, \alpha^\xi \beta^\xi), \\
+#'   \kappa^\tau|d^\tau,e^\tau& \sim  \mathcal{G}(d^\tau,e^\tau), \quad a^\tau|\alpha^\tau,\beta^\tau \sim  \mathcal{G}(\alpha^\tau, \alpha^\tau \beta^\tau), \\
 #'   \kappa^\zeta|d^\zeta,e^\zeta& \sim \mathcal{G}(d^\zeta,e^\zeta), \\
 #'   \kappa^\phi|d^\phi,e^\phi& \sim \mathcal{G}(d^\phi,e^\phi).
 #'  \end{aligned}
@@ -360,6 +524,68 @@
 #'  Metropolis-Hastings updates. For inference, we have adapted the MCMC sampler
 #'  presented in Bitto and Frühwirth-Schnatter (2019) and implemented in the \code{R} package
 #'  \code{shrinkTVP} (Knaus et al., 2021).
+#'
+#'  We also consider an alternative and more general shrinkage prior - the triple Gamma
+#'  prior - which encompasses the double Gamma prior as a special case (Cadonna et al., 2020).
+#'  The triple Gamma is a Normal-Gamma-Gamma prior on the scale and regression parameters, i.e.,
+#'  \deqn{
+#'  \begin{aligned}
+#'    \theta_j|\xi_j^2 &\sim \mathcal{N}(0,\xi^2_j),
+#'    &\quad \xi_j^2|a^\xi, \kappa^\xi_j &\sim \mathcal{G}\left(a^\xi, \frac{a^\xi \kappa_j^\xi}{2}\right),
+#'   &\quad \kappa_j^\xi|c^\xi,\kappa^\xi
+#'     \sim \mathcal{G}\left(c^\xi, \frac{c^\xi}{\kappa^\xi}\right) &\quad j = \{1, \dots, d\}, \\
+#'    \beta_j|\tau_j^2 &\sim \mathcal{N}(0,\tau_j^2),
+#'    &\quad \tau_j^2|a^\tau, \kappa^\tau_j &\sim \mathcal{G}\left(a^\tau, \frac{a^\tau \kappa_j^\tau}{2}\right),
+#'    &\quad \kappa_j^\tau|c^\tau,\kappa^\tau
+#'     \sim \mathcal{G}\left(c^\tau, \frac{c^\tau}{\kappa^\tau}\right)
+#'    &\quad j = \{1, \dots, d\}, \\
+#'  \end{aligned}
+#'  }
+#'  The additional prior-layer allows for covariate specific hyperparameters.
+#'  As the factor part of our model contains only one factor, the triple Gamma
+#'  prior only makes sense for the regression part of the model.
+#'
+#'  For building the MCMC sampler, we follow Cadonna et al. (2020) and consider
+#'  the following, alternative representation of the triple Gamma prior as the
+#'  basis for inference
+#'  \deqn{
+#'    \begin{aligned}
+#'    \theta_j|\overset{\vee}{\xi^2_j},\overset{\vee}{\kappa_j^\xi},\phi^\xi &\sim
+#'     \mathcal{N}(0,\phi^\xi\overset{\vee}{\xi_j^2}/\overset{\vee}{\kappa_j^\xi}),
+#'     \quad \overset{\vee}{\xi_j^2}|a^\xi \sim \mathcal{G}(a^\xi,1), \quad
+#'     \overset{\vee}{\kappa_j^\xi}|c^\xi \sim \mathcal{G}(c^\xi,1), \\
+#'     \beta_j|\overset{\vee}{\tau^2_j},\overset{\vee}{\kappa_j^\tau},\phi^\tau &\sim
+#'     \mathcal{N}(0,\phi^\tau\overset{\vee}{\tau_j^2}/\overset{\vee}{\kappa_j^\tau}),
+#'     \quad \overset{\vee}{\tau_j^2}|a^\tau \sim \mathcal{G}(a^\tau,1), \quad
+#'     \overset{\vee}{\kappa_j^\tau}|c^\tau \sim \mathcal{G}(c^\tau,1),
+#'    \end{aligned}
+#'  }
+#'  where setting \eqn{\tau^2_j = \phi^\tau\overset{\vee}{\tau_j^2}/\overset{\vee}{\kappa_j^\tau}}
+#'  and \eqn{\xi^2_j = \phi^\xi\overset{\vee}{\xi_j^2}/\overset{\vee}{\kappa_j^\xi}}
+#'  makes the connection to the original triple Gamma representation more obvious.
+#'  Here, \eqn{\phi^\tau = 2c^\tau/(a^\tau \kappa^\tau)} and
+#'  \eqn{\phi^\xi = 2c^\xi/(a^\xi \kappa^\xi)}.
+#'
+#'  Under triple Gamma shrinkage, the priors for \eqn{a^\xi,a^\tau,c^\xi,c^\tau}
+#'  are selected such that their support is restricted to \eqn{(0,0.5)} as the
+#'  triple Gamma prior then has a pole at the origin.
+#'   Cadonna et al. (2020) then consider the following Beta-priors
+#'  \deqn{
+#'    \begin{aligned}
+#'     2a^\xi|\alpha^\xi,\beta^\xi &\sim \mathcal{B}(\alpha^\xi,\beta^\xi), \quad 2c^\xi|\alpha^\xi, \beta^\xi \sim \mathcal{B}(\alpha^\xi,\beta^\xi) \\
+#'     2a^\tau|\alpha^\tau, \beta^\tau &\sim \mathcal{B}(\alpha^\tau,\beta^\tau), \quad 2c^\tau|\alpha^\tau, \beta^\tau \sim \mathcal{B}(\alpha^\tau,\beta^\tau)
+#'    \end{aligned}
+#'  }
+#'  Moreover, the global shrinkage parameters are equipped with the following F-priors
+#'  \deqn{
+#'    \frac{\kappa^\xi}{2}|a^\xi,c^\xi \sim \mathcal{F}(2a^\xi,2c^\xi), \quad
+#'    \frac{\kappa^\tau}{2}|a^\tau,c^\tau \sim \mathcal{F}(2a^\tau,2c^\tau).
+#'  }
+#'  Important: To be consistent with the double Gamma prior, the parameters
+#'  \eqn{\xi^2_j} and \eqn{\tau^2_j} are returned by the function, whereas
+#'  \eqn{\overset{\vee}{\xi_j^2}} and \eqn{\overset{\vee}{\tau_j^2}} are omitted
+#'  from the output and only sampled internally during MCMC. However, they can
+#'  be easily computed based on the above definitions.
 #'
 #'  The function \code{panelTVP} can handle the following popular regression models
 #'   \itemize{
@@ -574,6 +800,10 @@
 #'  Time-Varying Parameter Model Framework. In: Journal of Econometrics, 210,
 #'  75-97.
 #'
+#'  Cadonna, A., Frühwirth-Schnatter, S. and Knaus, P. (2020). Triple the Gamma -
+#'  A Unifying Shrinkage Prior for Variance and Variable Selection in Sparse
+#'  State Space and TVP Models. In: Econometrics, 8, 1-36.
+#'
 #'  Frühwirth-Schnatter, S. and Wagner, H. (2010). Stochastic Model Specification
 #'  Search for Gaussian and Partially Non-Gaussian State Space Models. Journal
 #'  of Econometrics, 154, 85-100.
@@ -605,54 +835,87 @@ panelTVP <- function(formula = NULL,
                      t = NULL,
                      model = NULL,
                      prior.reg = list(
-                       d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001,
-                       b.tau = 10, nu.tau = 5, b.xi = 10, nu.xi = 5,
-                       a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi = 10,
-                       iota.tau = 1, iota.xi = 1,
+                       a.tau = 0.1, a.xi = 0.1,
                        learn.a.tau = TRUE, learn.a.xi = TRUE,
-                       target.rate.tau = 0.44, target.rate.xi = 0.44,
+                       alpha.a.tau = 2, alpha.a.xi = 2,
+                       beta.a.tau = 1, beta.a.xi = 1,
+                       iota.a.tau = 1, iota.a.xi = 1,
+                       target.rate.a.tau = 0.44, target.rate.a.xi = 0.44,
+                       c.tau = 0.1, c.xi = 0.1,
+                       learn.c.tau = TRUE, learn.c.xi = TRUE,
+                       alpha.c.tau = 2, alpha.c.xi = 2,
+                       beta.c.tau = 1, beta.c.xi = 1,
+                       iota.c.tau = 1, iota.c.xi = 1,
+                       target.rate.c.tau = 0.44, target.rate.c.xi = 0.44,
+                       kappa.tau = 10, kappa.xi = 10,
                        learn.kappa.tau = TRUE, learn.kappa.xi = TRUE,
-                       type = "rw-t1", c = 1, B0 = 1
+                       d.tau = 0.001, d.xi = 0.001,
+                       e.tau = 0.001, e.xi = 0.001,
+                       type = "rw-t1", c = 1, B0 = 1, TG = FALSE
                      ),
                      prior.var = list(
                        learn.C0.hyp = list(g0 = 5, G0 = 3.333333), c0 = 2.5
                      ),
                      prior.load = list(
-                       d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
-                       a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10,
+                       a.phi = 0.1, a.zeta = 0.1,
+                       kappa.phi = 10, kappa.zeta = 10,
                        learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE,
+                       d.phi = 0.001, d.zeta = 0.001,
+                       e.phi = 0.001, e.zeta = 0.001,
                        type = "rw-t1", c = 1, L0 = 1
                      ),
                      prior.reg_zinb.count = list(
-                       d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001,
-                       b.tau = 10, nu.tau = 5, b.xi = 10, nu.xi = 5,
-                       a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi = 10,
-                       iota.tau = 1, iota.xi = 1,
+                       a.tau = 0.1, a.xi = 0.1,
                        learn.a.tau = TRUE, learn.a.xi = TRUE,
-                       target.rate.tau = 0.44, target.rate.xi = 0.44,
+                       alpha.a.tau = 2, alpha.a.xi = 2,
+                       beta.a.tau = 1, beta.a.xi = 1,
+                       iota.a.tau = 1, iota.a.xi = 1,
+                       target.rate.a.tau = 0.44, target.rate.a.xi = 0.44,
+                       c.tau = 0.1, c.xi = 0.1,
+                       learn.c.tau = TRUE, learn.c.xi = TRUE,
+                       alpha.c.tau = 2, alpha.c.xi = 2,
+                       beta.c.tau = 1, beta.c.xi = 1,
+                       iota.c.tau = 1, iota.c.xi = 1,
+                       target.rate.c.tau = 0.44, target.rate.c.xi = 0.44,
+                       kappa.tau = 10, kappa.xi = 10,
                        learn.kappa.tau = TRUE, learn.kappa.xi = TRUE,
-                       type = "rw-t1", c = 1, B0 = 1
+                       d.tau = 0.001, d.xi = 0.001,
+                       e.tau = 0.001, e.xi = 0.001,
+                       type = "rw-t1", c = 1, B0 = 1, TG = FALSE
                      ),
                      prior.load_zinb.count = list(
-                       d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
-                       a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10,
+                       a.phi = 0.1, a.zeta = 0.1,
+                       kappa.phi = 10, kappa.zeta = 10,
                        learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE,
+                       d.phi = 0.001, d.zeta = 0.001,
+                       e.phi = 0.001, e.zeta = 0.001,
                        type = "rw-t1", c = 1, L0 = 1
                      ),
                      prior.reg_zinb.inflation = list(
-                       d.tau = 0.001, e.tau = 0.001, d.xi = 0.001, e.xi = 0.001,
-                       b.tau = 10, nu.tau = 5, b.xi = 10, nu.xi = 5,
-                       a.tau = 1, kappa.tau = 10, a.xi = 1, kappa.xi = 10,
-                       iota.tau = 1, iota.xi = 1,
+                       a.tau = 0.1, a.xi = 0.1,
                        learn.a.tau = TRUE, learn.a.xi = TRUE,
-                       target.rate.tau = 0.44, target.rate.xi = 0.44,
+                       alpha.a.tau = 2, alpha.a.xi = 2,
+                       beta.a.tau = 1, beta.a.xi = 1,
+                       iota.a.tau = 1, iota.a.xi = 1,
+                       target.rate.a.tau = 0.44, target.rate.a.xi = 0.44,
+                       c.tau = 0.1, c.xi = 0.1,
+                       learn.c.tau = TRUE, learn.c.xi = TRUE,
+                       alpha.c.tau = 2, alpha.c.xi = 2,
+                       beta.c.tau = 1, beta.c.xi = 1,
+                       iota.c.tau = 1, iota.c.xi = 1,
+                       target.rate.c.tau = 0.44, target.rate.c.xi = 0.44,
+                       kappa.tau = 10, kappa.xi = 10,
                        learn.kappa.tau = TRUE, learn.kappa.xi = TRUE,
-                       type = "rw-t1", c = 1, B0 = 1
+                       d.tau = 0.001, d.xi = 0.001,
+                       e.tau = 0.001, e.xi = 0.001,
+                       type = "rw-t1", c = 1, B0 = 1, TG = FALSE
                      ),
                      prior.load_zinb.inflation = list(
-                       d.phi = 0.001, e.phi = 0.001, d.zeta = 0.001, e.zeta = 0.001,
-                       a.phi = 1, kappa.phi = 10, a.zeta = 1, kappa.zeta = 10,
+                       a.phi = 0.1, a.zeta = 0.1,
+                       kappa.phi = 10, kappa.zeta = 10,
                        learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE,
+                       d.phi = 0.001, d.zeta = 0.001,
+                       e.phi = 0.001, e.zeta = 0.001,
                        type = "rw-t1", c = 1, L0 = 1
                      ),
                      mcmc.opt = list(
@@ -743,17 +1006,21 @@ panelTVP <- function(formula = NULL,
     result$fmcmc <- NULL
 
     # adding learning settings to output
-    hyperpara <- c("a.xi", "a.tau", "kappa.xi", "kappa.tau", "kappa.zeta", "kappa.phi")
-    part <- c(rep("regression part", 4), rep("factor part", 2))
+    hyperpara <- c("a.xi", "a.tau", "c.xi", "c.tau", "kappa.xi", "kappa.tau", "kappa.zeta", "kappa.phi")
+    part <- c(rep("regression part", 6), rep("factor part", 2))
     learn <- c(prior.reg$learn.a.xi, prior.reg$learn.a.tau,
+               prior.reg$learn.c.xi, prior.reg$learn.c.tau,
                prior.reg$learn.kappa.xi, prior.reg$learn.kappa.tau,
                prior.load$learn.kappa.zeta, prior.load$learn.kappa.phi)
-    if(!(prior.reg$type %in% c("rw1", "rw2"))) learn[1:4] <- NA
-    if(!(prior.load$type %in% c("rw1", "rw2"))) learn[5:6] <- NA
+    if(!(prior.reg$type %in% c("rw1", "rw2"))) learn[1:6] <- NA
+    if(!(prior.load$type %in% c("rw1", "rw2"))) learn[7:8] <- NA
     result$learning.settings <- cbind(hyperpara, part, learn)
     colnames(result$learning.settings) <- c("hyperparameter", "model.part", "learned?")
     result$learning.settings <- as.data.frame(result$learning.settings)
-    if(!random.effects) result$learning.settings <- result$learning.settings[1:4,]
+    if(!random.effects) result$learning.settings <- result$learning.settings[1:6,]
+    if(!prior.reg$TG){
+      result$learning.settings[3:4, 3] <- NA
+    }
     # adding mcmc setting to output (incl. ASIS Boolean)
     result$mcmc.settings <- mcmc.opt
     # adding matrix to match effect ids to variable names (for user information)

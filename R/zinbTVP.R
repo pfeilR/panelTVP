@@ -178,9 +178,7 @@ zinbTVP <- function(df,
       # Step U
 
       omega_nb <- vector(mode = "numeric", length = length(df$y))
-      omega_nb[risk] <- efficient_PG_sampling(n = n.risk,
-                                              h = y.risk + r,
-                                              z = c(eta_nb[risk,]))
+      omega_nb[risk] <- efficient_PG_sampling(h = y.risk + r, z = c(eta_nb[risk,]))
       W.sparse_nb <- Matrix::Diagonal(n = length(omega_nb), x = omega_nb)
       W.dense_nb <- matrix(omega_nb, nrow = df$n, ncol = df$Tmax)
       z_nb <- vector(mode = "numeric", length = length(df$y))

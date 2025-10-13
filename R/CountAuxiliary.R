@@ -156,12 +156,12 @@ stepRisk <- function(y, miss, eta_nb, eta_logit, r){
 
 }
 
-efficient_PG_sampling <- function(n, h, z){
+efficient_PG_sampling <- function(h, z){
 
   n <- length(h)
   PG <- numeric(n)
-  idx_sp <- h >= 1
-  idx_small <- h < 1
+  idx_sp <- h >= 1 & h <= 50
+  idx_NOsp <- !idx_sp
 
   # Saddlepoint approximation for h >= 1
   if(any(idx_sp)){
@@ -169,8 +169,8 @@ efficient_PG_sampling <- function(n, h, z){
   }
 
   # Standard hybrid rpg for h < 1
-  if(any(idx_small)){
-    PG[idx_small] <- BayesLogit::rpg(sum(idx_small), h = h[idx_small], z = z[idx_small])
+  if(any(idx_NOsp)){
+    PG[idx_NOsp] <- BayesLogit::rpg(sum(idx_NOsp), h = h[idx_NOsp], z = z[idx_NOsp])
   }
 
   return(PG)

@@ -76,6 +76,15 @@ fit_panelTVP <- function(formula,
   prior.load$phi <- 1
   prior.load$zeta <- 1
 
+  if(prior.reg$TG){
+    prior.reg$kappa.tau.check <- rep(1, df$d)
+    prior.reg$kappa.xi.check <- rep(1, df$d)
+    prior.reg$ph.tau <- (2*prior.reg$c.tau)/(prior.reg$kappa.tau*prior.reg$a.tau)
+    prior.reg$ph.xi <- (2*prior.reg$c.xi)/(prior.reg$kappa.xi*prior.reg$a.xi)
+    prior.reg$tau.check <- (prior.reg$tau*prior.reg$kappa.tau.check)/prior.reg$ph.tau
+    prior.reg$xi.check <- (prior.reg$xi*prior.reg$kappa.xi.check)/prior.reg$ph.xi
+  }
+
   # create return matrix for the MCMC samples
 
   if(prior.reg$type == "ind"){
@@ -96,9 +105,18 @@ fit_panelTVP <- function(formula,
   if(prior.reg$type == "ind"){
     cnames <- c("SimNr", namesbetat, namessgma2, nameslambdat)
   } else{
-    cnames <- c("SimNr",namesbetat, namesbeta, namestheta,
-                namestau, namesxi, c("a.tau","kappa.tau","a.xi","kappa.xi"),
-                namessgma2, nameslambdat)
+    if(prior.reg$TG){
+      kappa.tau.j <- paste0("kappa.tau_", 1:df$d)
+      kappa.xi.j <- paste0("kappa.xi_", 1:df$d)
+      cnames <- c("SimNr",namesbetat, namesbeta, namestheta,
+                  namestau, namesxi, c("a.tau","kappa.tau","a.xi","kappa.xi",
+                                       "c.tau", kappa.tau.j, "c.xi", kappa.xi.j),
+                  namessgma2, nameslambdat)
+    } else{
+      cnames <- c("SimNr",namesbetat, namesbeta, namestheta,
+                  namestau, namesxi, c("a.tau","kappa.tau","a.xi","kappa.xi"),
+                  namessgma2, nameslambdat)
+    }
   }
   if(prior.load$type=="rw1" | prior.load$type=="rw2"){
     cnames <- c(cnames,"lambda","psi","phi2","zeta2", "a.phi", "kappa.phi", "a.zeta", "kappa.zeta")
@@ -126,10 +144,16 @@ fit_panelTVP <- function(formula,
   settings.NegBin$r.accept[1] <- 1 # we let metropolis start in 2nd iteration
 
   ## regression part
-  prior.reg$xi.accept <- c()
-  prior.reg$xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
-  prior.reg$tau.accept <- c()
-  prior.reg$tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+  prior.reg$a.xi.accept <- c()
+  prior.reg$a.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
+  prior.reg$a.tau.accept <- c()
+  prior.reg$a.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+  if(prior.reg$TG){
+    prior.reg$c.xi.accept <- c()
+    prior.reg$c.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    prior.reg$c.tau.accept <- c()
+    prior.reg$c.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+  }
 
   # fitting the model ----------------------------------------------------------
 

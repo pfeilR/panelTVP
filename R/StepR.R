@@ -73,100 +73,321 @@ stepR <- function(response,
       beta_tilde <- res_ASIS$beta_tilde
     }
 
-    ## Step DR-4: sample the hyperparameters -----------------------------------
+    ## Step D-4: hyperparameter sampling under double Gamma prior --------------
 
-    ### Step DR-4a: sample a_tau and a_xi (if metropolis == TRUE) --------------
+    if(!prior.reg$TG){ # Double Gamma Prior
 
-    if(prior.reg$learn.a.xi){
+      ### Step DR-4a: sample a_tau and a_xi  -----------------------------------
 
-      if(i>1){ # metropolis step starting in second iteration
+      if(prior.reg$learn.a.xi){
 
-        ## a_xi
+        if(i>1){ # metropolis step starting in second iteration
 
-        a_xi_state <- MH_step(a = prior.reg$a.xi,
-                              alphapart = alpha[(df$d+1):(2*df$d)],
-                              iota = prior.reg$iota.xi,
-                              prior_hp1 = prior.reg$nu.xi,
-                              prior_hp2 = prior.reg$b.xi*prior.reg$nu.xi,
-                              k = prior.reg$kappa.xi,
-                              accept = prior.reg$xi.accept,
-                              target.rate = prior.reg$target.rate.xi)
+          ## a_xi
 
-        if(a_xi_state[[1]] != prior.reg$a.xi){
-          prior.reg$xi.accept[i] <- 1
-        } else{
-          prior.reg$xi.accept[i] <- 0
+          a_xi_state <- MH_a_double(a = prior.reg$a.xi,
+                                    alphapart = alpha[(df$d+1):(2*df$d)],
+                                    iota = prior.reg$iota.a.xi,
+                                    prior_hp1 = prior.reg$alpha.a.xi,
+                                    prior_hp2 = prior.reg$alpha.a.xi*prior.reg$beta.a.xi, # Gamma prior
+                                    k = prior.reg$kappa.xi,
+                                    accept = prior.reg$a.xi.accept,
+                                    target.rate = prior.reg$target.rate.a.xi)
+
+          if(a_xi_state[[1]] != prior.reg$a.xi){
+            prior.reg$a.xi.accept[i] <- 1
+          } else{
+            prior.reg$a.xi.accept[i] <- 0
+          }
+          prior.reg$a.xi <- a_xi_state[[1]]
+          prior.reg$a.xi[prior.reg$a.xi>10^11]=10^11
+          prior.reg$a.xi[prior.reg$a.xi<0.1^7]=0.1^7
+          prior.reg$iota.a.xi <- a_xi_state[[2]]
+
         }
-        prior.reg$a.xi <- a_xi_state[[1]]
-        prior.reg$a.xi[prior.reg$a.xi>10^11]=10^11
-        prior.reg$a.xi[prior.reg$a.xi<0.1^7]=0.1^7
-        prior.reg$iota.xi <- a_xi_state[[2]]
 
       }
 
-    }
+      if(prior.reg$learn.a.tau){
 
-    if(prior.reg$learn.a.tau){
+        if(i>1){ # metropolis step starting in second iteration
 
-      if(i>1){ # metropolis step starting in second iteration
+          ## a_tau
 
-        ## a_tau
+          a_tau_state <- MH_a_double(a = prior.reg$a.tau,
+                                     alphapart = alpha[1:df$d],
+                                     iota = prior.reg$iota.a.tau,
+                                     prior_hp1 = prior.reg$alpha.a.tau,
+                                     prior_hp2 = prior.reg$alpha.a.tau*prior.reg$beta.a.tau,
+                                     k = prior.reg$kappa.tau,
+                                     accept = prior.reg$a.tau.accept,
+                                     target.rate = prior.reg$target.rate.a.tau)
 
-        a_tau_state <- MH_step(a = prior.reg$a.tau,
-                               alphapart = alpha[1:df$d],
-                               iota = prior.reg$iota.tau,
-                               prior_hp1 = prior.reg$nu.tau,
-                               prior_hp2 = prior.reg$b.tau*prior.reg$nu.tau,
-                               k = prior.reg$kappa.tau,
-                               accept = prior.reg$tau.accept,
-                               target.rate = prior.reg$target.rate.tau)
+          if(a_tau_state[[1]] != prior.reg$a.tau){
+            prior.reg$a.tau.accept[i] <- 1
+          } else{
+            prior.reg$a.tau.accept[i] <- 0
+          }
+          prior.reg$a.tau <- a_tau_state[[1]]
+          prior.reg$a.tau[prior.reg$a.tau>10^11]=10^11
+          prior.reg$a.tau[prior.reg$a.tau<0.1^7]=0.1^7
+          prior.reg$iota.a.tau <- a_tau_state[[2]]
 
-        if(a_tau_state[[1]] != prior.reg$a.tau){
-          prior.reg$tau.accept[i] <- 1
-        } else{
-          prior.reg$tau.accept[i] <- 0
         }
-        prior.reg$a.tau <- a_tau_state[[1]]
-        prior.reg$a.tau[prior.reg$a.tau>10^11]=10^11
-        prior.reg$a.tau[prior.reg$a.tau<0.1^7]=0.1^7
-        prior.reg$iota.tau <- a_tau_state[[2]]
 
       }
 
-    }
+      ### Step DR-4b: sample xi, tau ---------------------------------------------
 
-    ### Step DR-4b: sample xi, tau ---------------------------------------------
+        prior.reg$xi <- sample_GIG(a = prior.reg$a.xi, l = prior.reg$kappa.xi,
+                                   par = alpha[(df$d+1):(2*df$d)])
+        prior.reg$xi[prior.reg$xi>10^11]=10^11
+        prior.reg$xi[prior.reg$xi<0.1^15]=0.1^15
 
-    prior.reg$xi <- sample_GIG(a = prior.reg$a.xi, l = prior.reg$kappa.xi,
-                               par = alpha[(df$d+1):(2*df$d)])
-    prior.reg$xi[prior.reg$xi>10^11]=10^11
-    prior.reg$xi[prior.reg$xi<0.1^15]=0.1^15
+        prior.reg$tau <- sample_GIG(a = prior.reg$a.tau, l = prior.reg$kappa.tau,
+                                    par = alpha[1:df$d])
+        prior.reg$tau[prior.reg$tau>10^11]=10^11
+        prior.reg$tau[prior.reg$tau<0.1^15]=0.1^15
 
-    prior.reg$tau <- sample_GIG(a = prior.reg$a.tau, l = prior.reg$kappa.tau,
-                                par = alpha[1:df$d])
-    prior.reg$tau[prior.reg$tau>10^11]=10^11
-    prior.reg$tau[prior.reg$tau<0.1^15]=0.1^15
+      ### Step DR-4c: Sample kappa_xi, kappa_tau ---------------------------------
 
-    ### Step DR-4c: Sample kappa_xi, kappa_tau ---------------------------------
+      if(prior.reg$learn.kappa.xi){
+        prior.reg$kappa.xi <- sample_G(a = prior.reg$a.xi,
+                                       d = df$d,
+                                       par = prior.reg$xi,
+                                       prior_hp1 = prior.reg$d.xi,
+                                       prior_hp2 = prior.reg$e.xi)
+        prior.reg$kappa.xi[prior.reg$kappa.xi>10^11]=10^11
+        prior.reg$kappa.xi[prior.reg$kappa.xi<0.1^15]=0.1^15
+      }
 
-    if(prior.reg$learn.kappa.xi){
-      prior.reg$kappa.xi <- sample_G(a = prior.reg$a.xi,
-                                     d = df$d,
-                                     par = prior.reg$xi,
-                                     prior_hp1 = prior.reg$d.xi,
-                                     prior_hp2 = prior.reg$e.xi)
-      prior.reg$kappa.xi[prior.reg$kappa.xi>10^11]=10^11
-      prior.reg$kappa.xi[prior.reg$kappa.xi<0.1^15]=0.1^15
-    }
+      if(prior.reg$learn.kappa.tau){
+        prior.reg$kappa.tau <- sample_G(a = prior.reg$a.tau,
+                                        d = df$d,
+                                        par = prior.reg$tau,
+                                        prior_hp1 = prior.reg$d.tau,
+                                        prior_hp2 = prior.reg$e.tau)
+        prior.reg$kappa.tau[prior.reg$kappa.tau>10^11]=10^11
+        prior.reg$kappa.tau[prior.reg$kappa.tau<0.1^15]=0.1^15
+      }
 
-    if(prior.reg$learn.kappa.tau){
-      prior.reg$kappa.tau <- sample_G(a = prior.reg$a.tau,
-                                      d = df$d,
-                                      par = prior.reg$tau,
-                                      prior_hp1 = prior.reg$d.tau,
-                                      prior_hp2 = prior.reg$e.tau)
-      prior.reg$kappa.tau[prior.reg$kappa.tau>10^11]=10^11
-      prior.reg$kappa.tau[prior.reg$kappa.tau<0.1^15]=0.1^15
+    } else{ # Triple Gamma Prior
+
+      ### Step TR-4a: sample a_tau and a_xi  -----------------------------------
+
+      if(prior.reg$learn.a.xi){
+
+        if(i>1){ # metropolis step starting in second iteration
+
+          ## a_xi
+
+          a_xi_state <- MH_a_triple(a = prior.reg$a.xi,
+                                    c = prior.reg$c.xi,
+                                    par = alpha[(df$d+1):(2*df$d)],
+                                    iota = prior.reg$iota.a.xi,
+                                    prior_hp1 = prior.reg$alpha.a.xi,
+                                    prior_hp2 = prior.reg$beta.a.xi, # scaled Beta prior
+                                    k = prior.reg$kappa.xi,
+                                    kappa.check = prior.reg$kappa.xi.check,
+                                    accept = prior.reg$a.xi.accept,
+                                    target.rate = prior.reg$target.rate.a.xi)
+
+          if(a_xi_state[[1]] != prior.reg$a.xi){
+            prior.reg$a.xi.accept[i] <- 1
+          } else{
+            prior.reg$a.xi.accept[i] <- 0
+          }
+          prior.reg$a.xi <- a_xi_state[[1]]
+          prior.reg$a.xi[prior.reg$a.xi>10^11]=10^11
+          prior.reg$a.xi[prior.reg$a.xi<0.1^7]=0.1^7
+          prior.reg$iota.a.xi <- a_xi_state[[2]]
+
+          # update ph.xi immediately
+          prior.reg$ph.xi <- ph_update(a = prior.reg$a.xi,
+                                       c = prior.reg$c.xi,
+                                       kappa = prior.reg$kappa.xi)
+
+        }
+
+      }
+
+      if(prior.reg$learn.a.tau){
+
+        if(i>1){ # metropolis step starting in second iteration
+
+          ## a_tau
+
+          a_tau_state <- MH_a_triple(a = prior.reg$a.tau,
+                                     c = prior.reg$c.tau,
+                                     par = alpha[1:df$d],
+                                     iota = prior.reg$iota.a.tau,
+                                     prior_hp1 = prior.reg$alpha.a.tau,
+                                     prior_hp2 = prior.reg$beta.a.tau,
+                                     k = prior.reg$kappa.tau,
+                                     kappa.check = prior.reg$kappa.tau.check,
+                                     accept = prior.reg$a.tau.accept,
+                                     target.rate = prior.reg$target.rate.a.tau)
+
+          if(a_tau_state[[1]] != prior.reg$a.tau){
+            prior.reg$a.tau.accept[i] <- 1
+          } else{
+            prior.reg$a.tau.accept[i] <- 0
+          }
+          prior.reg$a.tau <- a_tau_state[[1]]
+          prior.reg$a.tau[prior.reg$a.tau>10^11]=10^11
+          prior.reg$a.tau[prior.reg$a.tau<0.1^7]=0.1^7
+          prior.reg$iota.a.tau <- a_tau_state[[2]]
+
+          # update ph.tau immediately
+          prior.reg$ph.tau <- ph_update(a = prior.reg$a.tau,
+                                        c = prior.reg$c.tau,
+                                        kappa = prior.reg$kappa.tau)
+
+
+        }
+
+      }
+
+     ### Step TR-4b: sampling of xi.check and tau.check -----------------------
+
+     prior.reg$xi.check <- sample_GIG_triple(a = prior.reg$a.xi,
+                                             k.check = prior.reg$kappa.xi.check,
+                                             par = alpha[(df$d+1):(2*df$d)],
+                                             ph = prior.reg$ph.xi)
+
+     prior.reg$tau.check <- sample_GIG_triple(a = prior.reg$a.tau,
+                                              k.check = prior.reg$kappa.tau.check,
+                                              par = alpha[1:df$d],
+                                              ph = prior.reg$ph.tau)
+
+     ### Step TR-4c: sampling of c.xi and c.tau using MH steps
+
+     if(prior.reg$learn.c.xi){
+
+       if(i>1){ # metropolis step starting in second iteration
+
+         ## c_xi
+
+         c_xi_state <- MH_c_triple(c = prior.reg$c.xi,
+                                   a = prior.reg$a.xi,
+                                   par = alpha[(df$d+1):(2*df$d)],
+                                   iota = prior.reg$iota.c.xi,
+                                   prior_hp1 = prior.reg$alpha.c.xi,
+                                   prior_hp2 = prior.reg$beta.c.xi, # scaled Beta prior
+                                   k = prior.reg$kappa.xi,
+                                   var.check = prior.reg$xi.check,
+                                   accept = prior.reg$c.xi.accept,
+                                   target.rate = prior.reg$target.rate.c.xi)
+
+         if(c_xi_state[[1]] != prior.reg$c.xi){
+           prior.reg$c.xi.accept[i] <- 1
+         } else{
+           prior.reg$c.xi.accept[i] <- 0
+         }
+         prior.reg$c.xi <- c_xi_state[[1]]
+         prior.reg$c.xi[prior.reg$c.xi>10^11]=10^11
+         prior.reg$c.xi[prior.reg$c.xi<0.1^7]=0.1^7
+         prior.reg$iota.c.xi <- c_xi_state[[2]]
+
+         # update ph.xi immediately
+         prior.reg$ph.xi <- ph_update(a = prior.reg$a.xi,
+                                      c = prior.reg$c.xi,
+                                      kappa = prior.reg$kappa.xi)
+
+       }
+
+     }
+
+     if(prior.reg$learn.c.tau){
+
+       if(i>1){ # metropolis step starting in second iteration
+
+         ## c_tau
+
+         c_tau_state <- MH_c_triple(c = prior.reg$c.tau,
+                                   a = prior.reg$a.tau,
+                                   par = alpha[1:df$d],
+                                   iota = prior.reg$iota.c.tau,
+                                   prior_hp1 = prior.reg$alpha.c.tau,
+                                   prior_hp2 = prior.reg$beta.c.tau, # scaled Beta prior
+                                   k = prior.reg$kappa.tau,
+                                   var.check = prior.reg$tau.check,
+                                   accept = prior.reg$c.tau.accept,
+                                   target.rate = prior.reg$target.rate.c.tau)
+
+         if(c_tau_state[[1]] != prior.reg$c.tau){
+           prior.reg$c.tau.accept[i] <- 1
+         } else{
+           prior.reg$c.tau.accept[i] <- 0
+         }
+         prior.reg$c.tau <- c_tau_state[[1]]
+         prior.reg$c.tau[prior.reg$c.tau>10^11]=10^11
+         prior.reg$c.tau[prior.reg$c.tau<0.1^7]=0.1^7
+         prior.reg$iota.c.tau <- c_tau_state[[2]]
+
+         # update ph.tau immediately
+         prior.reg$ph.tau <- ph_update(a = prior.reg$a.tau,
+                                      c = prior.reg$c.tau,
+                                      kappa = prior.reg$kappa.tau)
+
+       }
+
+     }
+
+     ### Step TR-4d: sampling of kappa.xi.check and kappa.tau.check
+
+     prior.reg$kappa.xi.check <- sample_kappa_check(c = prior.reg$c.xi,
+                                                    par = alpha[(df$d+1):(2*df$d)],
+                                                    ph = prior.reg$ph.xi,
+                                                    var.check = prior.reg$xi.check)
+
+     prior.reg$kappa.tau.check <- sample_kappa_check(c = prior.reg$c.tau,
+                                                     par = alpha[1:df$d],
+                                                     ph = prior.reg$ph.tau,
+                                                     var.check = prior.reg$tau.check)
+
+     ### Step TR-4e: sampling of kappa.xi and kappa.tau + associated hyperparameter
+     ### note that the hyperparameter is called d2 in Cadonna et al.
+
+     if(prior.reg$learn.kappa.xi){
+       prior.reg$e.xi <- rgamma(1, prior.reg$a.xi + prior.reg$c.xi,
+                                prior.reg$kappa.xi + (2*prior.reg$c.xi)/(prior.reg$a.xi))
+       prior.reg$kappa.xi <- sample_G_triple(a = prior.reg$a.xi,
+                                             c = prior.reg$c.xi,
+                                             par = alpha[(df$d+1):(2*df$d)],
+                                             k.check = prior.reg$kappa.xi.check,
+                                             var.check = prior.reg$xi.check,
+                                             prior_hp2 = prior.reg$e.xi)
+       # update ph.xi immediately
+       prior.reg$ph.xi <- ph_update(a = prior.reg$a.xi,
+                                    c = prior.reg$c.xi,
+                                    kappa = prior.reg$kappa.xi)
+
+     }
+
+     if(prior.reg$learn.kappa.tau){
+       prior.reg$e.tau <- rgamma(1, prior.reg$a.tau + prior.reg$c.tau,
+                                 prior.reg$kappa.tau + (2*prior.reg$c.tau)/(prior.reg$a.tau))
+       prior.reg$kappa.tau <- sample_G_triple(a = prior.reg$a.tau,
+                                              c = prior.reg$c.tau,
+                                              par = alpha[1:df$d],
+                                              k.check = prior.reg$kappa.tau.check,
+                                              var.check = prior.reg$tau.check,
+                                              prior_hp2 = prior.reg$e.tau)
+       # update ph.tau immediately
+       prior.reg$ph.tau <- ph_update(a = prior.reg$a.tau,
+                                     c = prior.reg$c.tau,
+                                     kappa = prior.reg$kappa.tau)
+     }
+
+    ### Step TR-4f: Update xi and tau
+    prior.reg$xi <- var_update_triple(ph = prior.reg$ph.xi,
+                                      v = prior.reg$xi.check,
+                                      k = prior.reg$kappa.xi.check)
+    prior.reg$tau <- var_update_triple(ph = prior.reg$ph.tau,
+                                       v = prior.reg$tau.check,
+                                       k = prior.reg$kappa.tau.check)
+
     }
 
     # transform to centered parameterization for saving results
@@ -499,7 +720,7 @@ resample_beta <- function(betat, theta2, tau, hyp.c, d){
 
 # Step 4 (hyperparameter sampling)
 
-log_acceptance_prob <- function(a_new, a, alphapart, b1, b2, k){
+log_acceptance_prob_a_double <- function(a_new, a, alphapart, b1, b2, k){
 
   #HW:  problems for very small alpha
   min.num <-10^(-10)
@@ -549,7 +770,7 @@ log_acceptance_prob <- function(a_new, a, alphapart, b1, b2, k){
 
   return(res)
 }
-MH_step <- function(a, alphapart, iota, prior_hp1, prior_hp2, k, accept, target.rate){
+MH_a_double <- function(a, alphapart, iota, prior_hp1, prior_hp2, k, accept, target.rate){
 
   if(!is.na(target.rate)){
 
@@ -558,19 +779,19 @@ MH_step <- function(a, alphapart, iota, prior_hp1, prior_hp2, k, accept, target.
     adapt.factor <- exp(0.01 * (accept.rate - target.rate))
     iota <- iota * adapt.factor
 
-  } else iota <- iota
+  }
 
   #draw a value from the proposal distribution
   alog <- rnorm(1, mean = log(a), sd = iota)
   proposal <- exp(alog)
 
   #compute the acceptance prob.:
-  acc_prob <- log_acceptance_prob(a_new = proposal,
-                                  a = a,
-                                  alphapart = alphapart,
-                                  b1 = prior_hp1,
-                                  b2 = prior_hp2,
-                                  k = k)
+  acc_prob <- log_acceptance_prob_a_double(a_new = proposal,
+                                           a = a,
+                                           alphapart = alphapart,
+                                           b1 = prior_hp1, # nu
+                                           b2 = prior_hp2, # b*nu
+                                           k = k)
   u <- runif(1)
 
   if(log(u) < acc_prob){
@@ -580,21 +801,179 @@ MH_step <- function(a, alphapart, iota, prior_hp1, prior_hp2, k, accept, target.
   }
   return(list(res, iota))
 }
+log_q_a_triple <- function(a, c, par, b1, b2, k, kappa.check){
+
+  #HW:  problems for very small values
+  min.num <-10^(-10)
+  if (min(abs(par)<min.num)){
+    hsmall <- abs(par)<min.num
+    par[hsmall]<-0 # HW
+  }
+  #HW
+
+  d <- length(par)
+  if (sum(par==0)>0){
+    par <- par[par != 0]
+  }
+  logk <- log(k)
+
+  # compute the parameters for the Bessel function:
+  par1 <- abs(a - 0.5) # abs() is fine as Bessel is even function about par1 / nu
+  par2 <- exp(0.5 * log(a) + 0.5 * log(kappa.check) + 0.5 * logk + log(abs(par)) - 0.5 * log(c))
+  bA <- (par2 > 50) | (par1 > 50)
+  besselA <- sapply(1:d, FUN = function(idx){
+    bessel_k(x = par2[idx], nu = par1, bessel_pkg = bA[idx])
+  }
+  )
+
+  # compute complete log ratio:
+  partA <- a*(-d*log(2)+(d/2)*logk-(d/2)*log(c)+(sum(log(kappa.check))/2)+(sum(log(par^2))/2))
+  partB <- (5/4)*d*log(a)+d*(a/2)*log(a)-d*lgamma(a+1)
+  partC <- sum(besselA)
+  partD <- -lbeta(a,c)+a*(log(a)+log(k/(2*c)))-log(a)-(a+c)*log(1+(a*k)/(2*c))
+  partE <- (b1-1)*log(2*a)-(b2-1)*log(1-2*a)
+  partF <- log(a)+log(0.5-a)
+  log.q <- partA + partB + partC + partD + partE + partF
+
+  return(log.q)
+}
+MH_a_triple <- function(a, c, par, iota, prior_hp1, prior_hp2, k, kappa.check, accept, target.rate){
+
+  if(!is.na(target.rate)){
+
+    # adaptive step
+    accept.rate <- sum(accept) / length(accept)
+    adapt.factor <- exp(0.01 * (accept.rate - target.rate))
+    iota <- iota * adapt.factor
+
+  }
+
+  #draw a value from the proposal distribution as in Cadonna et al.
+  z.old <- log(a/(0.5-a))
+  z.star <- rnorm(1, mean = z.old, sd = iota)
+  a.star <- 0.5*plogis(z.star)
+  eps <- 1e-08
+  a.star <- max(min(a.star, 0.5 - eps), eps)
+
+  # compute the q-values
+  log.q.old <- log_q_a_triple(a = a, c = c, par = par, b1 = prior_hp1, b2 = prior_hp2,
+                              k = k, kappa.check = kappa.check)
+  log.q.star <- log_q_a_triple(a = a.star, c = c, par = par, b1 = prior_hp1, b2 = prior_hp2,
+                               k = k, kappa.check = kappa.check)
+
+  acc_prob <- min(0, log.q.star - log.q.old)
+  acc_prob
+
+  u <- runif(1)
+
+  if(log(u) < acc_prob){
+    res <- a.star
+  }else{
+    res <- a
+  }
+  return(list(res, iota))
+}
+log_q_c_triple <- function(c, a, k, var.check, par, b1, b2){
+
+  d <- length(par)
+  par2 <- par^2
+  # compute acceptance probability
+  partA <- d*lgamma(c+0.5)-d*lgamma(c+1)+(d/2)*log(c)
+  partB <- -(c+0.5)*(sum(log(4*c*var.check+par2*k*a))-sum(log(4*c*var.check)))
+  partC <- -lbeta(a,c)-(a-1)*log(c)-(a+c)*log(1+(a*k)/(2*c))
+  partD <- (b1-1)*log(2*c)+(b2-1)*(1-2*c)
+  partE <- log(c)+log(0.5-c)
+  log.q <- partA + partB + partC + partD + partE
+
+  return(log.q)
+
+}
+MH_c_triple <- function(c, a, par, iota, prior_hp1, prior_hp2, k, var.check, accept, target.rate){
+
+  if(!is.na(target.rate)){
+
+    # adaptive step
+    accept.rate <- sum(accept) / length(accept)
+    adapt.factor <- exp(0.01 * (accept.rate - target.rate))
+    iota <- iota * adapt.factor
+
+  }
+
+  #draw a value from the proposal distribution as in Cadonna et al.
+  z.old <- log(c/(0.5-c))
+  z.star <- rnorm(1, mean = z.old, sd = iota)
+  c.star <- 0.5*plogis(z.star)
+  if(c.star == 0.5) c.star <- c.star * (1-.Machine$double.eps)
+
+  # compute the q-values
+  log.q.old <- log_q_c_triple(c = c, a = a, par = par, b1 = prior_hp1, b2 = prior_hp2,
+                              k = k, var.check = var.check)
+  log.q.star <- log_q_c_triple(c = c.star, a = a, par = par, b1 = prior_hp1, b2 = prior_hp2,
+                               k = k, var.check = var.check)
+
+  acc_prob <- min(0, log.q.star - log.q.old)
+
+  u <- runif(1)
+
+  if(log(u) < acc_prob){
+    res <- c.star
+  }else{
+    res <- c
+  }
+  return(list(res, iota))
+}
+
 sample_GIG <- function(a, l, par){
 
   p1 <- a-0.5
   p2 <- a*l
-
   par <- par^2
   sapply(par, FUN = function(x)
     rGIG_helper(n = 1, lambda = p1, chi = x, psi = p2))
+}
+sample_GIG_triple <- function(a, k.check, par, ph){
+
+  p1 <- a-0.5
+  p2 <- 2
+  par <- par^2
+  mapply(function(par_j, k.check_j){
+    rGIG_helper(n = 1, lambda = p1, chi = (k.check_j*par_j)/ph, psi = p2)
+  }, par, k.check)
+
 }
 sample_G <- function(a, d, par, prior_hp1, prior_hp2){
 
   p1 <- prior_hp1+a*d
   p2 <- prior_hp2+(sum(par)*a)/2
-  rgamma(1,p1, p2)
+  rgamma(1, p1, p2)
 
+}
+sample_G_triple <- function(a, c, par, k.check, var.check, prior_hp2){
+
+  # note: no prior_hp1 in triple gamma, instead prior.hp2 is sampled
+
+  d <- length(par)
+  par2 <- par^2
+  p1 <- (d/2)+a
+  p2 <- (a/(4*c))*sum((k.check/var.check)*par2)+prior_hp2
+  rgamma(1, p1, p2)
+
+}
+sample_kappa_check <- function(c, par, ph, var.check){
+
+  p1 <- 0.5+c
+  par2 <- par^2
+  p2 <- 1+(par2/(2*ph*var.check))
+  rgamma(length(par), p1, p2)
+
+}
+
+ph_update <- function(a, c, kappa){
+  (2*c)/(a*kappa)
+}
+
+var_update_triple <- function(ph, v, k){
+  (ph*v)/k
 }
 
 # independence samplers for betat

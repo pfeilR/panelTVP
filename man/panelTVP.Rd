@@ -140,11 +140,11 @@ updating of \eqn{c^\xi}
 \item \code{kappa.tau}: hyperparameter for learning \eqn{\tau^2_j}
 (double Gamma, triple Gamma). Note that this is the global parameter.
 The component-specific parameters are learned automatically when triple
-Gamma prior is selected.
+Gamma prior is selected
 \item \code{kappa.xi}: hyperparameter for learning \eqn{\xi^2_j}
 (double Gamma, triple Gamma). Note that this is the global parameter.
 The component-specific parameters are learned automatically when triple
-Gamma prior is selected.
+Gamma prior is selected
 \item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
 Gibbs-step with the value of argument \code{kappa.tau} used as starting value,
 if FALSE \eqn{\kappa^\tau = } \code{kappa.tau}
@@ -159,7 +159,7 @@ this parameter is only the starting value as it is learned during MCMC
 \item \code{d.xi}: hyperparameter for learning \eqn{\kappa^\xi}
 (only double Gamma)
 \item \code{e.xi}: hyperparameter for learning \eqn{\kappa^\xi}
-(double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+(double Gamma, triple Gamma). Note that under triple Gamma shrinkage
 this parameter is only the starting value as it is learned during MCMC
 \item \code{type}: the type of prior you want on your regression effects;
 this argument is either "rw-t0" (shrinkage prior starting at T = 0),
@@ -213,7 +213,7 @@ prior (ignored when using shrinkage prior)
 }
 Note that for the factor model, the hyperparameters \code{a.phi} and
 \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings.
-There is also no triple Gamma prior as only one factor is present.}
+There is also no triple Gamma prior as only one factor is present}
 
 \item{prior.reg_zinb.count}{A list of arguments for estimating the parameters of the regression
 part of the count model. This argument is only used when \code{model = 'ZINB'} and
@@ -278,11 +278,11 @@ updating of \eqn{c^\xi} (count component)
 \item \code{kappa.tau}: hyperparameter for learning \eqn{\tau^2_j}
 (double Gamma, triple Gamma). Note that this is the global parameter.
 The component-specific parameters are learned automatically when triple
-Gamma prior is selected. (count component)
+Gamma prior is selected (count component)
 \item \code{kappa.xi}: hyperparameter for learning \eqn{\xi^2_j}
 (double Gamma, triple Gamma). Note that this is the global parameter.
 The component-specific parameters are learned automatically when triple
-Gamma prior is selected. (count component)
+Gamma prior is selected (count component)
 \item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
 Gibbs-step with the value of argument \code{kappa.tau} used as starting value,
 if FALSE \eqn{\kappa^\tau = } \code{kappa.tau} (count component)
@@ -298,7 +298,7 @@ this parameter is only the starting value as it is learned during MCMC
 \item \code{d.xi}: hyperparameter for learning \eqn{\kappa^\xi}
 (only double Gamma) (count component)
 \item \code{e.xi}: hyperparameter for learning \eqn{\kappa^\xi}
-(double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+(double Gamma, triple Gamma). Note that under triple Gamma shrinkage
 this parameter is only the starting value as it is learned during MCMC
 (count component)
 \item \code{type}: the type of prior you want on your regression effects;
@@ -346,7 +346,7 @@ prior (ignored when using shrinkage prior) (count component)
 }
 Note that for the factor model, the hyperparameters \code{a.phi} and
 \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings.
-There is also no triple Gamma prior as only one factor is present.}
+There is also no triple Gamma prior as only one factor is present}
 
 \item{prior.reg_zinb.inflation}{A list of arguments for estimating the parameters of the regression
 part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
@@ -411,11 +411,11 @@ updating of \eqn{c^\xi} (inflation component)
 \item \code{kappa.tau}: hyperparameter for learning \eqn{\tau^2_j}
 (double Gamma, triple Gamma). Note that this is the global parameter.
 The component-specific parameters are learned automatically when triple
-Gamma prior is selected. (inflation component)
+Gamma prior is selected (inflation component)
 \item \code{kappa.xi}: hyperparameter for learning \eqn{\xi^2_j}
 (double Gamma, triple Gamma). Note that this is the global parameter.
 The component-specific parameters are learned automatically when triple
-Gamma prior is selected. (inflation component)
+Gamma prior is selected (inflation component)
 \item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
 Gibbs-step with the value of argument \code{kappa.tau} used as starting value,
 if FALSE \eqn{\kappa^\tau = } \code{kappa.tau} (inflation component)
@@ -431,7 +431,7 @@ this parameter is only the starting value as it is learned during MCMC
 \item \code{d.xi}: hyperparameter for learning \eqn{\kappa^\xi}
 (only double Gamma) (inflation component)
 \item \code{e.xi}: hyperparameter for learning \eqn{\kappa^\xi}
-(double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+(double Gamma, triple Gamma). Note that under triple Gamma shrinkage
 this parameter is only the starting value as it is learned during MCMC
 (inflation component)
 \item \code{type}: the type of prior you want on your regression effects;
@@ -479,7 +479,7 @@ prior (ignored when using shrinkage prior) (inflation component)
 }
 Note that for the factor model, the hyperparameters \code{a.phi} and
 \code{a.zeta} have to be fixed and are not sampled using Metropolis-Hastings.
-There is also no triple Gamma prior as only one factor is present.}
+There is also no triple Gamma prior as only one factor is present}
 
 \item{mcmc.opt}{a list containing information on the overall sampler.
 The arguments are:
@@ -738,6 +738,14 @@ Important: To be consistent with the double Gamma prior, the parameters
 \eqn{\overset{\vee}{\xi_j^2}} and \eqn{\overset{\vee}{\tau_j^2}} are omitted
 from the output and only sampled internally during MCMC. However, they can
 be easily computed based on the above definitions.
+
+Finally, it should be mentioned that not only the double Gamma prior and the Bayesian
+Lasso prior are special cases of the triple Gamma prior, but also other well-known
+shrinkage priors such as the Strawderman-Berger prior and the Horseshoe prior
+arise as special cases of the triple Gamma prior. For obtaining the
+Strawderman-Berger prior, set \eqn{a=0.5, c = 1, \kappa = 4}. For obtaining the
+Horseshoe prior, set \eqn{a =0.5, c = 0.5}. The \eqn{\kappa} parameters can then either
+be learned (hierachical Horseshoe) or held fixed (Horseshoe) (see Cadonna et al., 2020).
 
 The function \code{panelTVP} can handle the following popular regression models
 \itemize{

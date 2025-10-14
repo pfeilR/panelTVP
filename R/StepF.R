@@ -162,14 +162,14 @@ sample_lambda <- function (y, fi, Time, timeidx, alpha, pri.lambda, sigma2){
     phi_lambda <- sample_GIG(a = pri.lambda$a.phi,
                              l = pri.lambda$kappa.phi,
                              par = alpha_lambda[1])
-    phi_lambda[phi_lambda>10^11]=10^11
-    phi_lambda[phi_lambda<0.1^15]=0.1^15
+    phi_lambda[phi_lambda>10^8]=10^8
+    phi_lambda[phi_lambda<0.1^8]=0.1^8
 
     zeta_lambda <- sample_GIG(a = pri.lambda$a.zeta,
                               l = pri.lambda$kappa.zeta,
                               par = alpha_lambda[2])
-    zeta_lambda[zeta_lambda>10^11]=10^11
-    zeta_lambda[zeta_lambda<0.1^15]=0.1^15
+    zeta_lambda[zeta_lambda>10^8]=10^8
+    zeta_lambda[zeta_lambda<0.1^8]=0.1^8
 
     pri.lambda$phi <- phi_lambda
     pri.lambda$zeta <- zeta_lambda
@@ -304,14 +304,14 @@ sample_lambda.PG <- function(z, zit, fi, Time, timeidx, alpha, pri.lambda, W.spa
     phi_lambda <- sample_GIG(a = pri.lambda$a.phi,
                              l = pri.lambda$kappa.phi,
                              par = alpha_lambda[1])
-    phi_lambda[phi_lambda>10^11]=10^11
-    phi_lambda[phi_lambda<0.1^15]=0.1^15
+    phi_lambda[phi_lambda>10^8]=10^8
+    phi_lambda[phi_lambda<0.1^8]=0.1^8
 
     zeta_lambda <- sample_GIG(a = pri.lambda$a.zeta,
                               l = pri.lambda$kappa.zeta,
                               par = alpha_lambda[2])
-    zeta_lambda[zeta_lambda>10^11]=10^11
-    zeta_lambda[zeta_lambda<0.1^11]=0.1^11
+    zeta_lambda[zeta_lambda>10^8]=10^8
+    zeta_lambda[zeta_lambda<0.1^8]=0.1^8
 
     pri.lambda$phi <- phi_lambda
     pri.lambda$zeta <- zeta_lambda

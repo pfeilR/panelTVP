@@ -100,8 +100,8 @@ stepR <- function(response,
             prior.reg$a.xi.accept[i] <- 0
           }
           prior.reg$a.xi <- a_xi_state[[1]]
-          prior.reg$a.xi[prior.reg$a.xi>10^11]=10^11
-          prior.reg$a.xi[prior.reg$a.xi<0.1^7]=0.1^7
+          prior.reg$a.xi[prior.reg$a.xi>10^8]=10^8
+          prior.reg$a.xi[prior.reg$a.xi<0.1^8]=0.1^8
           prior.reg$iota.a.xi <- a_xi_state[[2]]
 
         }
@@ -129,8 +129,8 @@ stepR <- function(response,
             prior.reg$a.tau.accept[i] <- 0
           }
           prior.reg$a.tau <- a_tau_state[[1]]
-          prior.reg$a.tau[prior.reg$a.tau>10^11]=10^11
-          prior.reg$a.tau[prior.reg$a.tau<0.1^7]=0.1^7
+          prior.reg$a.tau[prior.reg$a.tau>10^8]=10^8
+          prior.reg$a.tau[prior.reg$a.tau<0.1^8]=0.1^8
           prior.reg$iota.a.tau <- a_tau_state[[2]]
 
         }
@@ -141,13 +141,13 @@ stepR <- function(response,
 
         prior.reg$xi <- sample_GIG(a = prior.reg$a.xi, l = prior.reg$kappa.xi,
                                    par = alpha[(df$d+1):(2*df$d)])
-        prior.reg$xi[prior.reg$xi>10^11]=10^11
-        prior.reg$xi[prior.reg$xi<0.1^15]=0.1^15
+        prior.reg$xi[prior.reg$xi>10^8]=10^8
+        prior.reg$xi[prior.reg$xi<0.1^8]=0.1^8
 
         prior.reg$tau <- sample_GIG(a = prior.reg$a.tau, l = prior.reg$kappa.tau,
                                     par = alpha[1:df$d])
-        prior.reg$tau[prior.reg$tau>10^11]=10^11
-        prior.reg$tau[prior.reg$tau<0.1^15]=0.1^15
+        prior.reg$tau[prior.reg$tau>10^8]=10^8
+        prior.reg$tau[prior.reg$tau<0.1^8]=0.1^8
 
       ### Step DR-4c: Sample kappa_xi, kappa_tau ---------------------------------
 
@@ -157,8 +157,8 @@ stepR <- function(response,
                                        par = prior.reg$xi,
                                        prior_hp1 = prior.reg$d.xi,
                                        prior_hp2 = prior.reg$e.xi)
-        prior.reg$kappa.xi[prior.reg$kappa.xi>10^11]=10^11
-        prior.reg$kappa.xi[prior.reg$kappa.xi<0.1^15]=0.1^15
+        prior.reg$kappa.xi[prior.reg$kappa.xi>10^8]=10^8
+        prior.reg$kappa.xi[prior.reg$kappa.xi<0.1^8]=0.1^8
       }
 
       if(prior.reg$learn.kappa.tau){
@@ -167,8 +167,8 @@ stepR <- function(response,
                                         par = prior.reg$tau,
                                         prior_hp1 = prior.reg$d.tau,
                                         prior_hp2 = prior.reg$e.tau)
-        prior.reg$kappa.tau[prior.reg$kappa.tau>10^11]=10^11
-        prior.reg$kappa.tau[prior.reg$kappa.tau<0.1^15]=0.1^15
+        prior.reg$kappa.tau[prior.reg$kappa.tau>10^8]=10^8
+        prior.reg$kappa.tau[prior.reg$kappa.tau<0.1^8]=0.1^8
       }
 
     } else{ # Triple Gamma Prior
@@ -198,8 +198,8 @@ stepR <- function(response,
             prior.reg$a.xi.accept[i] <- 0
           }
           prior.reg$a.xi <- a_xi_state[[1]]
-          prior.reg$a.xi[prior.reg$a.xi>10^11]=10^11
-          prior.reg$a.xi[prior.reg$a.xi<0.1^7]=0.1^7
+          prior.reg$a.xi[prior.reg$a.xi>10^8]=10^8
+          prior.reg$a.xi[prior.reg$a.xi<0.1^8]=0.1^8
           prior.reg$iota.a.xi <- a_xi_state[[2]]
 
           # update ph.xi immediately
@@ -234,8 +234,8 @@ stepR <- function(response,
             prior.reg$a.tau.accept[i] <- 0
           }
           prior.reg$a.tau <- a_tau_state[[1]]
-          prior.reg$a.tau[prior.reg$a.tau>10^11]=10^11
-          prior.reg$a.tau[prior.reg$a.tau<0.1^7]=0.1^7
+          prior.reg$a.tau[prior.reg$a.tau>10^8]=10^8
+          prior.reg$a.tau[prior.reg$a.tau<0.1^8]=0.1^8
           prior.reg$iota.a.tau <- a_tau_state[[2]]
 
           # update ph.tau immediately
@@ -254,11 +254,15 @@ stepR <- function(response,
                                              k.check = prior.reg$kappa.xi.check,
                                              par = alpha[(df$d+1):(2*df$d)],
                                              ph = prior.reg$ph.xi)
+     prior.reg$xi.check[prior.reg$xi.check>10^8]=10^8
+     prior.reg$xi.check[prior.reg$xi.check<0.1^8]=0.1^8
 
      prior.reg$tau.check <- sample_GIG_triple(a = prior.reg$a.tau,
                                               k.check = prior.reg$kappa.tau.check,
                                               par = alpha[1:df$d],
                                               ph = prior.reg$ph.tau)
+     prior.reg$tau.check[prior.reg$tau.check>10^8]=10^8
+     prior.reg$tau.check[prior.reg$tau.check<0.1^8]=0.1^8
 
      ### Step TR-4c: sampling of c.xi and c.tau using MH steps
 
@@ -285,8 +289,8 @@ stepR <- function(response,
            prior.reg$c.xi.accept[i] <- 0
          }
          prior.reg$c.xi <- c_xi_state[[1]]
-         prior.reg$c.xi[prior.reg$c.xi>10^11]=10^11
-         prior.reg$c.xi[prior.reg$c.xi<0.1^7]=0.1^7
+         prior.reg$c.xi[prior.reg$c.xi>10^8]=10^8
+         prior.reg$c.xi[prior.reg$c.xi<0.1^8]=0.1^8
          prior.reg$iota.c.xi <- c_xi_state[[2]]
 
          # update ph.xi immediately
@@ -321,8 +325,8 @@ stepR <- function(response,
            prior.reg$c.tau.accept[i] <- 0
          }
          prior.reg$c.tau <- c_tau_state[[1]]
-         prior.reg$c.tau[prior.reg$c.tau>10^11]=10^11
-         prior.reg$c.tau[prior.reg$c.tau<0.1^7]=0.1^7
+         prior.reg$c.tau[prior.reg$c.tau>10^8]=10^8
+         prior.reg$c.tau[prior.reg$c.tau<0.1^8]=0.1^8
          prior.reg$iota.c.tau <- c_tau_state[[2]]
 
          # update ph.tau immediately
@@ -384,9 +388,14 @@ stepR <- function(response,
     prior.reg$xi <- var_update_triple(ph = prior.reg$ph.xi,
                                       v = prior.reg$xi.check,
                                       k = prior.reg$kappa.xi.check)
+    prior.reg$xi[prior.reg$xi>10^8]=10^8
+    prior.reg$xi[prior.reg$xi<0.1^8]=0.1^8
+
     prior.reg$tau <- var_update_triple(ph = prior.reg$ph.tau,
                                        v = prior.reg$tau.check,
                                        k = prior.reg$kappa.tau.check)
+    prior.reg$tau[prior.reg$tau>10^8]=10^8
+    prior.reg$tau[prior.reg$tau<0.1^8]=0.1^8
 
     }
 
@@ -903,7 +912,8 @@ MH_c_triple <- function(c, a, par, iota, prior_hp1, prior_hp2, k, var.check, acc
   z.old <- log(c/(0.5-c))
   z.star <- rnorm(1, mean = z.old, sd = iota)
   c.star <- 0.5*plogis(z.star)
-  if(c.star == 0.5) c.star <- c.star * (1-.Machine$double.eps)
+  eps <- 1e-08
+  c.star <- max(min(c.star, 0.5 - eps), eps)
 
   # compute the q-values
   log.q.old <- log_q_c_triple(c = c, a = a, par = par, b1 = prior_hp1, b2 = prior_hp2,

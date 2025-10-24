@@ -109,6 +109,11 @@
 #'    \item \code{TG}: Boolean indicating whether triple Gamma prior should be used;
 #'     when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
 #'     prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
+#'    \item \code{TG.alternative}: Boolean indicating whether the alternative
+#'     triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
+#'     be used. Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
+#'     and have to be set to fixed values. If \code{TG = FALSE}, this argument
+#'     is ignored
 #'   }
 #' @param prior.var a list of arguments for estimating the homoscedastic error variance
 #'  in a Gaussian / Normal model. For other models, this argument is ignored.
@@ -249,6 +254,11 @@
 #'     when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
 #'     prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
 #'     (count component)
+#'     \item \code{TG.alternative}: Boolean indicating whether the alternative
+#'      triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
+#'      be used. Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
+#'      and have to be set to fixed values. If \code{TG = FALSE}, this argument
+#'      is ignored
 #'   }
 #' @param prior.load_zinb.count A list of arguments for estimating the parameters of the factor
 #'  part of the count model. This argument is only used when \code{model = 'ZINB'} and
@@ -380,6 +390,11 @@
 #'     when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
 #'     prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
 #'     (inflation component)
+#'    \item \code{TG.alternative}: Boolean indicating whether the alternative
+#'     triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
+#'     be used. Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
+#'     and have to be set to fixed values. If \code{TG = FALSE}, this argument
+#'     is ignored
 #'   }
 #' @param prior.load_zinb.inflation A list of arguments for estimating the parameters of the factor
 #'  part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
@@ -587,13 +602,30 @@
 #'  from the output and only sampled internally during MCMC. However, they can
 #'  be easily computed based on the above definitions.
 #'
-#'  Finally, it should be mentioned that not only the double Gamma prior and the Bayesian
+#'  It should be stated that not only the double Gamma prior and the Bayesian
 #'  Lasso prior are special cases of the triple Gamma prior, but also other well-known
 #'  shrinkage priors such as the Strawderman-Berger prior and the Horseshoe prior
 #'  arise as special cases of the triple Gamma prior. For obtaining the
 #'  Strawderman-Berger prior, set \eqn{a=0.5, c = 1, \kappa = 4}. For obtaining the
 #'  Horseshoe prior, set \eqn{a =0.5, c = 0.5}. The \eqn{\kappa} parameters can then either
 #'  be learned (hierachical Horseshoe) or held fixed (Horseshoe) (see Cadonna et al., 2020).
+#'
+#'  Finally, there exists an alternative representation of the triple Gamma prior,
+#'  which was proposed by Knaus and Frühwirth-Schnatter (2025) and is given by
+#'  \deqn{
+#'   \begin{aligned}
+#'    \theta_j^2|\xi^2_j &\sim \mathcal{N}(0,\xi^2_j), \quad \xi^2_j|\chi^\xi_j,c^\xi \sim
+#'    \mathcal{G}^{-1}(c^\xi,\chi^\xi_j), \quad \chi_j^\xi|a^\xi,c^\xi \sim
+#'    \mathcal{G}\Biggl(a^\xi, \frac{a^\xi}{c^\xi}\Biggr), \\
+#'    \beta_j^2|\tau^2_j &\sim \mathcal{N}(0,\tau^2_j), \quad \tau^2_j|\chi^\tau_j,c^\tau \sim
+#'    \mathcal{G}^{-1}(c^\tau,\chi^\tau_j), \quad \chi_j^\tau|a^\tau,c^\tau \sim
+#'    \mathcal{G}\Biggl(a^\tau, \frac{a^\tau}{c^\tau}\Biggr).
+#'   \end{aligned}
+#'  }
+#'  This new representation of the Triple Gamma shrinkage prior fascilitates posterior inference
+#'  as the parameters are sampled from standard distributions.
+#'  Following Knaus and Frühwirth-Schnatter (2025), the hyperparameters \eqn{a} and \eqn{c}
+#'  are assumed to be fixed by the researcher.
 #'
 #'  The function \code{panelTVP} can handle the following popular regression models
 #'   \itemize{
@@ -820,6 +852,9 @@
 #'  Shrinkage in the Time-Varying Parameter Model Framework using the R Package
 #'  \code{shrinkTVP}. In: Journal of Statistical Software, 100, 1-32.
 #'
+#'  Knaus, P. Frühwirth-Schnatter, S. (2025). The Dynamic Triple Gamma as a Shrinakge
+#'  Process for Time-Varying Parameter Models, arXiv preprint arXiv:2312.10487v2.
+#'
 #'  Neal, R.M. (2003). Slice sampling. In: The Annals of Statistics, 31, 705-767.
 #'
 #'  Neelon, B. (2019). Bayesian Zero-Inflated Negative Binomial Regression Based
@@ -859,7 +894,7 @@ panelTVP <- function(formula = NULL,
                        learn.kappa.tau = TRUE, learn.kappa.xi = TRUE,
                        d.tau = 0.001, d.xi = 0.001,
                        e.tau = 0.001, e.xi = 0.001,
-                       type = "rw-t1", c = 1, B0 = 1, TG = FALSE
+                       type = "rw-t1", c = 1, B0 = 1, TG = FALSE, TG.alternative = FALSE
                      ),
                      prior.var = list(
                        learn.C0.hyp = list(g0 = 5, G0 = 3.333333), c0 = 2.5
@@ -889,7 +924,7 @@ panelTVP <- function(formula = NULL,
                        learn.kappa.tau = TRUE, learn.kappa.xi = TRUE,
                        d.tau = 0.001, d.xi = 0.001,
                        e.tau = 0.001, e.xi = 0.001,
-                       type = "rw-t1", c = 1, B0 = 1, TG = FALSE
+                       type = "rw-t1", c = 1, B0 = 1, TG = FALSE, TG.alternative = FALSE
                      ),
                      prior.load_zinb.count = list(
                        a.phi = 0.1, a.zeta = 0.1,
@@ -916,7 +951,7 @@ panelTVP <- function(formula = NULL,
                        learn.kappa.tau = TRUE, learn.kappa.xi = TRUE,
                        d.tau = 0.001, d.xi = 0.001,
                        e.tau = 0.001, e.xi = 0.001,
-                       type = "rw-t1", c = 1, B0 = 1, TG = FALSE
+                       type = "rw-t1", c = 1, B0 = 1, TG = FALSE, TG.alternative = FALSE
                      ),
                      prior.load_zinb.inflation = list(
                        a.phi = 0.1, a.zeta = 0.1,
@@ -1028,6 +1063,9 @@ panelTVP <- function(formula = NULL,
     if(!random.effects) result$learning.settings <- result$learning.settings[1:6,]
     if(!prior.reg$TG){
       result$learning.settings[3:4, 3] <- NA
+    }
+    if(prior.reg$TG && prior.reg$TG.alternative){
+      result$learning.settings[1:6, 3] <- NA
     }
     # adding mcmc setting to output (incl. ASIS Boolean)
     result$mcmc.settings <- mcmc.opt

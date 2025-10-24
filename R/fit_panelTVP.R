@@ -76,7 +76,7 @@ fit_panelTVP <- function(formula,
   prior.load$phi <- 1
   prior.load$zeta <- 1
 
-  if(prior.reg$TG){
+  if(prior.reg$TG && !prior.reg$TG.alternative){
     prior.reg$kappa.tau.check <- rep(1, df$d)
     prior.reg$kappa.xi.check <- rep(1, df$d)
     prior.reg$ph.tau <- (2*prior.reg$c.tau)/(prior.reg$kappa.tau*prior.reg$a.tau)
@@ -104,19 +104,24 @@ fit_panelTVP <- function(formula,
   }
   if(prior.reg$type == "ind"){
     cnames <- c("SimNr", namesbetat, namessgma2, nameslambdat)
-  } else{
-    if(prior.reg$TG){
+  } else if(prior.reg$TG && !prior.reg$TG.alternative){ # original Triple Gamma
       kappa.tau.j <- paste0("kappa.tau_", 1:df$d)
       kappa.xi.j <- paste0("kappa.xi_", 1:df$d)
       cnames <- c("SimNr",namesbetat, namesbeta, namestheta,
                   namestau, namesxi, c("a.tau","kappa.tau","a.xi","kappa.xi",
                                        "c.tau", kappa.tau.j, "c.xi", kappa.xi.j),
                   namessgma2, nameslambdat)
-    } else{
-      cnames <- c("SimNr",namesbetat, namesbeta, namestheta,
-                  namestau, namesxi, c("a.tau","kappa.tau","a.xi","kappa.xi"),
-                  namessgma2, nameslambdat)
-    }
+  } else if(prior.reg$TG && prior.reg$TG.alternative){ # alternative Triple Gamma
+        chi.tau.j <- paste0("chi.tau_", 1:df$d)
+        chi.xi.j <- paste0("chi.xi_", 1:df$d)
+        cnames <- c("SimNr", namesbetat, namesbeta, namestheta,
+                    namestau, namesxi, c("a.tau", "a.xi", "c.tau", "c.xi",
+                                         chi.tau.j, chi.xi.j),
+                    namessgma2, nameslambdat)
+  } else{ # double Gamma
+    cnames <- c("SimNr",namesbetat, namesbeta, namestheta,
+                namestau, namesxi, c("a.tau","kappa.tau","a.xi","kappa.xi"),
+                namessgma2, nameslambdat)
   }
   if(prior.load$type=="rw1" | prior.load$type=="rw2"){
     cnames <- c(cnames,"lambda","psi","phi2","zeta2", "a.phi", "kappa.phi", "a.zeta", "kappa.zeta")
@@ -140,19 +145,23 @@ fit_panelTVP <- function(formula,
   # initialize acceptance rates
 
   ## r (negative binomial dispersion parameter)
-  settings.NegBin$r.accept <- c()
-  settings.NegBin$r.accept[1] <- 1 # we let metropolis start in 2nd iteration
+  if(model == "NegBin"){
+    settings.NegBin$r.accept <- c()
+    settings.NegBin$r.accept[1] <- 1 # we let metropolis start in 2nd iteration
+  }
 
   ## regression part
-  prior.reg$a.xi.accept <- c()
-  prior.reg$a.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
-  prior.reg$a.tau.accept <- c()
-  prior.reg$a.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
-  if(prior.reg$TG){
-    prior.reg$c.xi.accept <- c()
-    prior.reg$c.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
-    prior.reg$c.tau.accept <- c()
-    prior.reg$c.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+  if(prior.reg$type != "ind" && !prior.reg$TG.alternative){
+    prior.reg$a.xi.accept <- c()
+    prior.reg$a.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    prior.reg$a.tau.accept <- c()
+    prior.reg$a.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    if(prior.reg$TG){
+      prior.reg$c.xi.accept <- c()
+      prior.reg$c.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
+      prior.reg$c.tau.accept <- c()
+      prior.reg$c.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    }
   }
 
   # fitting the model ----------------------------------------------------------

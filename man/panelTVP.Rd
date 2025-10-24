@@ -18,7 +18,7 @@ panelTVP(
     0.44, target.rate.c.xi = 0.44, kappa.tau = 10, kappa.xi = 10, learn.kappa.tau = TRUE,
     learn.kappa.xi = TRUE, 
      d.tau = 0.001, d.xi = 0.001, e.tau = 0.001, e.xi =
-    0.001, type = "rw-t1", c = 1, B0 = 1, TG = FALSE),
+    0.001, type = "rw-t1", c = 1, B0 = 1, TG = FALSE, TG.alternative = FALSE),
   prior.var = list(learn.C0.hyp = list(g0 = 5, G0 = 3.333333), c0 = 2.5),
   prior.load = list(a.phi = 0.1, a.zeta = 0.1, kappa.phi = 10, kappa.zeta = 10,
     learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE, d.phi = 0.001, d.zeta = 0.001, e.phi
@@ -31,7 +31,7 @@ panelTVP(
     0.44, target.rate.c.xi = 0.44, kappa.tau = 10, kappa.xi = 10, learn.kappa.tau = TRUE,
     learn.kappa.xi = TRUE, 
      d.tau = 0.001, d.xi = 0.001, e.tau = 0.001, e.xi =
-    0.001, type = "rw-t1", c = 1, B0 = 1, TG = FALSE),
+    0.001, type = "rw-t1", c = 1, B0 = 1, TG = FALSE, TG.alternative = FALSE),
   prior.load_zinb.count = list(a.phi = 0.1, a.zeta = 0.1, kappa.phi = 10, kappa.zeta =
     10, learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE, d.phi = 0.001, d.zeta = 0.001,
     e.phi = 0.001, e.zeta = 0.001, type = "rw-t1", c = 1, L0 = 1),
@@ -43,7 +43,7 @@ panelTVP(
     0.44, target.rate.c.xi = 0.44, kappa.tau = 10, kappa.xi = 10, learn.kappa.tau = TRUE,
     learn.kappa.xi = TRUE, 
      d.tau = 0.001, d.xi = 0.001, e.tau = 0.001, e.xi =
-    0.001, type = "rw-t1", c = 1, B0 = 1, TG = FALSE),
+    0.001, type = "rw-t1", c = 1, B0 = 1, TG = FALSE, TG.alternative = FALSE),
   prior.load_zinb.inflation = list(a.phi = 0.1, a.zeta = 0.1, kappa.phi = 10, kappa.zeta
     = 10, learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE, d.phi = 0.001, d.zeta = 0.001,
     e.phi = 0.001, e.zeta = 0.001, type = "rw-t1", c = 1, L0 = 1),
@@ -171,6 +171,11 @@ independence prior (ignored when using shrinkage prior)
 \item \code{TG}: Boolean indicating whether triple Gamma prior should be used;
 when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
 prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
+\item \code{TG.alternative}: Boolean indicating whether the alternative
+triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
+be used. Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
+and have to be set to fixed values. If \code{TG = FALSE}, this argument
+is ignored
 }}
 
 \item{prior.var}{a list of arguments for estimating the homoscedastic error variance
@@ -314,6 +319,11 @@ independence prior (ignored when using shrinkage prior) (count component)
 when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
 prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
 (count component)
+\item \code{TG.alternative}: Boolean indicating whether the alternative
+triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
+be used. Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
+and have to be set to fixed values. If \code{TG = FALSE}, this argument
+is ignored
 }}
 
 \item{prior.load_zinb.count}{A list of arguments for estimating the parameters of the factor
@@ -447,6 +457,11 @@ independence prior (ignored when using shrinkage prior) (inflation component)
 when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
 prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
 (inflation component)
+\item \code{TG.alternative}: Boolean indicating whether the alternative
+triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
+be used. Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
+and have to be set to fixed values. If \code{TG = FALSE}, this argument
+is ignored
 }}
 
 \item{prior.load_zinb.inflation}{A list of arguments for estimating the parameters of the factor
@@ -739,13 +754,30 @@ Important: To be consistent with the double Gamma prior, the parameters
 from the output and only sampled internally during MCMC. However, they can
 be easily computed based on the above definitions.
 
-Finally, it should be mentioned that not only the double Gamma prior and the Bayesian
+It should be stated that not only the double Gamma prior and the Bayesian
 Lasso prior are special cases of the triple Gamma prior, but also other well-known
 shrinkage priors such as the Strawderman-Berger prior and the Horseshoe prior
 arise as special cases of the triple Gamma prior. For obtaining the
 Strawderman-Berger prior, set \eqn{a=0.5, c = 1, \kappa = 4}. For obtaining the
 Horseshoe prior, set \eqn{a =0.5, c = 0.5}. The \eqn{\kappa} parameters can then either
 be learned (hierachical Horseshoe) or held fixed (Horseshoe) (see Cadonna et al., 2020).
+
+Finally, there exists an alternative representation of the triple Gamma prior,
+which was proposed by Knaus and Frühwirth-Schnatter (2025) and is given by
+\deqn{
+  \begin{aligned}
+   \theta_j^2|\xi^2_j &\sim \mathcal{N}(0,\xi^2_j), \quad \xi^2_j|\chi^\xi_j,c^\xi \sim
+   \mathcal{G}^{-1}(c^\xi,\chi^\xi_j), \quad \chi_j^\xi|a^\xi,c^\xi \sim
+   \mathcal{G}\Biggl(a^\xi, \frac{a^\xi}{c^\xi}\Biggr), \\
+   \beta_j^2|\tau^2_j &\sim \mathcal{N}(0,\tau^2_j), \quad \tau^2_j|\chi^\tau_j,c^\tau \sim
+   \mathcal{G}^{-1}(c^\tau,\chi^\tau_j), \quad \chi_j^\tau|a^\tau,c^\tau \sim
+   \mathcal{G}\Biggl(a^\tau, \frac{a^\tau}{c^\tau}\Biggr).
+  \end{aligned}
+ }
+This new representation of the Triple Gamma shrinkage prior fascilitates posterior inference
+as the parameters are sampled from standard distributions.
+Following Knaus and Frühwirth-Schnatter (2025), the hyperparameters \eqn{a} and \eqn{c}
+are assumed to be fixed by the researcher.
 
 The function \code{panelTVP} can handle the following popular regression models
 \itemize{
@@ -891,6 +923,9 @@ of Econometrics, 154, 85-100.
 Knaus, P., Bitto-Nemling, A., Cadonna, A. and Frühwirth-Schnatter, S. (2021).
 Shrinkage in the Time-Varying Parameter Model Framework using the R Package
 \code{shrinkTVP}. In: Journal of Statistical Software, 100, 1-32.
+
+Knaus, P. Frühwirth-Schnatter, S. (2025). The Dynamic Triple Gamma as a Shrinakge
+Process for Time-Varying Parameter Models, arXiv preprint arXiv:2312.10487v2.
 
 Neal, R.M. (2003). Slice sampling. In: The Annals of Statistics, 31, 705-767.
 

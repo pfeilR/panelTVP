@@ -171,7 +171,7 @@ stepR <- function(response,
         prior.reg$kappa.tau[prior.reg$kappa.tau<0.1^8]=0.1^8
       }
 
-    } else{ # Triple Gamma Prior
+    } else if(!prior.reg$TG.alternative){ # original Triple Gamma Prior
 
       ### Step TR-4a: sample a_tau and a_xi  -----------------------------------
 
@@ -396,6 +396,32 @@ stepR <- function(response,
                                        k = prior.reg$kappa.tau.check)
     prior.reg$tau[prior.reg$tau>10^8]=10^8
     prior.reg$tau[prior.reg$tau<0.1^8]=0.1^8
+
+    } else{ # new representation of Triple Gamma
+
+      # Sampling of hyperparameters chi.xi.j and chi.tau.j
+      prior.reg$chi.xi.j <- rgamma(df$d,
+                                   prior.reg$a.xi + prior.reg$c.xi,
+                                   prior.reg$a.xi/prior.reg$c.xi + 1/prior.reg$xi)
+      prior.reg$chi.xi.j[prior.reg$chi.xi.j>10^8]=10^8
+      prior.reg$chi.xi.j[prior.reg$chi.xi.j<0.1^8]=0.1^8
+
+      prior.reg$chi.tau.j <- rgamma(df$d,
+                                    prior.reg$a.tau + prior.reg$c.tau,
+                                    prior.reg$a.tau/prior.reg$c.tau + 1/prior.reg$tau)
+      prior.reg$chi.tau.j[prior.reg$chi.tau.j>10^8]=10^8
+      prior.reg$chi.tau.j[prior.reg$chi.tau.j<0.1^8]=0.1^8
+
+      # Sampling of xi and tau
+      prior.reg$xi <- 1/rgamma(df$d, prior.reg$c.xi + 0.5,
+                               prior.reg$chi.xi.j + (alpha[(df$d+1):(2*df$d)]^2)/2)
+      prior.reg$xi[prior.reg$xi>10^8]=10^8
+      prior.reg$xi[prior.reg$xi<0.1^8]=0.1^8
+
+      prior.reg$tau <- 1/rgamma(df$d, prior.reg$c.tau + 0.5,
+                               prior.reg$chi.tau.j + (alpha[1:df$d]^2)/2)
+      prior.reg$tau[prior.reg$tau>10^8]=10^8
+      prior.reg$tau[prior.reg$tau<0.1^8]=0.1^8
 
     }
 

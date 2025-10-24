@@ -293,6 +293,9 @@ check.prior.reg <- function(prior.reg){
   if(is.null(prior.reg$TG) || !is.logical(prior.reg$TG) || length(prior.reg$TG) != 1){
     stop("Argument TG in regression prior must be a logical scalar.")
   }
+  if(is.null(prior.reg$TG.alternative) || !is.logical(prior.reg$TG.alternative) || length(prior.reg$TG.alternative) != 1){
+    stop("Argument TG in regression prior must be a logical scalar.")
+  }
   if(prior.reg$TG && prior.reg$type == "ind"){
     warning("Triple Gamma shrinkage will not be applied as you have selected an independence prior.")
   }
@@ -301,6 +304,9 @@ check.prior.reg <- function(prior.reg){
                       prior.reg$c.tau >= 0.5 || prior.reg$c.tau <= 0 ||
                       prior.reg$c.xi >= 0.5 || prior.reg$c.xi <= 0)){
     warning("Arguments 'a.tau', 'a.xi', 'c.tau' and 'c.xi' have support on (0, 0.5) when using the triple Gamma prior and when learning those parameters! Setting them at fixed values, e.g., for Strawderman-Berger prior is fine.")
+  }
+  if(!prior.reg$TG && prior.reg$TG.alternative){
+    stop("The alternative Triple Gamma priori requires argument TG to be TRUE as well.")
   }
 }
 

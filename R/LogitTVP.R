@@ -110,7 +110,7 @@ LogitTVP <- function(df,
 
       if(prior.reg$type %in% c("rw1", "rw2")){ # shrinkage
 
-        if(prior.reg$TG){ # triple Gamma
+        if(prior.reg$TG && !prior.reg$TG.alternative){ # triple Gamma
 
           res.i <- c(i,
                      betat,
@@ -126,6 +126,23 @@ LogitTVP <- function(df,
                      prior.reg$kappa.tau.check,
                      prior.reg$c.xi,
                      prior.reg$kappa.xi.check,
+                     0,
+                     lambda)
+
+        } else if(prior.reg$TG && prior.reg$TG.alternative){
+
+          res.i <- c(i,
+                     betat,
+                     alpha[1:df$d],
+                     alpha[(df$d+1):(2*df$d)],
+                     prior.reg$tau,
+                     prior.reg$xi,
+                     prior.reg$a.tau,
+                     prior.reg$a.xi,
+                     prior.reg$c.tau,
+                     prior.reg$c.xi,
+                     prior.reg$chi.tau.j,
+                     prior.reg$chi.xi.j,
                      0,
                      lambda)
 
@@ -215,17 +232,21 @@ LogitTVP <- function(df,
   Y <- Y[,seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)]
 
   # computing acceptance rates of Metropolis-based parameters
-  acceptance.rates <- matrix(nrow = 1, ncol = 4)
-  acceptance.rates[,1] <- accept.rate(accept = prior.reg$a.xi.accept, mcmc.opt = mcmc.opt)
-  acceptance.rates[,2] <- accept.rate(accept = prior.reg$a.tau.accept, mcmc.opt = mcmc.opt)
-  if(prior.reg$TG){
-    acceptance.rates[,3] <- accept.rate(accept = prior.reg$c.xi.accept, mcmc.opt = mcmc.opt)
-    acceptance.rates[,4] <- accept.rate(accept = prior.reg$c.tau.accept, mcmc.opt = mcmc.opt)
+  if(prior.reg$type != "ind" && !prior.reg$TG.alternative){
+    acceptance.rates <- matrix(nrow = 1, ncol = 4)
+    acceptance.rates[,1] <- accept.rate(accept = prior.reg$a.xi.accept, mcmc.opt = mcmc.opt)
+    acceptance.rates[,2] <- accept.rate(accept = prior.reg$a.tau.accept, mcmc.opt = mcmc.opt)
+    if(prior.reg$TG){
+      acceptance.rates[,3] <- accept.rate(accept = prior.reg$c.xi.accept, mcmc.opt = mcmc.opt)
+      acceptance.rates[,4] <- accept.rate(accept = prior.reg$c.tau.accept, mcmc.opt = mcmc.opt)
+    } else{
+      acceptance.rates[,3] <- NA
+      acceptance.rates[,4] <- NA
+    }
+    colnames(acceptance.rates) <- c("a.xi", "a.tau", "c.xi", "c.tau")
   } else{
-    acceptance.rates[,3] <- NA
-    acceptance.rates[,4] <- NA
+    acceptance.rates <- NULL
   }
-  colnames(acceptance.rates) <- c("a.xi", "a.tau", "c.xi", "c.tau")
 
   # return
   df$y[miss] <- NA

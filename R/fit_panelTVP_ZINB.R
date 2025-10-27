@@ -25,7 +25,7 @@ fit_panelTVP_ZINB <- function(formula,
   }
 
   if(any(colnames(data) == "t")) dat <- data[,names(data) != "t"]
-  if(any(colnames(dat) == "id")) dat <- dat[,names(dat) != "id"]
+  if(any(colnames(data) == "id")) dat <- data[,names(data) != "id"]
 
   resp <- all.vars(formula)[1]
   miss <- ifelse(is.na(data[,resp]), TRUE, FALSE)
@@ -102,6 +102,24 @@ fit_panelTVP_ZINB <- function(formula,
   prior.load_logit$phi <- 1
   prior.load_logit$zeta <- 1
 
+  if(prior.reg_nb$TG && !prior.reg_nb$TG.alternative){
+    prior.reg_nb$kappa.tau.check <- rep(1, df$d_nb)
+    prior.reg_nb$kappa.xi.check <- rep(1, df$d_nb)
+    prior.reg_nb$ph.tau <- (2*prior.reg_nb$c.tau)/(prior.reg_nb$kappa.tau*prior.reg_nb$a.tau)
+    prior.reg_nb$ph.xi <- (2*prior.reg_nb$c.xi)/(prior.reg_nb$kappa.xi*prior.reg_nb$a.xi)
+    prior.reg_nb$tau.check <- (prior.reg_nb$tau*prior.reg_nb$kappa.tau.check)/prior.reg_nb$ph.tau
+    prior.reg_nb$xi.check <- (prior.reg_nb$xi*prior.reg_nb$kappa.xi.check)/prior.reg_nb$ph.xi
+  }
+
+  if(prior.reg_logit$TG && !prior.reg_logit$TG.alternative){
+    prior.reg_logit$kappa.tau.check <- rep(1, df$d_logit)
+    prior.reg_logit$kappa.xi.check <- rep(1, df$d_logit)
+    prior.reg_logit$ph.tau <- (2*prior.reg_logit$c.tau)/(prior.reg_logit$kappa.tau*prior.reg_logit$a.tau)
+    prior.reg_logit$ph.xi <- (2*prior.reg_logit$c.xi)/(prior.reg_logit$kappa.xi*prior.reg_logit$a.xi)
+    prior.reg_logit$tau.check <- (prior.reg_logit$tau*prior.reg_logit$kappa.tau.check)/prior.reg_logit$ph.tau
+    prior.reg_logit$xi.check <- (prior.reg_logit$xi*prior.reg_logit$kappa.xi.check)/prior.reg_logit$ph.xi
+  }
+
   #-----------------------------------------------------------------------------
   # create return matrix for the MCMC samples
 
@@ -131,12 +149,26 @@ fit_panelTVP_ZINB <- function(formula,
   }
   if(prior.reg_nb$type == "ind"){
     cnames_nb <- c("SimNr", namesbetat_nb, nameslambdat_nb)
-  } else{
+  } else if(prior.reg_nb$TG && !prior.reg_nb$TG.alternative){ # original Triple Gamma
+      kappa.tau.j_nb <- paste0("kappa.tau_", 1:df$d_nb)
+      kappa.xi.j_nb <- paste0("kappa.xi_", 1:df$d_nb)
+      cnames_nb <- c("SimNr",namesbetat_nb, namesbeta_nb, namestheta_nb,
+                     namestau_nb, namesxi_nb, c("a.tau","kappa.tau","a.xi","kappa.xi",
+                                                "c.tau", kappa.tau.j_nb, "c.xi", kappa.xi.j_nb),
+                     nameslambdat_nb)
+  } else if(prior.reg_nb$TG && prior.reg_nb$TG.alternative){ # alternative Triple Gamma
+      chi.tau.j_nb <- paste0("chi.tau_", 1:df$d_nb)
+      chi.xi.j_nb <- paste0("chi.xi_", 1:df$d_nb)
+      cnames_nb <- c("SimNr", namesbetat_nb, namesbeta_nb, namestheta_nb,
+                  namestau_nb, namesxi_nb, c("a.tau", "a.xi", "c.tau", "c.xi",
+                                             chi.tau.j_nb, chi.xi.j_nb),
+                  nameslambdat_nb)
+  } else{ # double Gamma
     cnames_nb <- c("SimNr",namesbetat_nb, namesbeta_nb, namestheta_nb,
                    namestau_nb, namesxi_nb, c("a.tau","kappa.tau","a.xi","kappa.xi"),
                    nameslambdat_nb)
   }
-  if(prior.load_nb$type=="rw1" | prior.load_nb$type=="rw2"){
+  if(prior.load_nb$type=="rw1" || prior.load_nb$type=="rw2"){
     cnames_nb <- c(cnames_nb,"lambda","psi","phi2","zeta2", "a.phi", "kappa.phi",
                    "a.zeta", "kappa.zeta")
   }
@@ -151,13 +183,27 @@ fit_panelTVP_ZINB <- function(formula,
   }
   if(prior.reg_logit$type == "ind"){
     cnames_logit <- c("SimNr", namesbetat_logit, nameslambdat_logit)
-  } else{
+  } else if(prior.reg_logit$TG && !prior.reg_logit$TG.alternative){ # original Triple Gamma
+    kappa.tau.j_logit <- paste0("kappa.tau_", 1:df$d_logit)
+    kappa.xi.j_logit <- paste0("kappa.xi_", 1:df$d_logit)
     cnames_logit <- c("SimNr",namesbetat_logit, namesbeta_logit, namestheta_logit,
-                      namestau_logit, namesxi_logit, c("a.tau","kappa.tau","a.xi","kappa.xi"),
-                      nameslambdat_logit)
+                   namestau_logit, namesxi_logit, c("a.tau","kappa.tau","a.xi","kappa.xi",
+                                              "c.tau", kappa.tau.j_logit, "c.xi", kappa.xi.j_logit),
+                   nameslambdat_logit)
+  } else if(prior.reg_logit$TG && prior.reg_logit$TG.alternative){ # alternative Triple Gamma
+    chi.tau.j_logit <- paste0("chi.tau_", 1:df$d_logit)
+    chi.xi.j_logit <- paste0("chi.xi_", 1:df$d_logit)
+    cnames_logit <- c("SimNr", namesbetat_logit, namesbeta_logit, namestheta_logit,
+                   namestau_logit, namesxi_logit, c("a.tau", "a.xi", "c.tau", "c.xi",
+                                              chi.tau.j_logit, chi.xi.j_logit),
+                   nameslambdat_logit)
+  } else{ # double Gamma
+    cnames_logit <- c("SimNr",namesbetat_logit, namesbeta_logit, namestheta_logit,
+                   namestau_logit, namesxi_logit, c("a.tau","kappa.tau","a.xi","kappa.xi"),
+                   nameslambdat_logit)
   }
   col_res_logit <- length(cnames_logit)
-  if(prior.load_logit$type=="rw1" | prior.load_logit$type=="rw2"){
+  if(prior.load_logit$type=="rw1" || prior.load_logit$type=="rw2"){
     cnames_logit <- c(cnames_logit,"lambda","psi","phi2","zeta2", "a.phi", "kappa.phi",
                       "a.zeta", "kappa.zeta")
     col_res_logit <- length(cnames_logit)
@@ -176,14 +222,30 @@ fit_panelTVP_ZINB <- function(formula,
   settings.NegBin$r.accept <- c()
 
   ## regression part
-  prior.reg_nb$xi.accept <- c()
-  prior.reg_nb$xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
-  prior.reg_nb$tau.accept <- c()
-  prior.reg_nb$tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
-  prior.reg_logit$xi.accept <- c()
-  prior.reg_logit$xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
-  prior.reg_logit$tau.accept <- c()
-  prior.reg_logit$tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+  if(prior.reg_nb$type != "ind" && !prior.reg_nb$TG.alternative){
+    prior.reg_nb$a.xi.accept <- c()
+    prior.reg_nb$a.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    prior.reg_nb$a.tau.accept <- c()
+    prior.reg_nb$a.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    if(prior.reg_nb$TG){
+      prior.reg_nb$c.xi.accept <- c()
+      prior.reg_nb$c.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
+      prior.reg_nb$c.tau.accept <- c()
+      prior.reg_nb$c.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    }
+  }
+  if(prior.reg_logit$type != "ind" && !prior.reg_logit$TG.alternative){
+    prior.reg_logit$a.xi.accept <- c()
+    prior.reg_logit$a.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    prior.reg_logit$a.tau.accept <- c()
+    prior.reg_logit$a.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    if(prior.reg_logit$TG){
+      prior.reg_logit$c.xi.accept <- c()
+      prior.reg_logit$c.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
+      prior.reg_logit$c.tau.accept <- c()
+      prior.reg_logit$c.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    }
+  }
 
   # Fitting the ZINB model
 

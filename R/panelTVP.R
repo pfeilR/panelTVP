@@ -25,22 +25,24 @@
 #'     (double Gamma, triple Gamma)
 #'    \item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.tau} used as starting value, if FALSE
-#'     \eqn{a^\tau =} \code{a.tau}
+#'     \eqn{a^\tau =} \code{a.tau} (not learned under alternative triple Gamma)
 #'    \item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.xi} used as starting value, if FALSE
-#'     \eqn{a^\xi =} \code{a.xi}
+#'     \eqn{a^\xi =} \code{a.xi} (not learned under alternative triple Gamma)
 #'     \item \code{alpha.a.tau}: hyperparameter for learning \eqn{a^\tau}
-#'      (double Gamma, triple Gamma)
+#'      (argument is ignored when \code{learn.a.tau = FALSE})
 #'     \item \code{alpha.a.xi}: hyperparameter for learning \eqn{a^\xi}
-#'      (double Gamma, triple Gamma)
+#'      (argument is ignored when \code{learn.a.xi = FALSE})
 #'     \item \code{beta.a.tau}: hyperparameter for learning \eqn{a^\tau}
-#'      (double Gamma, triple Gamma)
+#'      (argument is ignored when \code{learn.a.tau = FALSE})
 #'     \item \code{beta.a.xi}: hyperparameter for learning \eqn{a^\xi}
-#'      (double Gamma, triple Gamma)
+#'      (argument is ignored when \code{learn.a.xi = FALSE})
 #'    \item \code{iota.a.tau}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\tau}
+#'     updating of \eqn{a^\tau} (argument is ignored when
+#'     \code{learn.a.tau = FALSE})
 #'    \item \code{iota.a.xi}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\xi}
+#'     updating of \eqn{a^\xi} (argument is ignored when
+#'     \code{learn.a.xi = FALSE})
 #'    \item \code{target.rate.a.tau}: desired acceptance rate when updating
 #'     \eqn{a^\tau} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.a.tau = FALSE})
@@ -53,18 +55,18 @@
 #'     (only triple Gamma)
 #'    \item \code{learn.c.tau}: if TRUE \eqn{c^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.tau} used as starting value, if FALSE
-#'     \eqn{c^\tau =} \code{c.tau}
+#'     \eqn{c^\tau =} \code{c.tau} (not learned under alternative triple Gamma)
 #'    \item \code{learn.c.xi}: if TRUE \eqn{c^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.xi} used as starting value, if FALSE
-#'     \eqn{c^\xi =} \code{c.xi}
+#'     \eqn{c^\xi =} \code{c.xi} (not learned under alternative triple Gamma)
 #'     \item \code{alpha.c.tau}: hyperparameter for learning \eqn{c^\tau}
-#'      (only triple Gamma)
+#'      (argument is ignored when \code{learn.c.tau = FALSE})
 #'     \item \code{alpha.c.xi}: hyperparameter for learning \eqn{c^\xi}
-#'      (only triple Gamma)
+#'      (argument is ignored when \code{learn.c.xi = FALSE})
 #'     \item \code{beta.c.tau}: hyperparameter for learning \eqn{c^\tau}
-#'      (only triple Gamma)
+#'      (argument is ignored when \code{learn.c.tau = FALSE})
 #'     \item \code{beta.c.xi}: hyperparameter for learning \eqn{c^\xi}
-#'      (only triple Gamma)
+#'      (argument is ignored when \code{learn.c.xi = FALSE})
 #'    \item \code{iota.c.tau}: proposal standard deviation for Metropolis-Hastings
 #'     updating of \eqn{c^\tau}
 #'    \item \code{iota.c.xi}: proposal standard deviation for Metropolis-Hastings
@@ -76,11 +78,11 @@
 #'     \eqn{c^\xi} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.c.xi = FALSE})
 #'    \item \code{kappa.tau}: hyperparameter for learning \eqn{\tau^2_j}
-#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     (double Gamma, original triple Gamma). Note that this is the global parameter.
 #'     The component-specific parameters are learned automatically when triple
 #'     Gamma prior is selected
 #'    \item \code{kappa.xi}: hyperparameter for learning \eqn{\xi^2_j}
-#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     (double Gamma, original triple Gamma). Note that this is the global parameter.
 #'     The component-specific parameters are learned automatically when triple
 #'     Gamma prior is selected
 #'    \item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
@@ -92,12 +94,12 @@
 #'    \item \code{d.tau}: hyperparameter for learning \eqn{\kappa^\tau}
 #'     (only double Gamma)
 #'    \item \code{e.tau}: hyperparameter for learning \eqn{\kappa^\tau}
-#'     (double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+#'     (double Gamma, original triple Gamma prior). Note that under triple Gamma shrinkage
 #'     this parameter is only the starting value as it is learned during MCMC
 #'    \item \code{d.xi}: hyperparameter for learning \eqn{\kappa^\xi}
 #'     (only double Gamma)
 #'    \item \code{e.xi}: hyperparameter for learning \eqn{\kappa^\xi}
-#'     (double Gamma, triple Gamma). Note that under triple Gamma shrinkage
+#'     (double Gamma, original triple Gamma). Note that under triple Gamma shrinkage
 #'     this parameter is only the starting value as it is learned during MCMC
 #'    \item \code{type}: the type of prior you want on your regression effects;
 #'     this argument is either "rw-t0" (shrinkage prior starting at T = 0),
@@ -111,9 +113,11 @@
 #'     prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
 #'    \item \code{TG.alternative}: Boolean indicating whether the alternative
 #'     triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
-#'     be used. Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
-#'     and have to be set to fixed values. If \code{TG = FALSE}, this argument
-#'     is ignored
+#'     be used. If \code{TG.alternative = FALSE}, the original triple Gamma
+#'     representation based on Cadonna et al. (2020) will be used instead.
+#'     Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
+#'     and have to be set to fixed values in the alternative representation.
+#'     If \code{TG = FALSE}, this argument is ignored
 #'   }
 #' @param prior.var a list of arguments for estimating the homoscedastic error variance
 #'  in a Gaussian / Normal model. For other models, this argument is ignored.
@@ -165,22 +169,26 @@
 #'     (double Gamma, triple Gamma) (count component)
 #'    \item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.tau} used as starting value, if FALSE
-#'     \eqn{a^\tau =} \code{a.tau} (count component)
+#'     \eqn{a^\tau =} \code{a.tau} (not learned under alternative triple Gamma)
+#'     (count component)
 #'    \item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.xi} used as starting value, if FALSE
-#'     \eqn{a^\xi =} \code{a.xi} (count component)
+#'     \eqn{a^\xi =} \code{a.xi} (not learned under alternative triple Gamma)
+#'      (count component)
 #'     \item \code{alpha.a.tau}: hyperparameter for learning \eqn{a^\tau}
-#'      (double Gamma, triple Gamma) (count component)
+#'      (argument is ignored when \code{learn.a.tau = FALSE}) (count component)
 #'     \item \code{alpha.a.xi}: hyperparameter for learning \eqn{a^\xi}
-#'      (double Gamma, triple Gamma) (count component)
+#'      (argument is ignored when \code{learn.a.xi = FALSE}) (count component)
 #'     \item \code{beta.a.tau}: hyperparameter for learning \eqn{a^\tau}
-#'      (double Gamma, triple Gamma) (count component)
+#'      (argument is ignored when \code{learn.a.tau = FALSE}) (count component)
 #'     \item \code{beta.a.xi}: hyperparameter for learning \eqn{a^\xi}
-#'      (double Gamma, triple Gamma) (count component)
+#'      (argument is ignored when \code{learn.a.xi = FALSE}) (count component)
 #'    \item \code{iota.a.tau}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\tau} (count component)
+#'     updating of \eqn{a^\tau} (argument is ignored when
+#'     \code{learn.a.tau = FALSE}) (count component)
 #'    \item \code{iota.a.xi}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\xi} (count component)
+#'     updating of \eqn{a^\xi} (argument is ignored when
+#'     \code{learn.a.xi = FALSE}) (count component)
 #'    \item \code{target.rate.a.tau}: desired acceptance rate when updating
 #'     \eqn{a^\tau} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.a.tau = FALSE}) (count component)
@@ -193,18 +201,20 @@
 #'     (only triple Gamma) (count component)
 #'    \item \code{learn.c.tau}: if TRUE \eqn{c^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.tau} used as starting value, if FALSE
-#'     \eqn{c^\tau =} \code{c.tau} (count component)
+#'     \eqn{c^\tau =} \code{c.tau} (not learned under alternative triple Gamma)
+#'      (count component)
 #'    \item \code{learn.c.xi}: if TRUE \eqn{c^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.xi} used as starting value, if FALSE
-#'     \eqn{c^\xi =} \code{c.xi} (count component)
+#'     \eqn{c^\xi =} \code{c.xi} (not learned under alternative triple Gamma)
+#'      (count component)
 #'     \item \code{alpha.c.tau}: hyperparameter for learning \eqn{c^\tau}
-#'      (only triple Gamma) (count component)
+#'      (argument is ignored when \code{learn.c.tau = FALSE}) (count component)
 #'     \item \code{alpha.c.xi}: hyperparameter for learning \eqn{c^\xi}
-#'      (only triple Gamma) (count component)
+#'      (argument is ignored when \code{learn.c.xi = FALSE}) (count component)
 #'     \item \code{beta.c.tau}: hyperparameter for learning \eqn{c^\tau}
-#'      (only triple Gamma) (count component)
+#'      (argument is ignored when \code{learn.c.tau = FALSE}) (count component)
 #'     \item \code{beta.c.xi}: hyperparameter for learning \eqn{c^\xi}
-#'      (only triple Gamma) (count component)
+#'      (argument is ignored when \code{learn.c.xi = FALSE}) (count component)
 #'    \item \code{iota.c.tau}: proposal standard deviation for Metropolis-Hastings
 #'     updating of \eqn{c^\tau} (count component)
 #'    \item \code{iota.c.xi}: proposal standard deviation for Metropolis-Hastings
@@ -216,11 +226,11 @@
 #'     \eqn{c^\xi} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.c.xi = FALSE}) (count component)
 #'    \item \code{kappa.tau}: hyperparameter for learning \eqn{\tau^2_j}
-#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     (double Gamma, original triple Gamma). Note that this is the global parameter.
 #'     The component-specific parameters are learned automatically when triple
 #'     Gamma prior is selected (count component)
 #'    \item \code{kappa.xi}: hyperparameter for learning \eqn{\xi^2_j}
-#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     (double Gamma, original triple Gamma). Note that this is the global parameter.
 #'     The component-specific parameters are learned automatically when triple
 #'     Gamma prior is selected (count component)
 #'    \item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
@@ -232,33 +242,34 @@
 #'    \item \code{d.tau}: hyperparameter for learning \eqn{\kappa^\tau}
 #'     (only double Gamma) (count component)
 #'    \item \code{e.tau}: hyperparameter for learning \eqn{\kappa^\tau}
-#'     (double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+#'     (double Gamma, original triple Gamma prior). Note that under triple Gamma shrinkage
 #'     this parameter is only the starting value as it is learned during MCMC
-#'      (count component)
+#'     (count component)
 #'    \item \code{d.xi}: hyperparameter for learning \eqn{\kappa^\xi}
 #'     (only double Gamma) (count component)
 #'    \item \code{e.xi}: hyperparameter for learning \eqn{\kappa^\xi}
-#'     (double Gamma, triple Gamma). Note that under triple Gamma shrinkage
+#'     (double Gamma, original triple Gamma). Note that under triple Gamma shrinkage
 #'     this parameter is only the starting value as it is learned during MCMC
-#'     (count component)
+#'      (count component)
 #'    \item \code{type}: the type of prior you want on your regression effects;
 #'     this argument is either "rw-t0" (shrinkage prior starting at T = 0),
-#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior)
+#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior),
 #'      (count component)
 #'    \item \code{c}: prior parameter that scales the variance when using
-#'     shrinkage prior (ignored when using independence prior)
-#'      (count component)
+#'     shrinkage prior (ignored when using independence prior) (count component)
 #'    \item \code{B0}: prior variance on the regression parameters when using
 #'     independence prior (ignored when using shrinkage prior) (count component)
 #'    \item \code{TG}: Boolean indicating whether triple Gamma prior should be used;
 #'     when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
 #'     prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
-#'     (count component)
-#'     \item \code{TG.alternative}: Boolean indicating whether the alternative
-#'      triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
-#'      be used. Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
-#'      and have to be set to fixed values. If \code{TG = FALSE}, this argument
-#'      is ignored
+#'      (count component)
+#'    \item \code{TG.alternative}: Boolean indicating whether the alternative
+#'     triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
+#'     be used. If \code{TG.alternative = FALSE}, the original triple Gamma
+#'     representation based on Cadonna et al. (2020) will be used instead.
+#'     Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
+#'     and have to be set to fixed values in the alternative representation.
+#'     If \code{TG = FALSE}, this argument is ignored (count component)
 #'   }
 #' @param prior.load_zinb.count A list of arguments for estimating the parameters of the factor
 #'  part of the count model. This argument is only used when \code{model = 'ZINB'} and
@@ -301,22 +312,26 @@
 #'     (double Gamma, triple Gamma) (inflation component)
 #'    \item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.tau} used as starting value, if FALSE
-#'     \eqn{a^\tau =} \code{a.tau} (inflation component)
+#'     \eqn{a^\tau =} \code{a.tau} (not learned under alternative triple Gamma)
+#'     (inflation component)
 #'    \item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.xi} used as starting value, if FALSE
-#'     \eqn{a^\xi =} \code{a.xi} (inflation component)
+#'     \eqn{a^\xi =} \code{a.xi} (not learned under alternative triple Gamma)
+#'      (inflation component)
 #'     \item \code{alpha.a.tau}: hyperparameter for learning \eqn{a^\tau}
-#'      (double Gamma, triple Gamma) (inflation component)
+#'      (argument is ignored when \code{learn.a.tau = FALSE}) (inflation component)
 #'     \item \code{alpha.a.xi}: hyperparameter for learning \eqn{a^\xi}
-#'      (double Gamma, triple Gamma) (inflation component)
+#'      (argument is ignored when \code{learn.a.xi = FALSE}) (inflation component)
 #'     \item \code{beta.a.tau}: hyperparameter for learning \eqn{a^\tau}
-#'      (double Gamma, triple Gamma) (inflation component)
+#'      (argument is ignored when \code{learn.a.tau = FALSE}) (inflation component)
 #'     \item \code{beta.a.xi}: hyperparameter for learning \eqn{a^\xi}
-#'      (double Gamma, triple Gamma) (inflation component)
+#'      (argument is ignored when \code{learn.a.xi = FALSE}) (inflation component)
 #'    \item \code{iota.a.tau}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\tau} (inflation component)
+#'     updating of \eqn{a^\tau} (argument is ignored when
+#'     \code{learn.a.tau = FALSE}) (inflation component)
 #'    \item \code{iota.a.xi}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{a^\xi} (inflation component)
+#'     updating of \eqn{a^\xi} (argument is ignored when
+#'     \code{learn.a.xi = FALSE}) (inflation component)
 #'    \item \code{target.rate.a.tau}: desired acceptance rate when updating
 #'     \eqn{a^\tau} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.a.tau = FALSE}) (inflation component)
@@ -329,18 +344,20 @@
 #'     (only triple Gamma) (inflation component)
 #'    \item \code{learn.c.tau}: if TRUE \eqn{c^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.tau} used as starting value, if FALSE
-#'     \eqn{c^\tau =} \code{c.tau} (inflation component)
+#'     \eqn{c^\tau =} \code{c.tau} (not learned under alternative triple Gamma)
+#'      (inflation component)
 #'    \item \code{learn.c.xi}: if TRUE \eqn{c^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.xi} used as starting value, if FALSE
-#'     \eqn{c^\xi =} \code{c.xi} (inflation component)
+#'     \eqn{c^\xi =} \code{c.xi} (not learned under alternative triple Gamma)
+#'      (inflation component)
 #'     \item \code{alpha.c.tau}: hyperparameter for learning \eqn{c^\tau}
-#'      (only triple Gamma) (inflation component)
+#'      (argument is ignored when \code{learn.c.tau = FALSE}) (inflation component)
 #'     \item \code{alpha.c.xi}: hyperparameter for learning \eqn{c^\xi}
-#'      (only triple Gamma) (inflation component)
+#'      (argument is ignored when \code{learn.c.xi = FALSE}) (inflation component)
 #'     \item \code{beta.c.tau}: hyperparameter for learning \eqn{c^\tau}
-#'      (only triple Gamma) (inflation component)
+#'      (argument is ignored when \code{learn.c.tau = FALSE}) (inflation component)
 #'     \item \code{beta.c.xi}: hyperparameter for learning \eqn{c^\xi}
-#'      (only triple Gamma) (inflation component)
+#'      (argument is ignored when \code{learn.c.xi = FALSE}) (inflation component)
 #'    \item \code{iota.c.tau}: proposal standard deviation for Metropolis-Hastings
 #'     updating of \eqn{c^\tau} (inflation component)
 #'    \item \code{iota.c.xi}: proposal standard deviation for Metropolis-Hastings
@@ -352,11 +369,11 @@
 #'     \eqn{c^\xi} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.c.xi = FALSE}) (inflation component)
 #'    \item \code{kappa.tau}: hyperparameter for learning \eqn{\tau^2_j}
-#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     (double Gamma, original triple Gamma). Note that this is the global parameter.
 #'     The component-specific parameters are learned automatically when triple
 #'     Gamma prior is selected (inflation component)
 #'    \item \code{kappa.xi}: hyperparameter for learning \eqn{\xi^2_j}
-#'     (double Gamma, triple Gamma). Note that this is the global parameter.
+#'     (double Gamma, original triple Gamma). Note that this is the global parameter.
 #'     The component-specific parameters are learned automatically when triple
 #'     Gamma prior is selected (inflation component)
 #'    \item \code{learn.kappa.tau}: if TRUE \eqn{\kappa^\tau} is sampled in a
@@ -368,33 +385,34 @@
 #'    \item \code{d.tau}: hyperparameter for learning \eqn{\kappa^\tau}
 #'     (only double Gamma) (inflation component)
 #'    \item \code{e.tau}: hyperparameter for learning \eqn{\kappa^\tau}
-#'     (double Gamma, triple Gamma prior). Note that under triple Gamma shrinkage
+#'     (double Gamma, original triple Gamma prior). Note that under triple Gamma shrinkage
 #'     this parameter is only the starting value as it is learned during MCMC
-#'      (inflation component)
+#'     (inflation component)
 #'    \item \code{d.xi}: hyperparameter for learning \eqn{\kappa^\xi}
 #'     (only double Gamma) (inflation component)
 #'    \item \code{e.xi}: hyperparameter for learning \eqn{\kappa^\xi}
-#'     (double Gamma, triple Gamma). Note that under triple Gamma shrinkage
+#'     (double Gamma, original triple Gamma). Note that under triple Gamma shrinkage
 #'     this parameter is only the starting value as it is learned during MCMC
-#'     (inflation component)
+#'      (inflation component)
 #'    \item \code{type}: the type of prior you want on your regression effects;
 #'     this argument is either "rw-t0" (shrinkage prior starting at T = 0),
-#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior)
+#'     "rw-t1" (shrinkage prior starting at T = 1) or "ind" (independence prior),
 #'      (inflation component)
 #'    \item \code{c}: prior parameter that scales the variance when using
-#'     shrinkage prior (ignored when using independence prior)
-#'      (inflation component)
+#'     shrinkage prior (ignored when using independence prior) (inflation component)
 #'    \item \code{B0}: prior variance on the regression parameters when using
 #'     independence prior (ignored when using shrinkage prior) (inflation component)
 #'    \item \code{TG}: Boolean indicating whether triple Gamma prior should be used;
 #'     when \code{TG = FALSE} and \code{type = "rw-t0/1"} then the double Gamma
 #'     prior is used; when \code{type = "ind"} the argument \code{TG} is ignored
-#'     (inflation component)
+#'      (inflation component)
 #'    \item \code{TG.alternative}: Boolean indicating whether the alternative
 #'     triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
-#'     be used. Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
-#'     and have to be set to fixed values. If \code{TG = FALSE}, this argument
-#'     is ignored
+#'     be used. If \code{TG.alternative = FALSE}, the original triple Gamma
+#'     representation based on Cadonna et al. (2020) will be used instead.
+#'     Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
+#'     and have to be set to fixed values in the alternative representation.
+#'     If \code{TG = FALSE}, this argument is ignored (inflation component)
 #'   }
 #' @param prior.load_zinb.inflation A list of arguments for estimating the parameters of the factor
 #'  part of the zero-inflation model. This argument is only used when \code{model = 'ZINB'} and
@@ -773,7 +791,7 @@
 #' @author Roman Pfeiler, Helga Wagner
 #'
 #' @examples
-#' # Example 1: Gaussian Response, learn all possible parameters
+#' # Example 1: Gaussian Response, learn all possible parameters (double Gamma prior)
 #' sim.gaussian <- sim_panelTVP(n = 100,
 #'                              Tmax = 4,
 #'                              beta = c(4,1,0,0),
@@ -788,9 +806,10 @@
 #'                          t = sim.gaussian$observed$t,
 #'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                          model = "Gaussian")
-#' # Example 2: Gaussian Response, Bayesian Lasso
+#' # Example 2: Gaussian Response, hierarchical Bayesian Lasso (double Gamma prior)
 #' prior.reg <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg),
-#'                                list(learn.a.tau = FALSE, learn.a.xi = FALSE))
+#'                                list(a.tau = 1, a.xi = 1,
+#'                                     learn.a.tau = FALSE, learn.a.xi = FALSE))
 #' res.gaussian2 <- panelTVP(y ~ W1 + W2 + W3,
 #'                          data = sim.gaussian$observed,
 #'                          id = sim.gaussian$observed$id,
@@ -799,7 +818,73 @@
 #'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                          model = "Gaussian")
 #'
-#' # Example 3: Logit Response, learn all possible parameters
+#' # Example 3: Gaussian Response, learn all possible parameters (original triple Gamma prior)
+#' prior.reg <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg), list(TG = TRUE))
+#' res.gaussian3 <- panelTVP(y ~ W1 + W2 + W3,
+#'                          data = sim.gaussian$observed,
+#'                          id = sim.gaussian$observed$id,
+#'                          t = sim.gaussian$observed$t,
+#'                          prior.reg = prior.reg,
+#'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                          model = "Gaussian")
+#'
+#' # Example 4: Gaussian Response, hierarchical Horseshoe prior (original triple Gamma prior)
+#' prior.reg <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg),
+#'                                list(TG = TRUE, a.tau = 0.5, a.xi = 0.5,
+#'                                     learn.a.tau = FALSE, learn.a.xi = FALSE,
+#'                                     c.tau = 0.5, c.xi = 0.5,
+#'                                     learn.c.tau = FALSE, learn.c.xi = FALSE))
+#' res.gaussian4 <- panelTVP(y ~ W1 + W2 + W3,
+#'                          data = sim.gaussian$observed,
+#'                          id = sim.gaussian$observed$id,
+#'                          t = sim.gaussian$observed$t,
+#'                          prior.reg = prior.reg,
+#'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                          model = "Gaussian")
+#'
+#' # Example 5: Gaussian Response, non-hierarchical Horseshoe prior (original triple Gamma prior)
+#' prior.reg <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg),
+#'                                list(TG = TRUE, a.tau = 0.5, a.xi = 0.5,
+#'                                     learn.a.tau = FALSE, learn.a.xi = FALSE,
+#'                                     c.tau = 0.5, c.xi = 0.5,
+#'                                     learn.c.tau = FALSE, learn.c.xi = FALSE,
+#'                                     learn.kappa.tau = FALSE, learn.kappa.xi = FALSE))
+#' res.gaussian5 <- panelTVP(y ~ W1 + W2 + W3,
+#'                          data = sim.gaussian$observed,
+#'                          id = sim.gaussian$observed$id,
+#'                          t = sim.gaussian$observed$t,
+#'                          prior.reg = prior.reg,
+#'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                          model = "Gaussian")
+#'
+#' # Example 6: Gaussian Response, Strawderman-Berger prior (original triple Gamma prior)
+#' prior.reg <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg),
+#'                                list(TG = TRUE, a.tau = 0.5, a.xi = 0.5,
+#'                                     learn.a.tau = FALSE, learn.a.xi = FALSE,
+#'                                     c.tau = 1, c.xi = 1,
+#'                                     learn.c.tau = FALSE, learn.c.xi = FALSE,
+#'                                     kappa.tau = 4, kappa.xi = 4,
+#'                                     learn.kappa.tau = FALSE, learn.kappa.xi = FALSE))
+#' res.gaussian6 <- panelTVP(y ~ W1 + W2 + W3,
+#'                          data = sim.gaussian$observed,
+#'                          id = sim.gaussian$observed$id,
+#'                          t = sim.gaussian$observed$t,
+#'                          prior.reg = prior.reg,
+#'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                          model = "Gaussian")
+#'
+#' # Example 7: Gaussian Response, alternative triple Gamma prior
+#' prior.reg <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg),
+#'                                list(TG = TRUE, TG.alternative = TRUE))
+#' res.gaussian7 <- panelTVP(y ~ W1 + W2 + W3,
+#'                          data = sim.gaussian$observed,
+#'                          id = sim.gaussian$observed$id,
+#'                          t = sim.gaussian$observed$t,
+#'                          prior.reg = prior.reg,
+#'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
+#'                          model = "Gaussian")
+#'
+#' # Example 8: Logit Response, learn all possible parameters (double Gamma prior)
 #' sim.logit <- sim_panelTVP(n = 100,
 #'                           Tmax = 4,
 #'                           beta = c(1,0.5,0,0),
@@ -814,7 +899,7 @@
 #'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                       model = "Logit")
 #'
-#' # Example 4: ZINB, learn all possible parameters
+#' # Example 9: ZINB, learn all possible parameters (double Gamma prior)
 #' sim.zinb <- sim_panelTVP(n = 100,
 #'                          Tmax = 4,
 #'                          beta_zinb.count = c(0.5,-0.7,0,0),
@@ -1141,18 +1226,20 @@ panelTVP <- function(formula = NULL,
     result$mcmc_risk <- NULL
 
     # adding learning settings to output
-    hyperpara <- c("a.xi", "a.tau", "kappa.xi", "kappa.tau", "kappa.zeta", "kappa.phi")
-    part <- c(rep("regression part", 4), rep("factor part", 2))
+    hyperpara <- c("a.xi", "a.tau", "c.xi", "c.tau", "kappa.xi", "kappa.tau", "kappa.zeta", "kappa.phi")
+    part <- c(rep("regression part", 6), rep("factor part", 2))
     learn_nb <- c(prior.reg_nb$learn.a.xi, prior.reg_nb$learn.a.tau,
+                  prior.reg_nb$learn.c.xi, prior.reg_nb$learn.c.tau,
                   prior.reg_nb$learn.kappa.xi, prior.reg_nb$learn.kappa.tau,
                   prior.load_nb$learn.kappa.zeta, prior.load_nb$learn.kappa.phi)
-    if(!(prior.reg_nb$type %in% c("rw1", "rw2"))) learn_nb[1:4] <- NA
-    if(!(prior.load_nb$type %in% c("rw1", "rw2"))) learn_nb[5:6] <- NA
+    if(!(prior.reg_nb$type %in% c("rw1", "rw2"))) learn_nb[1:6] <- NA
+    if(!(prior.load_nb$type %in% c("rw1", "rw2"))) learn_nb[7:8] <- NA
     learn_logit <- c(prior.reg_logit$learn.a.xi, prior.reg_logit$learn.a.tau,
+                     prior.reg_logit$learn.c.xi, prior.reg_logit$learn.c.tau,
                      prior.reg_logit$learn.kappa.xi, prior.reg_logit$learn.kappa.tau,
                      prior.load_logit$learn.kappa.zeta, prior.load_logit$learn.kappa.phi)
-    if(!(prior.reg_logit$type %in% c("rw1", "rw2"))) learn_logit[1:4] <- NA
-    if(!(prior.load_logit$type %in% c("rw1", "rw2"))) learn_logit[5:6] <- NA
+    if(!(prior.reg_logit$type %in% c("rw1", "rw2"))) learn_logit[1:6] <- NA
+    if(!(prior.load_logit$type %in% c("rw1", "rw2"))) learn_logit[7:8] <- NA
     result$learning.settings_logit <- cbind(hyperpara, part, learn_logit)
     colnames(result$learning.settings_logit) <- c("hyperparameter", "model.part", "learned?")
     result$learning.settings_logit <- as.data.frame(result$learning.settings_logit)
@@ -1160,8 +1247,20 @@ panelTVP <- function(formula = NULL,
     colnames(result$learning.settings_nb) <- c("hyperparameter", "model.part", "learned?")
     result$learning.settings_nb <- as.data.frame(result$learning.settings_nb)
     if(!random.effects){
-      result$learning.settings_nb <- result$learning.settings_nb[1:4,]
-      result$learning.settings_logit <- result$learning.settings_logit[1:4,]
+      result$learning.settings_nb <- result$learning.settings_nb[1:6,]
+      result$learning.settings_logit <- result$learning.settings_logit[1:6,]
+    }
+    if(!prior.reg_nb$TG){
+      result$learning.settings_nb[3:4, 3] <- NA
+    }
+    if(!prior.reg_logit$TG){
+      result$learning.settings_nb[3:4, 3] <- NA
+    }
+    if(prior.reg_nb$TG && prior.reg_nb$TG.alternative){
+      result$learning.settings_nb[1:6, 3] <- NA
+    }
+    if(prior.reg_logit$TG && prior.reg_logit$TG.alternative){
+      result$learning.settings_logit[1:6, 3] <- NA
     }
     # adding mcmc setting to output (incl. ASIS Boolean)
     result$mcmc.settings <- mcmc.opt

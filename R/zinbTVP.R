@@ -245,18 +245,55 @@ zinbTVP <- function(df,
 
       if(prior.reg_logit$type %in% c("rw1", "rw2")){ # shrinkage
 
-        res.i_logit <- c(i,
-                         betat_logit,
-                         alpha_logit[1:df.logit$d],
-                         alpha_logit[(df.logit$d+1):(2*df.logit$d)],
-                         prior.reg_logit$tau,
-                         prior.reg_logit$xi,
-                         prior.reg_logit$a.tau,
-                         prior.reg_logit$kappa.tau,
-                         prior.reg_logit$a.xi,
-                         prior.reg_logit$kappa.xi,
-                         lambda_logit
-        )
+        if(prior.reg_logit$TG && !prior.reg_logit$TG.alternative){ # triple Gamma
+
+          res.i_logit <- c(i,
+                           betat_logit,
+                           alpha_logit[1:df.logit$d],
+                           alpha_logit[(df.logit$d+1):(2*df.logit$d)],
+                           prior.reg_logit$tau,
+                           prior.reg_logit$xi,
+                           prior.reg_logit$a.tau,
+                           prior.reg_logit$kappa.tau,
+                           prior.reg_logit$a.xi,
+                           prior.reg_logit$kappa.xi,
+                           prior.reg_logit$c.tau,
+                           prior.reg_logit$kappa.tau.check,
+                           prior.reg_logit$c.xi,
+                           prior.reg_logit$kappa.xi.check,
+                           lambda_logit)
+
+        } else if(prior.reg_logit$TG && prior.reg_logit$TG.alternative){
+
+          res.i_logit <- c(i,
+                           betat_logit,
+                           alpha_logit[1:df.logit$d],
+                           alpha_logit[(df.logit$d+1):(2*df.logit$d)],
+                           prior.reg_logit$tau,
+                           prior.reg_logit$xi,
+                           prior.reg_logit$a.tau,
+                           prior.reg_logit$a.xi,
+                           prior.reg_logit$c.tau,
+                           prior.reg_logit$c.xi,
+                           prior.reg_logit$chi.tau.j,
+                           prior.reg_logit$chi.xi.j,
+                           lambda_logit)
+
+        } else{ # double Gamma
+
+          res.i_logit <- c(i,
+                           betat_logit,
+                           alpha_logit[1:df.logit$d],
+                           alpha_logit[(df.logit$d+1):(2*df.logit$d)],
+                           prior.reg_logit$tau,
+                           prior.reg_logit$xi,
+                           prior.reg_logit$a.tau,
+                           prior.reg_logit$kappa.tau,
+                           prior.reg_logit$a.xi,
+                           prior.reg_logit$kappa.xi,
+                           lambda_logit
+          )
+        }
 
       } else{ # independence prior
 
@@ -283,20 +320,59 @@ zinbTVP <- function(df,
 
       res_frame_logit[i,] <- res.i_logit
 
+      #
+
       if(prior.reg_nb$type %in% c("rw1", "rw2")){ # shrinkage
 
-        res.i_nb <- c(i,
-                      betat_nb,
-                      alpha_nb[1:df.nb$d],
-                      alpha_nb[(df.nb$d+1):(2*df.nb$d)],
-                      prior.reg_nb$tau,
-                      prior.reg_nb$xi,
-                      prior.reg_nb$a.tau,
-                      prior.reg_nb$kappa.tau,
-                      prior.reg_nb$a.xi,
-                      prior.reg_nb$kappa.xi,
-                      lambda_nb
-        )
+        if(prior.reg_nb$TG && !prior.reg_nb$TG.alternative){ # triple Gamma
+
+          res.i_nb <- c(i,
+                        betat_nb,
+                        alpha_nb[1:df.nb$d],
+                        alpha_nb[(df.nb$d+1):(2*df.nb$d)],
+                        prior.reg_nb$tau,
+                        prior.reg_nb$xi,
+                        prior.reg_nb$a.tau,
+                        prior.reg_nb$kappa.tau,
+                        prior.reg_nb$a.xi,
+                        prior.reg_nb$kappa.xi,
+                        prior.reg_nb$c.tau,
+                        prior.reg_nb$kappa.tau.check,
+                        prior.reg_nb$c.xi,
+                        prior.reg_nb$kappa.xi.check,
+                        lambda_nb)
+
+        } else if(prior.reg_nb$TG && prior.reg_nb$TG.alternative){
+
+          res.i_nb <- c(i,
+                        betat_nb,
+                        alpha_nb[1:df.nb$d],
+                        alpha_nb[(df.nb$d+1):(2*df.nb$d)],
+                        prior.reg_nb$tau,
+                        prior.reg_nb$xi,
+                        prior.reg_nb$a.tau,
+                        prior.reg_nb$a.xi,
+                        prior.reg_nb$c.tau,
+                        prior.reg_nb$c.xi,
+                        prior.reg_nb$chi.tau.j,
+                        prior.reg_nb$chi.xi.j,
+                        lambda_nb)
+
+        } else{ # double Gamma
+
+          res.i_nb <- c(i,
+                           betat_nb,
+                           alpha_nb[1:df.nb$d],
+                           alpha_nb[(df.nb$d+1):(2*df.nb$d)],
+                           prior.reg_nb$tau,
+                           prior.reg_nb$xi,
+                           prior.reg_nb$a.tau,
+                           prior.reg_nb$kappa.tau,
+                           prior.reg_nb$a.xi,
+                           prior.reg_nb$kappa.xi,
+                           lambda_nb
+          )
+        }
 
       } else{ # independence prior
 
@@ -382,12 +458,29 @@ zinbTVP <- function(df,
   Y <- Y[,seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)]
 
   # computing acceptance rates of Metropolis-based parameters
-  acceptance.rates <- matrix(nrow = 1, ncol = 4)
-  acceptance.rates[,1] <- accept.rate(accept = prior.reg_logit$xi.accept, mcmc.opt = mcmc.opt)
-  acceptance.rates[,2] <- accept.rate(accept = prior.reg_logit$tau.accept, mcmc.opt = mcmc.opt)
-  acceptance.rates[,3] <- accept.rate(accept = prior.reg_nb$xi.accept, mcmc.opt = mcmc.opt)
-  acceptance.rates[,4] <- accept.rate(accept = prior.reg_nb$tau.accept, mcmc.opt = mcmc.opt)
-  colnames(acceptance.rates) <- c("a.xi (logit)", "a.tau (logit)", "a.xi (nb)", "a.tau (nb)")
+  acceptance.rates_logit <- matrix(nrow = 1, ncol = 4)
+  if(prior.reg_logit$type != "ind" && !prior.reg_logit$TG.alternative){
+    acceptance.rates_logit[,1] <- accept.rate(accept = prior.reg_logit$a.xi.accept, mcmc.opt = mcmc.opt)
+    acceptance.rates_logit[,2] <- accept.rate(accept = prior.reg_logit$a.tau.accept, mcmc.opt = mcmc.opt)
+    if(prior.reg_logit$TG){
+      acceptance.rates_logit[,3] <- accept.rate(accept = prior.reg_logit$c.xi.accept, mcmc.opt = mcmc.opt)
+      acceptance.rates_logit[,4] <- accept.rate(accept = prior.reg_logit$c.tau.accept, mcmc.opt = mcmc.opt)
+    }
+  }
+  acceptance.rates_nb <- matrix(nrow = 1, ncol = 4)
+  if(prior.reg_nb$type != "ind" && !prior.reg_nb$TG.alternative){
+    acceptance.rates_nb <- matrix(nrow = 1, ncol = 4)
+    acceptance.rates_nb[,1] <- accept.rate(accept = prior.reg_nb$a.xi.accept, mcmc.opt = mcmc.opt)
+    acceptance.rates_nb[,2] <- accept.rate(accept = prior.reg_nb$a.tau.accept, mcmc.opt = mcmc.opt)
+    if(prior.reg_nb$TG){
+      acceptance.rates_nb[,3] <- accept.rate(accept = prior.reg_nb$c.xi.accept, mcmc.opt = mcmc.opt)
+      acceptance.rates_nb[,4] <- accept.rate(accept = prior.reg_nb$c.tau.accept, mcmc.opt = mcmc.opt)
+    }
+  }
+  acceptance.rates <- cbind(acceptance.rates_logit, acceptance.rates_nb)
+  colnames(acceptance.rates) <- c("a.xi (logit)", "a.tau (logit)", "c.xi (logit)", "c.tau (logit)",
+                                  "a.xi (nb)", "a.tau (nb)", "c.xi (nb)", "c.tau (nb)")
+  if(sum(is.na(acceptance.rates)) == 8) acceptance.rates <- NULL
 
   # return
   df$y[miss] <- NA

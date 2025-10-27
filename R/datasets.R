@@ -33,13 +33,16 @@
 #'    The Ohio State University. Columbus, OH: 2024.
 #' @source For more details, please visit the offical website of the dataset \url{https://www.nlsinfo.org/}
 #' @examples
-#'  res.mari <- panelTVP(Used.Mari.Since.DLI ~ Sex + Baseline.Age_c + Bullied.Before.12 + Ethnicity + Residence,
+#'  res.mari <- panelTVP(Used.Mari.Since.DLI ~ Sex + Baseline.Age_c +
+#'                       Bullied.Before.12 + Ethnicity + Residence,
 #'                       data = Marijuana,
 #'                       t = Marijuana$t,
 #'                       id = Marijuana$id,
-#'                       mcmc.opt = list(chain.length = 100, burnin = 0, thin = 1, asis = TRUE),
+#'                       mcmc.opt = list(chain.length = 100, burnin = 0, thin = 1,
+#'                                       asis = TRUE),
 #'                       model = "Logit")
-#'  # Please increase the length of the Markov Chain. 100 draws in total is only for demonstration!
+#'  # Please increase the length of the Markov Chain. 100 draws in total is
+#'  # only for demonstration!
 #'
 "Marijuana"
 
@@ -78,12 +81,15 @@
 #'    The Ohio State University. Columbus, OH: 2024.
 #' @source For more details, please visit the offical website of the dataset \url{https://www.nlsinfo.org/}
 #' @examples
-#'  res.income <- panelTVP(Gross.Family.Income_log ~ Sex + Baseline.Age_c + Ethnicity + Edu + Hours.Worked,
-#'                       data = Income,
-#'                       t = Income$t,
-#'                       id = Income$id,
-#'                       mcmc.opt = list(chain.length = 100, burnin = 0, thin = 1, asis = TRUE),
-#'                       model = "Gaussian")
-#'  # Please increase the length of the Markov Chain. 100 draws in total is only for demonstration!
+#'  res.income <- panelTVP(Gross.Family.Income_log ~ Sex + Baseline.Age_c +
+#'                         Ethnicity + Edu + Hours.Worked,
+#'                         data = Income,
+#'                         t = Income$t,
+#'                         id = Income$id,
+#'                         mcmc.opt = list(chain.length = 100, burnin = 0,
+#'                         thin = 1, asis = TRUE),
+#'                         model = "Gaussian")
+#'  # Please increase the length of the Markov Chain. 100 draws in total is
+#'  # only for demonstration!
 #'
 "Income"

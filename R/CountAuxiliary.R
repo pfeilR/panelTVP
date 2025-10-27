@@ -163,12 +163,12 @@ efficient_PG_sampling <- function(h, z){
   idx_sp <- h >= 1 & h <= 50
   idx_NOsp <- !idx_sp
 
-  # Saddlepoint approximation for h >= 1
+  # Saddlepoint approximation for h >= 1 and h <= 50
   if(any(idx_sp)){
     PG[idx_sp] <- BayesLogit::rpg.sp(sum(idx_sp), h = h[idx_sp], z = z[idx_sp])
   }
 
-  # Standard hybrid rpg for h < 1
+  # Standard hybrid rpg for h < 1 or h > 50
   if(any(idx_NOsp)){
     PG[idx_NOsp] <- BayesLogit::rpg(sum(idx_NOsp), h = h[idx_NOsp], z = z[idx_NOsp])
   }

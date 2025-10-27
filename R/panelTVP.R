@@ -478,6 +478,9 @@
 #'  (default yields 95 percent coverage)
 #' @param R.WAIC number of replications for computing the marginal WAIC, where
 #'  the latent factors are integrated out
+#' @param posterior.predictive.matrix if TRUE (= default) the posterior predictive distribution
+#'  based on the training data is computed and returned as a list object by the function.
+#'  Setting it to FALSE is usually only done for saving memory.
 #' @param random.effects if TRUE (= default) a factor model is included for estimating
 #'  random effects, if FALSE the model does not contain random effects and, consequently,
 #'  priors on the parameters of the factor model are ignored
@@ -1055,6 +1058,7 @@ panelTVP <- function(formula = NULL,
                      ),
                      HPD.coverage = 0.95,
                      R.WAIC = 1000,
+                     posterior.predictive.matrix = TRUE,
                      random.effects = TRUE,
                      progress.bar = FALSE
 ){
@@ -1080,7 +1084,7 @@ panelTVP <- function(formula = NULL,
   # input checks
   check.panelTVP(formula, data, id, t, model, prior.reg, prior.var, prior.load,
                  prior.reg_nb, prior.load_nb, prior.reg_logit, prior.load_logit,
-                 mcmc.opt, settings.NegBin, HPD.coverage, R.WAIC,
+                 mcmc.opt, settings.NegBin, HPD.coverage, R.WAIC, posterior.predictive.matrix,
                  random.effects, progress.bar)
 
   # ordering dataset and removing gaps in id
@@ -1126,10 +1130,12 @@ panelTVP <- function(formula = NULL,
     }
     # add WAIC and remove chain of factor scores to save memory
     # result$WAIC <- compute_waic(result, random.effects, R.WAIC)
-    if(random.effects){
-      result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
-    } else{
-      result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin_no.fac(result)
+    if(posterior.predictive.matrix){
+      if(random.effects){
+        result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
+      } else{
+        result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin_no.fac(result)
+      }
     }
     result$fmcmc <- NULL
 
@@ -1216,10 +1222,12 @@ panelTVP <- function(formula = NULL,
     }
     # add WAIC and remove chain of factor scores and risk-indicators to save memory
     # result$WAIC <- compute_waic(result, random.effects, R.WAIC)
-    if(random.effects){
-      result$posterior.predictive <- compute_fitted_ZINB(result)
-    } else{
-      result$posterior.predictive <- compute_fitted_ZINB_no.fac(result)
+    if(posterior.predictive.matrix){
+      if(random.effects){
+        result$posterior.predictive <- compute_fitted_ZINB(result)
+      } else{
+        result$posterior.predictive <- compute_fitted_ZINB_no.fac(result)
+      }
     }
     result$fmcmc_logit <- NULL
     result$fmcmc_nb <- NULL

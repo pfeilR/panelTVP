@@ -52,6 +52,7 @@ panelTVP(
     p.overrelax = 0, accuracy.overrelax = 10),
   HPD.coverage = 0.95,
   R.WAIC = 1000,
+  posterior.predictive.matrix = TRUE,
   random.effects = TRUE,
   progress.bar = FALSE
 )
@@ -550,6 +551,10 @@ see the original paper on Slice sampling by Neal (2003)}
 
 \item{R.WAIC}{number of replications for computing the marginal WAIC, where
 the latent factors are integrated out}
+
+\item{posterior.predictive.matrix}{if TRUE (= default) the posterior predictive distribution
+based on the training data is computed and returned as a list object by the function.
+Setting it to FALSE is usually only done for saving memory.}
 
 \item{random.effects}{if TRUE (= default) a factor model is included for estimating
 random effects, if FALSE the model does not contain random effects and, consequently,

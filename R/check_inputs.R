@@ -81,7 +81,7 @@ check_sim <- function(n,
 
 check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, prior.load,
                            prior.reg_nb, prior.load_nb, prior.reg_logit, prior.load_logit,
-                           mcmc.opt, settings.NegBin, HPD.coverage, R.WAIC,
+                           mcmc.opt, settings.NegBin, HPD.coverage, R.WAIC, posterior.predictive.matrix,
                            random.effects, progress.bar){
 
   if(is.null(formula) || is.null(data)) stop("Arguments 'formula' and 'data' are required with no defaults.")
@@ -208,6 +208,12 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
   if(is.null(R.WAIC) ||!is.numeric(R.WAIC) || length(R.WAIC) != 1 || R.WAIC %% 1 != 0 ||
      !is.finite(R.WAIC) || R.WAIC < 1)
     stop("Argument 'R.WAIC' must be a single, positive integer.")
+
+  # posterior.predictive.matrix
+  if(is.null(posterior.predictive.matrix) || !is.logical(posterior.predictive.matrix) ||
+     length(posterior.predictive.matrix) != 1 || !is.finite(posterior.predictive.matrix)){
+    stop("Argument 'posterior.predictive.matrix' must be a single logical value.")
+  }
 
   # random.effects
   if(is.null(random.effects) || !is.logical(random.effects) ||

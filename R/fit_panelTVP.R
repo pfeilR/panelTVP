@@ -26,7 +26,7 @@ fit_panelTVP <- function(formula,
   if(model == "NegBin") data$y[miss] <- MASS::rnegbin(n = N.miss, mu = 1, theta = 1)
 
   if(any(colnames(data) == "t")) dat <- data[,names(data) != "t"]
-  if(any(colnames(data) == "id")) dat <- data[,names(data) != "id"]
+  if(any(colnames(dat) == "id")) dat <- dat[,names(dat) != "id"]
 
   mf <- model.frame(formula = formula, data = dat, drop.unused.levels = TRUE)
   y <- model.response(mf)

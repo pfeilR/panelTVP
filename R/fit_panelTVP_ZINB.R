@@ -25,7 +25,7 @@ fit_panelTVP_ZINB <- function(formula,
   }
 
   if(any(colnames(data) == "t")) dat <- data[,names(data) != "t"]
-  if(any(colnames(data) == "id")) dat <- data[,names(data) != "id"]
+  if(any(colnames(dat) == "id")) dat <- dat[,names(dat) != "id"]
 
   resp <- all.vars(formula)[1]
   miss <- ifelse(is.na(data[,resp]), TRUE, FALSE)

@@ -190,7 +190,7 @@ GaussianTVP <- function(df,
 
   if(progress.bar) close(pb)
   #print time
-  print(paste("MCMC sampling finished in", round(time[3]), "seconds. Preparing results for final output ..."))
+  cat(paste("MCMC sampling finished in", round(time[3]), "seconds."))
 
   #remove burnin
   res <- res_frame[res_frame[,"SimNr"] > mcmc.opt$burnin,]

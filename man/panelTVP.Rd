@@ -51,7 +51,7 @@ panelTVP(
   settings.NegBin = list(alpha.r = 2, beta.r = 1, expansion.steps = 10, width = 1,
     p.overrelax = 0, accuracy.overrelax = 10),
   HPD.coverage = 0.95,
-  R.WAIC = 1000,
+  R.WAIC = 20,
   posterior.predictive.matrix = TRUE,
   random.effects = TRUE,
   progress.bar = FALSE

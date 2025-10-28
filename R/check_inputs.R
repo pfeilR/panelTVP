@@ -206,8 +206,8 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
 
   # R.WAIC
   if(is.null(R.WAIC) ||!is.numeric(R.WAIC) || length(R.WAIC) != 1 || R.WAIC %% 1 != 0 ||
-     !is.finite(R.WAIC) || R.WAIC < 1)
-    stop("Argument 'R.WAIC' must be a single, positive integer.")
+     !is.finite(R.WAIC) || R.WAIC < 2)
+    stop("Argument 'R.WAIC' must be a single, positive integer and has to be at least 2.")
 
   # posterior.predictive.matrix
   if(is.null(posterior.predictive.matrix) || !is.logical(posterior.predictive.matrix) ||

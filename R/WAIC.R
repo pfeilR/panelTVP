@@ -95,24 +95,20 @@ log_lik_army <- function(y, eta, model, s){
   if(m == "Gaussian"){
     sigma2 <- model$mcmc[s, "sigma2"]
     return(dnorm(y, mean = eta, sd = sqrt(sigma2), log = TRUE))
-  }
-
-  if(m == "Probit"){
+  } else if(m == "Probit"){
     p <- pnorm(eta)
     p <- pmax(pmin(p, 1 - 1e-4), 1e-4)
     return(dbinom(y, size = 1, prob = p, log = TRUE))
-  }
-
-  if(m == "Logit"){
+  } else if(m == "Logit"){
     p <- plogis(eta)
     p <- pmax(pmin(p, 1 - 1e-4), 1e-4)
     return(dbinom(y, size = 1, prob = p, log = TRUE))
-  }
-
-  if (m == "NegBin"){
+  } else if (m == "NegBin"){
     r <- model$mcmc[s, "r"]
     mu <- r * exp(eta)
     return(dnbinom(y, size = r, mu = mu, log = TRUE))
+  } else{
+    stop("Not supported model type.")
   }
 
 }
@@ -130,7 +126,7 @@ lp.model <- function(model, s, R){
   if(cps) lambda_col <- "lambda_t"
   eta_list <- vector("list", Tmax)
   fi_matrix <- matrix(rnorm((N/Tmax)*R), ncol = R)
-  fi_matrix <- apply(fi_matrix, 2, function(x) x - mean(x))
+  fi_matrix <- scale(fi_matrix)
   for(t in 1:Tmax){
     Xt <- as.matrix(X_split[[as.character(t)]][, -ncol(X)])
     beta_cols <- paste0("beta_t", 1:d, t)
@@ -183,7 +179,7 @@ lp.zinb <- function(model, s, R){
   if(cps_logit) lambda_col_logit <- "lambda_t"
   eta_list_logit <- vector("list", Tmax)
   fi_matrix_logit <- matrix(rnorm((N/Tmax)*R), ncol = R)
-  fi_matrix_logit <- apply(fi_matrix_logit, 2, function(x) x - mean(x))
+  fi_matrix_logit <- scale(fi_matrix_logit)
 
   X_nb <- cbind(model$data$X_nb, t = model$data$timeidx)
   d_nb <- model$data$d_nb
@@ -196,7 +192,7 @@ lp.zinb <- function(model, s, R){
   if(cps_nb) lambda_col_nb <- "lambda_t"
   eta_list_nb <- vector("list", Tmax)
   fi_matrix_nb <- matrix(rnorm((N/Tmax)*R), ncol = R)
-  fi_matrix_nb <- apply(fi_matrix_nb, 2, function(x) x - mean(x))
+  fi_matrix_nb <- scale(fi_matrix_nb)
 
   for(t in 1:Tmax){
 

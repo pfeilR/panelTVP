@@ -1057,7 +1057,7 @@ panelTVP <- function(formula = NULL,
                        width = 1, p.overrelax = 0, accuracy.overrelax = 10
                      ),
                      HPD.coverage = 0.95,
-                     R.WAIC = 1000,
+                     R.WAIC = 20,
                      posterior.predictive.matrix = TRUE,
                      random.effects = TRUE,
                      progress.bar = FALSE
@@ -1129,7 +1129,9 @@ panelTVP <- function(formula = NULL,
                                                "a.zeta", "kappa.zeta")),]
     }
     # add WAIC and remove chain of factor scores to save memory
-    # result$WAIC <- compute_waic(result, random.effects, R.WAIC)
+    cat(" Computing WAIC ...")
+    result$WAIC <- compute_waic(result, random.effects, R.WAIC)
+    cat(" Analysis finished!")
     if(posterior.predictive.matrix){
       if(random.effects){
         result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
@@ -1221,7 +1223,9 @@ panelTVP <- function(formula = NULL,
                                                        "a.zeta", "kappa.zeta")),]
     }
     # add WAIC and remove chain of factor scores and risk-indicators to save memory
-    # result$WAIC <- compute_waic(result, random.effects, R.WAIC)
+    cat(" Computing WAIC ...")
+    result$WAIC <- compute_waic(result, random.effects, R.WAIC)
+    cat(" Analysis finished!")
     if(posterior.predictive.matrix){
       if(random.effects){
         result$posterior.predictive <- compute_fitted_ZINB(result)

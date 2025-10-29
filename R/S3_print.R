@@ -33,7 +33,6 @@
 print.panelTVP.Gaussian <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Gaussian. It contains:\n
   - learning.settings: Information on learning status of hyperparameters. \n
-  - variable.codes: Information on which variable is associated with which regression parameter. \n
   - data: Input data and additional context information derived from the data.\n
   - mcmc: Markov Chains for every parameter except for the factor scores.\n
   - posterior: Posterior summary. \n
@@ -45,6 +44,7 @@ print.panelTVP.Gaussian <- function(x, ...){
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
   - mcmc.settings: Details on MCMC sampler. \n
+  - variable.codes: Information on which variable is associated with which regression parameter. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
   - plot(): This will give you plots of the coefficient estimates.\n
@@ -85,7 +85,6 @@ You may use the following functions to get additional information:\n
 print.panelTVP.Probit <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Probit. It contains:\n
   - learning.settings: Information on learning status of hyperparameters. \n
-  - variable.codes: Information on which variable is associated with which regression parameter. \n
   - data: Input data and additional context information derived from the data.\n
   - mcmc: Markov Chains for every parameter except for the factor scores.\n
   - posterior: Posterior summary. \n
@@ -97,6 +96,7 @@ print.panelTVP.Probit <- function(x, ...){
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
   - mcmc.settings: Details on MCMC sampler. \n
+  - variable.codes: Information on which variable is associated with which regression parameter. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
   - plot(): This will give you plots of the coefficient estimates.\n
@@ -137,7 +137,6 @@ You may use the following functions to get additional information:\n
 print.panelTVP.Logit <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Logit. It contains:\n
   - learning.settings: Information on learning status of hyperparameters. \n
-  - variable.codes: Information on which variable is associated with which regression parameter. \n
   - data: Input data and additional context information derived from the data.\n
   - mcmc: Markov Chains for every parameter except for the factor scores.\n
   - posterior: Posterior summary. \n
@@ -149,6 +148,7 @@ print.panelTVP.Logit <- function(x, ...){
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
   - mcmc.settings: Details on MCMC sampler. \n
+  - variable.codes: Information on which variable is associated with which regression parameter. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
   - plot(): This will give you plots of the coefficient estimates.\n
@@ -190,7 +190,6 @@ You may use the following functions to get additional information:\n
 print.panelTVP.NegBin <- function(x, ...){
   cat("\nThis is an object of class panelTVP.NegBin. It contains:\n
   - learning.settings: Information on learning status of hyperparameters. \n
-  - variable.codes: Information on which variable is associated with which regression parameter. \n
   - data: Input data and additional context information derived from the data.\n
   - mcmc: Markov Chains for every parameter except for the factor scores.\n
   - posterior: Posterior summary. \n
@@ -202,6 +201,7 @@ print.panelTVP.NegBin <- function(x, ...){
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
   - mcmc.settings: Details on MCMC sampler. \n
+  - variable.codes: Information on which variable is associated with which regression parameter. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
   - plot(): This will give you plots of the coefficient estimates.\n
@@ -248,8 +248,6 @@ print.panelTVP.ZINB <- function(x, ...){
   cat("\nThis is an object of class panelTVP.ZINB. It contains:\n
   - learning.settings_logit: Information on learning status of hyperparameters. (zero-inflation component) \n
   - learning.settings_nb: Information on learning status of hyperparameters. (count component) \n
-  - variable.codes_logit: Information on which variable is associated with which regression parameter. (zero-inflation component) \n
-  - variable.codes_nb: Information on which variable is associated with which regression parameter. (count component) \n
   - data: Input data and additional context information derived from the data.\n
   - mcmc_logit: Markov Chains for every parameter except for the factor scores. (zero-inflation component) \n
   - mcmc_nb: Markov Chains for every parameter except for the factor scores. (count component) \n
@@ -264,6 +262,8 @@ print.panelTVP.ZINB <- function(x, ...){
   - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
   - mcmc.settings: Details on MCMC sampler. \n
+  - variable.codes_logit: Information on which variable is associated with which regression parameter. (zero-inflation component) \n
+  - variable.codes_nb: Information on which variable is associated with which regression parameter. (count component) \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
   - plot(): This will give you plots of the coefficient estimates.\n

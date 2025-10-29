@@ -466,7 +466,7 @@
 #'    \item \code{alpha.r}: shape parameter of Gamma proposal
 #'    \item \code{beta.r}: rate parameter of Gamma proposal
 #'    \item \code{expansion.steps}: number of steps in stepping-out phase
-#'    \item \code{width}: width of the slice interval (on the log-scale of r)
+#'    \item \code{width}: width of the slice interval (on the log-scale of \eqn{r})
 #'    \item \code{p.overrelax}: probability of performing an overrelaxation step;
 #'     performing overrelaxation might increase sampling efficiency; when overrelaxation
 #'     should not be used, set \code{p.overrelax = 0}
@@ -480,11 +480,11 @@
 #'  the latent factors are integrated out
 #' @param posterior.predictive.matrix if TRUE (= default) the posterior predictive distribution
 #'  based on the training data is computed and returned as a list object by the function.
-#'  Setting it to FALSE is usually only done for saving memory.
+#'  Setting it to FALSE is usually only done for saving memory
 #' @param random.effects if TRUE (= default) a factor model is included for estimating
 #'  random effects, if FALSE the model does not contain random effects and, consequently,
 #'  priors on the parameters of the factor model are ignored
-#' @param progress.bar if TRUE a progressbar is displayed, if FALSE the progress bar is omitted
+#' @param progress.bar if TRUE a progress bar is displayed, if FALSE the progress bar is omitted
 #'
 #' @description
 #' This is the main function for fitting a flexible Bayesian panel data model
@@ -494,7 +494,7 @@
 #'
 #' @details
 #'  This function fits a Bayesian time-varying parameter panel data model to a
-#'  longitudinal response \eqn{y_{it}} for \eqn{i \in \{1,\dots,n\}} subjects that are observed
+#'  longitudinal response \eqn{\text{y}_{it}} for \eqn{i \in \{1,\dots,n\}} subjects that are observed
 #'  at \eqn{t \in \{1,\dots,T\}}
 #'  time points. The model is expressed in its non-centered form
 #'  (see Frühwirth-Schnatter and Wagner (2010) for details on this parameterization)
@@ -505,7 +505,7 @@
 #'  \mathbf{x}_{it}^\top \boldsymbol{\Theta} \boldsymbol{\tilde{\beta}}_t +
 #'   f_i\lambda + f_i \psi \tilde{\lambda}_t,}
 #'  where \eqn{\mathbf{x}_{it}} is a \eqn{d}-dimensional column vector of covariate
-#'  values for subject \eqn{i} at time \eqn{t}, \eqn{\boldsymbol{\beta}} is a d-dimensional
+#'  values for subject \eqn{i} at time \eqn{t}, \eqn{\boldsymbol{\beta}} is a \eqn{d}-dimensional
 #'  column vector of fixed effects (including the intercept as first parameter),
 #'  \eqn{\boldsymbol{\Theta} = \text{diag}(\theta_1,\dots,\theta_d)} is a
 #'  diagonal matrix, where larger main diagonal elements indicate stronger variation
@@ -542,12 +542,12 @@
 #'  \end{aligned}
 #'  }
 #'
-#'  We follow Bitto and Frühwirth-Schnatter (2019) and assign the following prior
-#'  distributions on the parameters of the double Gamma prior
+#'  We follow Bitto and Frühwirth-Schnatter (2019) and assign the following hyperpriors
+#'  on the parameters of the double Gamma prior
 #'  \deqn{
 #'  \begin{aligned}
-#'   \kappa^\xi|d^\xi,e^\xi& \sim \mathcal{G}(d^\xi,e^\xi), \quad  a^\xi|\alpha^\xi,\beta^\xi \sim  \mathcal{G}(\alpha^\xi, \alpha^\xi \beta^\xi), \\
-#'   \kappa^\tau|d^\tau,e^\tau& \sim  \mathcal{G}(d^\tau,e^\tau), \quad a^\tau|\alpha^\tau,\beta^\tau \sim  \mathcal{G}(\alpha^\tau, \alpha^\tau \beta^\tau), \\
+#'   \kappa^\xi|d^\xi,e^\xi& \sim \mathcal{G}(d^\xi,e^\xi), \quad  a^\xi|\alpha_{a^\xi},\beta_{a^\xi} \sim  \mathcal{G}(\alpha_{a^\xi}, \alpha_{a^\xi} \beta_{a^\xi}), \\
+#'   \kappa^\tau|d^\tau,e^\tau& \sim  \mathcal{G}(d^\tau,e^\tau), \quad a^\tau|\alpha_{a^\tau},\beta_{a^\tau} \sim  \mathcal{G}(\alpha_{a^\tau}, \alpha_{a^\tau} \beta_{a^\tau}), \\
 #'   \kappa^\zeta|d^\zeta,e^\zeta& \sim \mathcal{G}(d^\zeta,e^\zeta), \\
 #'   \kappa^\phi|d^\phi,e^\phi& \sim \mathcal{G}(d^\phi,e^\phi).
 #'  \end{aligned}
@@ -574,11 +574,11 @@
 #'    &\quad \tau_j^2|a^\tau, \kappa^\tau_j &\sim \mathcal{G}\left(a^\tau, \frac{a^\tau \kappa_j^\tau}{2}\right),
 #'    &\quad \kappa_j^\tau|c^\tau,\kappa^\tau
 #'     \sim \mathcal{G}\left(c^\tau, \frac{c^\tau}{\kappa^\tau}\right)
-#'    &\quad j = \{1, \dots, d\}, \\
+#'    &\quad j = \{1, \dots, d\}. \\
 #'  \end{aligned}
 #'  }
 #'  The additional prior-layer allows for covariate specific hyperparameters.
-#'  As the factor part of our model contains only one factor, the triple Gamma
+#'  As the factor part of the model contains only one factor, the triple Gamma
 #'  prior only makes sense for the regression part of the model.
 #'
 #'  For building the MCMC sampler, we follow Cadonna et al. (2020) and consider
@@ -608,8 +608,8 @@
 #'   Cadonna et al. (2020) then consider the following Beta-priors
 #'  \deqn{
 #'    \begin{aligned}
-#'     2a^\xi|\alpha^\xi,\beta^\xi &\sim \mathcal{B}(\alpha^\xi,\beta^\xi), \quad 2c^\xi|\alpha^\xi, \beta^\xi \sim \mathcal{B}(\alpha^\xi,\beta^\xi) \\
-#'     2a^\tau|\alpha^\tau, \beta^\tau &\sim \mathcal{B}(\alpha^\tau,\beta^\tau), \quad 2c^\tau|\alpha^\tau, \beta^\tau \sim \mathcal{B}(\alpha^\tau,\beta^\tau)
+#'     2a^\xi|\alpha_{a^\xi},\beta_{a^\xi} &\sim \mathcal{B}(\alpha_{a^\xi},\beta_{a^\xi}), \quad 2c^\xi|\alpha_{c^\xi}, \beta_{c^\xi} \sim \mathcal{B}(\alpha_{c^\xi},\beta_{c^\xi}) \\
+#'     2a^\tau|\alpha_{a^\tau}, \beta_{a^\tau} &\sim \mathcal{B}(\alpha_{a^\tau},\beta_{a^\tau}), \quad 2c^\tau|\alpha_{c^\tau}, \beta_{c^\tau} \sim \mathcal{B}(\alpha_{c^\tau},\beta_{c^\tau})
 #'    \end{aligned}
 #'  }
 #'  Moreover, the global shrinkage parameters are equipped with the following F-priors
@@ -625,11 +625,11 @@
 #'
 #'  It should be stated that not only the double Gamma prior and the Bayesian
 #'  Lasso prior are special cases of the triple Gamma prior, but also other well-known
-#'  shrinkage priors such as the Strawderman-Berger prior and the Horseshoe prior
-#'  arise as special cases of the triple Gamma prior. For obtaining the
-#'  Strawderman-Berger prior, set \eqn{a=0.5, c = 1, \kappa = 4}. For obtaining the
-#'  Horseshoe prior, set \eqn{a =0.5, c = 0.5}. The \eqn{\kappa} parameters can then either
-#'  be learned (hierachical Horseshoe) or held fixed (Horseshoe) (see Cadonna et al., 2020).
+#'  shrinkage priors such as the Strawderman-Berger prior and the Horseshoe prior.
+#'  For obtaining the Strawderman-Berger prior, set \eqn{a=0.5, c = 1, \kappa = 4}.
+#'  For obtaining the Horseshoe prior, set \eqn{a =0.5, c = 0.5}.
+#'  The \eqn{\kappa} parameters can then either be learned (hierachical Horseshoe)
+#'  or held fixed (non-hierarchical Horseshoe) (see Cadonna et al., 2020).
 #'
 #'  Finally, there exists an alternative representation of the triple Gamma prior,
 #'  which was proposed by Knaus and Frühwirth-Schnatter (2025) and is given by
@@ -658,21 +658,21 @@
 #'   }
 #'
 #'  With a Gaussian (Normal) response, the model is given as follows
-#'  \deqn{y_{it} = \eta_{it} + \varepsilon_{it}, \quad \varepsilon_{it} \sim \mathcal{N}(0,\sigma^2),}
+#'  \deqn{\text{y}_{it} = \eta_{it} + \varepsilon_{it}, \quad \varepsilon_{it} \sim \mathcal{N}(0,\sigma^2),}
 #'  where we place a hierarchical prior on the error variance
 #'  \deqn{\sigma^2|c_0,C_0 \sim \mathcal{G}^{-1}(c_0,C_0), \quad C_0|g_0,G_0 \sim \mathcal{G}(g_0,G_0).}
 #'
-#'  In the binary Logit model, the conditional probability that \eqn{y_{it} = 1} is modelled
+#'  In the binary Logit model, the conditional probability that \eqn{\text{y}_{it} = 1} is modelled
 #'  via the Logit-link as
-#'  \deqn{\mathbb{P}(y_{it} = 1|\eta_{it}) = \frac{\exp(\eta_{it})}{1+\exp(\eta_{it})},   }
+#'  \deqn{\mathbb{P}(\text{y}_{it} = 1|\eta_{it}) = \frac{\exp(\eta_{it})}{1+\exp(\eta_{it})},   }
 #'  whereas in the binary Probit model, this probability is modelled
 #'  via the Probit-link as
-#'  \deqn{\mathbb{P}(y_{it} = 1|\eta_{it}) = \Phi(\eta_{it}),}
+#'  \deqn{\mathbb{P}(\text{y}_{it} = 1|\eta_{it}) = \Phi(\eta_{it}),}
 #'  where \eqn{\Phi(\cdot)} denotes the standard Normal cumulative distribution function.
 #'
 #'  For modelling overdispersed count data, we assume that the response is a realization
 #'  of a Negative Binomial distribution with pmf given by
-#'  \deqn{p(y_{it}|r,\eta_{it}) = \frac{\Gamma(y_{it}+r)}{\Gamma(r)y_{it}!}(1-q_{it})^r q_{it}^{y_{it}},
+#'  \deqn{p(\text{y}_{it}|r,\eta_{it}) = \frac{\Gamma(\text{y}_{it}+r)}{\Gamma(r)\text{y}_{it}!}(1-q_{it})^r q_{it}^{\text{y}_{it}},
 #'   \quad q_{it} = \frac{\exp(\eta_{it})}{1+\exp(\eta_{it})},}
 #'  where we place a prior on the constant dispersion parameter
 #'   \deqn{r|\alpha^r,\beta^r \sim \mathcal{G}(\alpha^r,\beta^r).}
@@ -686,18 +686,18 @@
 #'  experiencing the event, whereas an at-risk zero belongs to an observation that is
 #'  at-risk of experiencing the event but has for some reason a zero recorded.
 #'  It is therefore assumed that the outcome in the Zero-Inflated Negative Binomial model
-#'   \eqn{y_{it}} is a realization of a
+#'   \eqn{\text{y}_{it}} is a realization of a
 #'  mixture distribution with a point mass at zero (for the structural zeros) and
 #'  a standard Negative Binomial count model for observations that are at-risk,
 #'  i.e., this includes both at-risk zeros and positive counts. The ZINB model
 #'  can, thus, be stated as (Neelon, 2019)
-#'  \deqn{ y_{it}|r,\mu_{it},w_{it} \sim (1-\pi_{it}) \cdot \mathbb{I}_{(w_{it} = 0)} + \pi_{it} \cdot \mathcal{NB}(\mu_{it},r) \mathbb{I}_{(w_{it}=1)},}
+#'  \deqn{ \text{y}_{it}|r,\mu_{it},w_{it} \sim (1-\pi_{it}) \cdot \mathbb{I}_{(w_{it} = 0)} + \pi_{it} \cdot \mathcal{NB}(\mu_{it},r) \mathbb{I}_{(w_{it}=1)},}
 #'  where \eqn{w_{it}} is a latent at-risk indicator such that with probability
 #'  \eqn{1-\pi_{it}, w_{it} = 0} and with probability \eqn{\pi_{it}, w_{it} = 1},
 #'  and \eqn{\mu_{it}} is the mean of the Negative Binomial distribution.
 #'
 #'  There are two separate linear predictors in the ZINB model. The first
-#'  linear predictor \eqn{\eta_{it}^{\text{logit}}} is related to the zero-inflated
+#'  linear predictor \eqn{\eta_{it}^{\text{logit}}} is related to the zero-inflation
 #'  part of the model through
 #'  \deqn{\pi_{it} = \frac{\exp(\eta_{it}^{\text{logit}})}{1+\exp(\eta_{it}^{\text{logit}})},}
 #'  whereas the second linear predictor \eqn{\eta_{it}^{\text{nb}}} is related to
@@ -707,7 +707,7 @@
 #'  \deqn{\mu_{it} = r \exp(\eta_{it}^{\text{nb}}).}
 #'  In every iteration of the MCMC sampler, the latent at-risk indicators \eqn{w_{it}} are updated
 #'  and the parameters in the count model are estimated by using only the observations
-#'  that are currently in the risk set. Note that for \eqn{y_{it} > 0} the at-risk indicators
+#'  that are currently in the risk set. Note that for \eqn{\text{y}_{it} > 0} the at-risk indicators
 #'  are fixed at \eqn{w_{it} = 1} in every iteration.
 #'
 #'  If the response variable contains missing values, data augmentation is used to
@@ -722,7 +722,6 @@
 #'  the returned object contains a list of the following elements:
 #'  \describe{
 #'    \item{learning.settings}{information on which parameters have been learned}
-#'    \item{variable.codes}{information on which covariate is associated with which parameter}
 #'    \item{data}{the data used for fitting the model and additional context information
 #'    derived from the data}
 #'    \item{Y}{the \eqn{Tn \times M} response data matrix of every iteration of the chain,
@@ -745,6 +744,7 @@
 #'    \item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 #'     predictive distribution for each observation (rows) and each MCMC draw (columns)}
 #'    \item{mcmc.settings}{details on the MCMC sampler}
+#'    \item{variable.codes}{information on which covariate is associated with which parameter}
 #'  }
 #'  When modelling a Zero-Inflated Negative Binomial response,
 #'  the returned object contains a list of the following elements:
@@ -752,10 +752,6 @@
 #'    \item{learning.settings_logit}{information on which parameters have been learned
 #'       for the zero-inflation component of the model}
 #'    \item{learning.settings_nb}{information on which parameters have been learned
-#'       for the count component of the model}
-#'    \item{variable.codes_logit}{information on which covariate is associated with which parameter
-#'       for the zero-inflation component of the model}
-#'    \item{variable.codes_nb}{information on which covariate is associated with which parameter
 #'       for the count component of the model}
 #'    \item{data}{the data used for fitting the model and additional context information
 #'    derived from the data}
@@ -788,6 +784,10 @@
 #'    \item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 #'     predictive distribution for each observation (rows) and each MCMC draw (columns)}
 #'    \item{mcmc.settings}{details on the MCMC sampler}
+#'    \item{variable.codes_logit}{information on which covariate is associated with which parameter
+#'       for the zero-inflation component of the model}
+#'    \item{variable.codes_nb}{information on which covariate is associated with which parameter
+#'       for the count component of the model}
 #'  }
 #' @export
 #'
@@ -813,11 +813,15 @@
 #' prior.reg <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.reg),
 #'                                list(a.tau = 1, a.xi = 1,
 #'                                     learn.a.tau = FALSE, learn.a.xi = FALSE))
+#' prior.load <- utils::modifyList(as.list(rlang::fn_fmls(panelTVP)$prior.load),
+#'                                list(a.phi = 1, a.zeta = 1,
+#'                                     learn.a.phi = FALSE, learn.a.zeta = FALSE))
 #' res.gaussian2 <- panelTVP(y ~ W1 + W2 + W3,
 #'                          data = sim.gaussian$observed,
 #'                          id = sim.gaussian$observed$id,
 #'                          t = sim.gaussian$observed$t,
 #'                          prior.reg = prior.reg,
+#'                          prior.load = prior.load,
 #'                          mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE),
 #'                          model = "Gaussian")
 #'

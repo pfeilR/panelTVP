@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 
 # panelTVP
 
-Hi folks and welcome to the package panelTVP! 
+Hello and welcome to the package panelTVP! 
 
 This package provides functions for fitting Bayesian regression models for panel data with time-varying parameters. The functions in this package were created by Roman Pfeiler and Helga Wagner. Maintainer of the package is Roman Pfeiler (roman.pfeiler@jku.at).
 
@@ -74,6 +74,8 @@ For fitting a Bayesian time-varying parameter model to the panel data, the main 
 ```{r}
 res <- panelTVP(y ~ W1 + W2,
                 data = d$observed,
+                id = d$observed$id,
+                t = d$observed$t,
                 model = "Gaussian",
                 mcmc.opt = list(chain.length = 500, burnin = 100, thin = 2, asis = TRUE))
 ```
@@ -100,5 +102,5 @@ As we can see, the insignificant effect of covariate **W2** is effectively shrun
 
 ## The end?
 
-Note that this was just a very simple and quick example for the sake of a creating a first overview of the package. For a more thorough introduction to the package visit the packages' Vignette under **INSERT LINK TO VIGNETTE**.
+Note that this was just a very simple and quick example for the sake of creating a first overview of the package. For a more thorough introduction to the package visit the packages' Vignette under **INSERT LINK TO VIGNETTE**.
 

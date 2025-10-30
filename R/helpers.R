@@ -39,7 +39,7 @@ constructZ <- function(X, Time, timeidx, beta_tilde){
 }
 
 # construct.lp: constructs the linear predictor \eta_{it} =X_{it} beta_t
-construct.lp <- function(X, Time, timeidx,  betat){
+construct.lp <- function(X, Time, timeidx, betat){
   hlp <- list()
   for(it in 1:Time){
     Xt <- X[timeidx==it, ,drop = FALSE]
@@ -54,11 +54,11 @@ construct.lp <- function(X, Time, timeidx,  betat){
 # transform_to_centered: from the non-centered to the centered parametrisation
 #                        (from beta_tilde to betat)
 # beta_tilde is a (T+1)x d matrix
-transform_to_centered <- function(beta_tilde, alpha,d){
+transform_to_centered <- function(beta_tilde, alpha, d){
   TT <- dim(beta_tilde)[1]
   beta <- rep(alpha[1:d], each = TT)
   theta <- alpha[(d+1):(2*d)]
-  betat <- matrix(beta, ncol = d)+
+  betat <- matrix(beta, ncol = d) +
     beta_tilde %*% diag(theta, nrow = d, ncol = d)
   return(betat)
 }

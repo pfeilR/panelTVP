@@ -4,7 +4,7 @@
 #' @param Tmax number of time points / repeated measurements per subject (scalar)
 #' @param model either "Gaussian", "Probit", "Logit", "NegBin" or "ZINB"
 #' @param beta fixed regression effects of Gaussian, Probit, Logit or
-#'  Negative Binomial model with psi_zinb.countthe first value representing the
+#'  Negative Binomial model with the first value representing the
 #'  global intercept (vector of dimension d)
 #' @param theta standard deviations of random walk for regression effects
 #'  of Gaussian, Probit, Logit or Negative Binomial model;
@@ -25,7 +25,7 @@
 #' @param lambda_zinb.count fixed factor loading in count component
 #'  of Zero-Inflated Negative Binomial model (scalar)
 #' @param psi_zinb.count standard deviation of random walk for factor loading
-#'  in count component Zero-Inflated Negative Binomial model;
+#'  in count component of Zero-Inflated Negative Binomial model;
 #'  a larger value yields a factor loading that varies stronger over time (scalar)
 #' @param beta_zinb.inflation fixed regression effects in zero-inflation component of Zero-Inflated
 #'  Negative Binomial model with the first value representing the
@@ -37,7 +37,7 @@
 #' @param lambda_zinb.inflation fixed factor loading in zero-inflation component
 #'  of Zero-Inflated Negative Binomial model (scalar)
 #' @param psi_zinb.inflation standard deviation of random walk for factor loading
-#'  in zero-inflation component Zero-Inflated Negative Binomial model;
+#'  in zero-inflation component of Zero-Inflated Negative Binomial model;
 #'  a larger value yields a factor loading that varies stronger over time (scalar)
 #' @param r dispersion parameter of the Negative Binomial and
 #'  Zero-Inflated Negative Binomial model (scalar, ignored
@@ -85,10 +85,10 @@
 #'  \quad t \in \{1,\dots,T\},}
 #'  where \eqn{\textbf{x}_{it}} is a column vector of the same dimension as the input vector
 #'  \code{beta}. The first covariate is a 1 for estimating the global intercept, whereas
-#'  the other covariates in \eqn{\textbf{x}} are independently generated standard Normal
+#'  the other covariates in \eqn{\textbf{x}_{it}} are independently generated standard Normal
 #'  random variables. The subject-specific factor scores in \eqn{\textbf{f} = (f_1,\dots,f_n)^\top}
-#'  are realizations of standard Normals as well. Moreover, factor scores are centered to have
-#'  a mean of zero. The time-varying parameters
+#'  are realizations of standard Normals as well. Moreover, factor scores are scaled to have
+#'  a mean of zero and a variance of one. The time-varying parameters
 #'  \eqn{\boldsymbol{\beta}_1,\dots,\boldsymbol{\beta}_T} and \eqn{\lambda_1,\dots,\lambda_T}
 #'  are generated from first-order random walks. Using the non-centered parameterization
 #'  (see Frühwirth-Schnatter and Wagner, 2010), the time-varying parameters are
@@ -148,8 +148,7 @@
 #'  \code{psi} of the previous models. Furthermore, note that not the same sets of covariates have
 #'  to be used in the zero-inflation and count predictors \eqn{\eta_{it}^\text{logit}} and
 #'  \eqn{\eta_{it}^\text{nb}}, respectively. This simulation function generates different
-#'  covariates for the two predictors, but the main function of this package [panelTVP()] can handle
-#'  different sets.
+#'  covariates for the two predictors.
 #'
 #' @description
 #' This function simulates panel data with time-varying parameters,

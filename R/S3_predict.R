@@ -7,11 +7,11 @@
 #' @param object an object of class \code{panelTVP.Gaussian}
 #' @param X.new a matrix or data frame consisting of new data for the same variables
 #'  that were used for fitting the model. The first column must contain a 1, when
-#'  the fitted model contains an intercept.
+#'  the fitted model contains an intercept
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
-#'  function.
+#'  function
 #' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
 #' @param pop.pred logical value, if TRUE population-based predictions are made,
 #'  that ignore the random effects structure, if FALSE the random effects structure
@@ -82,11 +82,11 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 #' @param object an object of class \code{panelTVP.Probit}
 #' @param X.new a matrix or data frame consisting of new data for the same variables
 #'  that were used for fitting the model. The first column must contain a 1, when
-#'  the fitted model contains an intercept.
+#'  the fitted model contains an intercept
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
-#'  function.
+#'  function
 #' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
 #' @param pop.pred logical value, if TRUE population-based predictions are made,
 #'  that ignore the random effects structure, if FALSE the random effects structure
@@ -155,11 +155,11 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 #' @param object an object of class \code{panelTVP.Logit}
 #' @param X.new a matrix or data frame consisting of new data for the same variables
 #'  that were used for fitting the model. The first column must contain a 1, when
-#'  the fitted model contains an intercept.
+#'  the fitted model contains an intercept
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
-#'  function.
+#'  function
 #' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
 #' @param pop.pred logical value, if TRUE population-based predictions are made,
 #'  that ignore the random effects structure, if FALSE the random effects structure
@@ -227,11 +227,11 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 #' @param object an object of class \code{panelTVP.NegBin}
 #' @param X.new a matrix or data frame consisting of new data for the same variables
 #'  that were used for fitting the model. The first column must contain a 1, when
-#'  the fitted model contains an intercept.
+#'  the fitted model contains an intercept
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
-#'  function.
+#'  function
 #' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
 #' @param pop.pred logical value, if TRUE population-based predictions are made,
 #'  that ignore the random effects structure, if FALSE the random effects structure
@@ -308,7 +308,7 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 #' @param timepoint a numeric scalar indicating the time point for which predictions should
 #'  be made, i.e., predictions for a given data set are only made for one specific time point.
 #'  In case you want predictions for additional time points you need to repeatedly call this
-#'  function.
+#'  function
 #' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
 #' @param pop.pred logical value, if TRUE population-based predictions are made,
 #'  that ignore the random effects structure, if FALSE the random effects structure
@@ -405,13 +405,13 @@ pred.helper <- function(model, X.new, timepoint,
       if(cla == "panelTVP.Gaussian"){
         y.future[, s] <- rnorm(n, mean = mcmc.eta[, s], sd = sqrt(sigma2[s]))
       }
-      if(cla == "panelTVP.Probit"){
+      else if(cla == "panelTVP.Probit"){
         y.future[, s] <- rbinom(n, size = 1, prob = pnorm(mcmc.eta[,s]))
       }
-      if(cla == "panelTVP.Logit"){
+      else if(cla == "panelTVP.Logit"){
         y.future[, s] <- rbinom(n, size = 1, prob = plogis(mcmc.eta[,s]))
       }
-      if(cla == "panelTVP.NegBin"){
+      else if(cla == "panelTVP.NegBin"){
         y.future[, s] <- MASS::rnegbin(n, mu = r[s] * exp(mcmc.eta[,s]), theta = r[s])
       }
     }
@@ -420,19 +420,18 @@ pred.helper <- function(model, X.new, timepoint,
       eta.replicant <- matrix(nrow = n, ncol = n.replicates)
       y.replicant <- matrix(nrow = n, ncol = n.replicates)
       for(replicant in 1:n.replicates){
-        fi <- rnorm(n) # sampling from the prior for new subjects
-        fi <- fi - mean(fi)
+        fi <- base::scale(rnorm(n))
         eta.replicant[, replicant] <- X.new %*% mcmc.beta[s,] + mcmc.lamb[s] * fi
         if(cla == "panelTVP.Gaussian"){
           y.replicant[, replicant] <- rnorm(n, mean = eta.replicant[, replicant], sd = sqrt(sigma2[s]))
         }
-        if(cla == "panelTVP.Probit"){
+        else if(cla == "panelTVP.Probit"){
           y.replicant[, replicant] <- rbinom(n, size = 1, prob = pnorm(eta.replicant[, replicant]))
         }
-        if(cla == "panelTVP.Logit"){
+        else if(cla == "panelTVP.Logit"){
           y.replicant[, replicant] <- rbinom(n, size = 1, prob = plogis(eta.replicant[, replicant]))
         }
-        if(cla == "panelTVP.NegBin"){
+        else if(cla == "panelTVP.NegBin"){
           y.replicant[, replicant] <- MASS::rnegbin(n, mu = r[s] * exp(eta.replicant[, replicant]), theta = r[s])
         }
       }
@@ -499,10 +498,8 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
       eta_logit.replicant <- matrix(nrow = n, ncol = n.replicates)
       y.replicant <- matrix(nrow = n, ncol = n.replicates)
       for(replicant in 1:n.replicates){
-        fi_nb <- rnorm(n)
-        fi_nb <- fi_nb - mean(fi_nb)
-        fi_logit <- rnorm(n)
-        fi_logit <- fi_logit - mean(fi_logit)
+        fi_nb <- base::scale(rnorm(n))
+        fi_logit <- base::scale(rnorm(n))
         eta_nb.replicant[, replicant] <- X_nb.new %*% mcmc.beta_nb[s,] +
           mcmc.lamb_nb[s] * fi_nb
         eta_logit.replicant[, replicant] <- X_logit.new %*% mcmc.beta_logit[s,] +

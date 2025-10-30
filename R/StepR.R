@@ -419,7 +419,7 @@ stepR <- function(response,
       prior.reg$xi[prior.reg$xi<0.1^8]=0.1^8
 
       prior.reg$tau <- 1/rgamma(df$d, prior.reg$c.tau + 0.5,
-                               prior.reg$chi.tau.j + (alpha[1:df$d]^2)/2)
+                                prior.reg$chi.tau.j + (alpha[1:df$d]^2)/2)
       prior.reg$tau[prior.reg$tau>10^8]=10^8
       prior.reg$tau[prior.reg$tau<0.1^8]=0.1^8
 

@@ -19,12 +19,12 @@
 
 \item{X.new}{a matrix or data frame consisting of new data for the same variables
 that were used for fitting the model. The first column must contain a 1, when
-the fitted model contains an intercept.}
+the fitted model contains an intercept}
 
 \item{timepoint}{a numeric scalar indicating the time point for which predictions should
 be made, i.e., predictions for a given data set are only made for one specific time point.
 In case you want predictions for additional time points you need to repeatedly call this
-function.}
+function}
 
 \item{coverage}{coverage probability for prediction intervals - defaults to 95 percent coverage}
 

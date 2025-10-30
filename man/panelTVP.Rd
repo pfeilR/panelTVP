@@ -1018,7 +1018,7 @@ Knaus, P., Bitto-Nemling, A., Cadonna, A. and Frühwirth-Schnatter, S. (2021).
 Shrinkage in the Time-Varying Parameter Model Framework using the R Package
 \code{shrinkTVP}. In: Journal of Statistical Software, 100, 1-32.
 
-Knaus, P. Frühwirth-Schnatter, S. (2025). The Dynamic Triple Gamma as a Shrinakge
+Knaus, P. Frühwirth-Schnatter, S. (2025). The Dynamic Triple Gamma as a Shrinkage
 Process for Time-Varying Parameter Models, arXiv preprint arXiv:2312.10487v2.
 
 Neal, R.M. (2003). Slice sampling. In: The Annals of Statistics, 31, 705-767.

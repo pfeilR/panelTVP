@@ -29,7 +29,7 @@ the fitted model contains an intercept in the Logit part (zero-inflation compone
 \item{timepoint}{a numeric scalar indicating the time point for which predictions should
 be made, i.e., predictions for a given data set are only made for one specific time point.
 In case you want predictions for additional time points you need to repeatedly call this
-function.}
+function}
 
 \item{coverage}{coverage probability for prediction intervals - defaults to 95 percent coverage}
 

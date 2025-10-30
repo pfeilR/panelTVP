@@ -34,12 +34,12 @@ sim_Gaussian_Probit_Logit_NegBin <- function(n,
     ind <- ((tt-1)*n+1):(n*tt)
     linpred[ind,] <- W[ind,] %*% matrix(betat[tt,])
   }
-  Sigma <- diag(rep(sigma2, t))
-  if(model == "Gaussian") error <- matrix(mvtnorm::rmvnorm(n, mean = rep(0, t), sigma = Sigma))
+  if(model == "Gaussian"){
+    Sigma <- diag(rep(sigma2, t))
+    error <- matrix(mvtnorm::rmvnorm(n, mean = rep(0, t), sigma = Sigma))
+  }
   y <- matrix(NA,n*t)
-  # fi <- matrix(rnorm(n), ncol = 1)
-  # fi <- fi - mean(fi)
-  fi <- scale(rnorm(n), center = TRUE, scale = TRUE)
+  fi <- base::scale(rnorm(n))
   Fmat <- matrix(NA,n*t)
   for(tt in (1:t)){
     Fmat[((tt-1)*n+1):(n*tt),] <- fi %*% matrix(lambdat[tt,])
@@ -54,12 +54,12 @@ sim_Gaussian_Probit_Logit_NegBin <- function(n,
       y <- rbinom(length(prob.binary), size = 1, prob = prob.binary)
     }
 
-    if(model == "Probit"){
+    else if(model == "Probit"){
       prob.binary <- pnorm(eta)
       y <- rbinom(length(prob.binary), size = 1, prob = prob.binary)
     }
 
-    if(model == "NegBin"){
+    else if(model == "NegBin"){
       mu <- r * exp(eta)
       y <- MASS::rnegbin(length(mu), mu = mu, theta = r)
     }
@@ -179,13 +179,9 @@ sim_ZINB <- function(n,
   W.nb <- model.matrix(~W.nb[,-1])
   linpred.logit <- matrix(NA,n*t)
   linpred.nb <- matrix(NA,n*t)
-  # fi.logit <- matrix(rnorm(n), ncol = 1)
-  # fi.logit <- fi.logit - mean(fi.logit)
-  fi.logit <- scale(rnorm(n), center = TRUE, scale = TRUE)
+  fi.logit <- base::scale(rnorm(n))
   Fmat.logit <- matrix(NA,n*t)
-  # fi.nb <- matrix(rnorm(n), ncol = 1)
-  # fi.nb <- fi.nb - mean(fi.nb)
-  fi.nb <- scale(rnorm(n), center = TRUE, scale = TRUE)
+  fi.nb <- base::scale(rnorm(n))
   Fmat.nb <- matrix(NA,n*t)
   for(tt in 1:t){
     ind <- ((tt-1)*n+1):(n*tt)

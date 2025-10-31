@@ -4,58 +4,25 @@
 \alias{panelTVP}
 \title{Fit a Bayesian panel model with time-varying parameters}
 \usage{
-panelTVP(
-  formula = NULL,
-  data = NULL,
-  id = NULL,
-  t = NULL,
-  model = NULL,
-  prior.reg = list(a.tau = 0.1, a.xi = 0.1, learn.a.tau = TRUE, learn.a.xi = TRUE,
-    alpha.a.tau = 2, alpha.a.xi = 2, beta.a.tau = 1, beta.a.xi = 1, iota.a.tau = 1,
-    iota.a.xi = 1, target.rate.a.tau = 0.44, target.rate.a.xi = 0.44, c.tau = 0.1, c.xi =
-    0.1, learn.c.tau = TRUE, learn.c.xi = TRUE, alpha.c.tau = 2, alpha.c.xi = 2,
-    beta.c.tau = 1, beta.c.xi = 1, iota.c.tau = 1, iota.c.xi = 1, target.rate.c.tau =
-    0.44, target.rate.c.xi = 0.44, kappa.tau = 10, kappa.xi = 10, learn.kappa.tau = TRUE,
-    learn.kappa.xi = TRUE, 
-     d.tau = 0.001, d.xi = 0.001, e.tau = 0.001, e.xi =
-    0.001, type = "rw-t1", c = 1, B0 = 1, TG = FALSE, TG.alternative = FALSE),
-  prior.var = list(learn.C0.hyp = list(g0 = 5, G0 = 3.333333), c0 = 2.5),
-  prior.load = list(a.phi = 0.1, a.zeta = 0.1, kappa.phi = 10, kappa.zeta = 10,
-    learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE, d.phi = 0.001, d.zeta = 0.001, e.phi
-    = 0.001, e.zeta = 0.001, type = "rw-t1", c = 1, L0 = 1),
-  prior.reg_zinb.count = list(a.tau = 0.1, a.xi = 0.1, learn.a.tau = TRUE, learn.a.xi =
-    TRUE, alpha.a.tau = 2, alpha.a.xi = 2, beta.a.tau = 1, beta.a.xi = 1, iota.a.tau = 1,
-    iota.a.xi = 1, target.rate.a.tau = 0.44, target.rate.a.xi = 0.44, c.tau = 0.1, c.xi =
-    0.1, learn.c.tau = TRUE, learn.c.xi = TRUE, alpha.c.tau = 2, alpha.c.xi = 2,
-    beta.c.tau = 1, beta.c.xi = 1, iota.c.tau = 1, iota.c.xi = 1, target.rate.c.tau =
-    0.44, target.rate.c.xi = 0.44, kappa.tau = 10, kappa.xi = 10, learn.kappa.tau = TRUE,
-    learn.kappa.xi = TRUE, 
-     d.tau = 0.001, d.xi = 0.001, e.tau = 0.001, e.xi =
-    0.001, type = "rw-t1", c = 1, B0 = 1, TG = FALSE, TG.alternative = FALSE),
-  prior.load_zinb.count = list(a.phi = 0.1, a.zeta = 0.1, kappa.phi = 10, kappa.zeta =
-    10, learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE, d.phi = 0.001, d.zeta = 0.001,
-    e.phi = 0.001, e.zeta = 0.001, type = "rw-t1", c = 1, L0 = 1),
-  prior.reg_zinb.inflation = list(a.tau = 0.1, a.xi = 0.1, learn.a.tau = TRUE, learn.a.xi
-    = TRUE, alpha.a.tau = 2, alpha.a.xi = 2, beta.a.tau = 1, beta.a.xi = 1, iota.a.tau =
-    1, iota.a.xi = 1, target.rate.a.tau = 0.44, target.rate.a.xi = 0.44, c.tau = 0.1,
-    c.xi = 0.1, learn.c.tau = TRUE, learn.c.xi = TRUE, alpha.c.tau = 2, alpha.c.xi = 2,
-    beta.c.tau = 1, beta.c.xi = 1, iota.c.tau = 1, iota.c.xi = 1, target.rate.c.tau =
-    0.44, target.rate.c.xi = 0.44, kappa.tau = 10, kappa.xi = 10, learn.kappa.tau = TRUE,
-    learn.kappa.xi = TRUE, 
-     d.tau = 0.001, d.xi = 0.001, e.tau = 0.001, e.xi =
-    0.001, type = "rw-t1", c = 1, B0 = 1, TG = FALSE, TG.alternative = FALSE),
-  prior.load_zinb.inflation = list(a.phi = 0.1, a.zeta = 0.1, kappa.phi = 10, kappa.zeta
-    = 10, learn.kappa.phi = TRUE, learn.kappa.zeta = TRUE, d.phi = 0.001, d.zeta = 0.001,
-    e.phi = 0.001, e.zeta = 0.001, type = "rw-t1", c = 1, L0 = 1),
-  mcmc.opt = list(chain.length = 12000, burnin = 2000, thin = 10, asis = TRUE),
-  settings.NegBin = list(alpha.r = 2, beta.r = 1, expansion.steps = 10, width = 1,
-    p.overrelax = 0, accuracy.overrelax = 10),
-  HPD.coverage = 0.95,
-  R.WAIC = 20,
-  posterior.predictive.matrix = TRUE,
-  random.effects = TRUE,
-  progress.bar = FALSE
-)
+panelTVP(formula = NULL,
+         data = NULL,
+         id = NULL,
+         t = NULL,
+         model = NULL,
+         prior.reg = list(),
+         prior.var = list(),
+         prior.load = list(),
+         prior.reg_zinb.count = list(),
+         prior.load_zinb.count = list(),
+         prior.reg_zinb.inflation = list(),
+         prior.load_zinb.inflation = list(),
+         mcmc.opt = list(),
+         settings.NegBin = list(),
+         HPD.coverage = 0.95,
+         R.WAIC = 20,
+         posterior.predictive.matrix = TRUE,
+         random.effects = TRUE,
+         progress.bar = FALSE)
 }
 \arguments{
 \item{formula}{the usual formula argument in regression methods, e.g., as in \code{\link[=lm]{lm()}}.

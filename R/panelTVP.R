@@ -1,5 +1,25 @@
 #' Fit a Bayesian panel model with time-varying parameters
 #'
+#' @usage panelTVP(formula = NULL,
+#'          data = NULL,
+#'          id = NULL,
+#'          t = NULL,
+#'          model = NULL,
+#'          prior.reg = list(),
+#'          prior.var = list(),
+#'          prior.load = list(),
+#'          prior.reg_zinb.count = list(),
+#'          prior.load_zinb.count = list(),
+#'          prior.reg_zinb.inflation = list(),
+#'          prior.load_zinb.inflation = list(),
+#'          mcmc.opt = list(),
+#'          settings.NegBin = list(),
+#'          HPD.coverage = 0.95,
+#'          R.WAIC = 20,
+#'          posterior.predictive.matrix = TRUE,
+#'          random.effects = TRUE,
+#'          progress.bar = FALSE)
+#'
 #' @param formula the usual formula argument in regression methods, e.g., as in [lm()].
 #'  When fitting a Zero-Inflated Negative Binomial model, the covariates for the
 #'  Negative Binomial (count) component and the Logit (zero-inflation) component are

@@ -123,7 +123,7 @@ Binomial and ZINB model)}
 \description{
 This function simulates panel data with time-varying parameters,
 where the distribution of the
-response variable is either Gaussian, binary (using a Probit or Logit link)
+response variable is either Gaussian, binary (using a Probit or Logit link),
 Negative Binomial or Zero-Inflated Negative Binomial.
 }
 \details{

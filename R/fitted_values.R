@@ -39,7 +39,7 @@ compute_fitted_Gaussian_Probit_Logit_NegBin <- function(result){
                                             S = S)
   }
 
-  return(float::fl(y.fit))
+  return(y.fit)
 
 }
 
@@ -134,7 +134,7 @@ compute_fitted_ZINB <- function(result){
     y.fit[o, ] <- y.draw
   }
 
-  return(float::fl(y.fit))
+  return(y.fit)
 
 }
 
@@ -170,6 +170,6 @@ compute_fitted_ZINB_no.fac <- function(result){
     y.fit[o, ] <- y.draw
   }
 
-  return(float::fl(y.fit))
+  return(y.fit)
 
 }

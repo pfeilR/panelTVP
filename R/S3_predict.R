@@ -13,8 +13,8 @@
 #'  In case you want predictions for additional time points you need to repeatedly call this
 #'  function
 #' @param coverage coverage probability for prediction intervals - defaults to 95 percent coverage
-#' @param pop.pred logical value, if TRUE population-based predictions are made,
-#'  that ignore the random effects structure, if FALSE the random effects structure
+#' @param subject.specific.pred logical value, if FALSE global predictions are made,
+#'  that ignore the random effects structure, if TRUE the random effects structure
 #'  is included as well where the unknown factor scores are sampled from their
 #'  standard Normal prior - defaults to FALSE
 #' @param n.replicates number of replicates within each Monte Carlo draw and for each subject
@@ -66,6 +66,7 @@
 predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
                                       coverage = 0.95, pop.pred = FALSE,
                                       n.replicates = 100, ...){
+  pop.pred <- !subject.specific.pred
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
                 pop.pred = pop.pred, n.replicates = n.replicates)
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
@@ -139,6 +140,7 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
 predict.panelTVP.Probit <- function(object, X.new, timepoint,
                                     coverage = 0.95, pop.pred = FALSE,
                                     n.replicates = 100, ...){
+  pop.pred <- !subject.specific.pred
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
                 pop.pred = pop.pred, n.replicates = n.replicates)
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
@@ -212,6 +214,7 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
 predict.panelTVP.Logit <- function(object, X.new, timepoint,
                                    coverage = 0.95, pop.pred = FALSE,
                                    n.replicates = 100, ...){
+  pop.pred <- !subject.specific.pred
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
                 pop.pred = pop.pred, n.replicates = n.replicates)
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
@@ -285,6 +288,7 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
 predict.panelTVP.NegBin <- function(object, X.new, timepoint,
                                     coverage = 0.95, pop.pred = FALSE,
                                     n.replicates = 100, ...){
+  pop.pred <- !subject.specific.pred
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
                 pop.pred = pop.pred, n.replicates = n.replicates)
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
@@ -371,6 +375,7 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
 predict.panelTVP.ZINB <- function(object, X_nb.new, X_logit.new, timepoint,
                                   coverage = 0.95, pop.pred = FALSE,
                                   n.replicates = 100, ...){
+  pop.pred <- !subject.specific.pred
   check.predict_ZINB(model = object, X_nb.new = X_nb.new, X_logit.new = X_logit.new,
                      timepoint = timepoint, coverage = coverage, pop.pred = pop.pred,
                      n.replicates = n.replicates)

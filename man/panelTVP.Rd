@@ -20,7 +20,7 @@ panelTVP(formula = NULL,
          settings.NegBin = list(),
          HPD.coverage = 0.95,
          R.WAIC = 20,
-         posterior.predictive.matrix = TRUE,
+         posterior.predictive.matrix = FALSE,
          random.effects = TRUE,
          progress.bar = FALSE)
 }
@@ -756,10 +756,10 @@ Finally, there exists an alternative representation of the triple Gamma prior,
 which was proposed by Knaus and Frühwirth-Schnatter (2025) and is given by
 \deqn{
   \begin{aligned}
-   \theta_j^2|\xi^2_j &\sim \mathcal{N}(0,\xi^2_j), \quad \xi^2_j|\chi^\xi_j,c^\xi \sim
+   \theta_j|\xi^2_j &\sim \mathcal{N}(0,\xi^2_j), \quad \xi^2_j|\chi^\xi_j,c^\xi \sim
    \mathcal{G}^{-1}(c^\xi,\chi^\xi_j), \quad \chi_j^\xi|a^\xi,c^\xi \sim
    \mathcal{G}\Biggl(a^\xi, \frac{a^\xi}{c^\xi}\Biggr), \\
-   \beta_j^2|\tau^2_j &\sim \mathcal{N}(0,\tau^2_j), \quad \tau^2_j|\chi^\tau_j,c^\tau \sim
+   \beta_j|\tau^2_j &\sim \mathcal{N}(0,\tau^2_j), \quad \tau^2_j|\chi^\tau_j,c^\tau \sim
    \mathcal{G}^{-1}(c^\tau,\chi^\tau_j), \quad \chi_j^\tau|a^\tau,c^\tau \sim
    \mathcal{G}\Biggl(a^\tau, \frac{a^\tau}{c^\tau}\Biggr).
   \end{aligned}

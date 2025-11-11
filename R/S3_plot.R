@@ -263,6 +263,7 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
       }
     })
   )]
+  plot_list <- plot_list[order(sapply(plot_list, function(x) unique(x$var)) == "Factor Loading")]
   plot_objs <- list()
   for(i in 1:length(plot_list)) plot_objs[[i]] <- make_plot(plot_list[[i]])
   plot_objs[[1]] <- plot_objs[[1]] + ggplot2::ylab(expression(hat(lambda)))

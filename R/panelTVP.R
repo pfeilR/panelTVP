@@ -1081,7 +1081,7 @@ panelTVP <- function(formula = NULL,
                        width = 1, p.overrelax = 0, accuracy.overrelax = 10
                      ),
                      HPD.coverage = 0.95,
-                     R.WAIC = 20,
+                     R.WAIC = 5,
                      posterior.predictive.matrix = FALSE,
                      random.effects = TRUE,
                      progress.bar = FALSE

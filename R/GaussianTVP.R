@@ -74,7 +74,8 @@ GaussianTVP <- function(df,
                            lambda = lambda,
                            alpha_lambda = alpha_lambda,
                            prior.load = prior.load,
-                           estimation = "Normal")
+                           estimation = "Normal",
+                           mcmc.opt = mcmc.opt)
         fi <- stepF.out$fi
         lambda <- stepF.out$lambda
         alpha_lambda <- stepF.out$alpha_lambda

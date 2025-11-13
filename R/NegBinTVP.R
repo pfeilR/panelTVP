@@ -113,7 +113,8 @@ NegBinTVP <- function(df,
                            lambda = lambda,
                            alpha_lambda = alpha_lambda,
                            prior.load = prior.load,
-                           estimation = "PG")
+                           estimation = "PG",
+                           mcmc.opt = mcmc.opt)
         fi <- stepF.out$fi
         lambda <- stepF.out$lambda
         alpha_lambda <- stepF.out$alpha_lambda

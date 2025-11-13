@@ -135,7 +135,8 @@ zinbTVP <- function(df,
                                  lambda = lambda_logit,
                                  alpha_lambda = alpha_lambda_logit,
                                  prior.load = prior.load_logit,
-                                 estimation = "PG")
+                                 estimation = "PG",
+                                 mcmc.opt = mcmc.opt)
         fi_logit <- stepF.out_logit$fi
         lambda_logit <- stepF.out_logit$lambda
         alpha_lambda_logit <- stepF.out_logit$alpha_lambda
@@ -216,7 +217,8 @@ zinbTVP <- function(df,
                               lambda = lambda_nb,
                               alpha_lambda = alpha_lambda_nb,
                               prior.load = prior.load_nb,
-                              estimation = "PG")
+                              estimation = "PG",
+                              mcmc.opt = mcmc.opt)
         fi_nb <- stepF.out_nb$fi
         lambda_nb <- stepF.out_nb$lambda
         alpha_lambda_nb <- stepF.out_nb$alpha_lambda

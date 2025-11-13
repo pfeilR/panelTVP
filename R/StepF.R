@@ -6,7 +6,8 @@ stepF <- function(response,
                   lambda,
                   alpha_lambda,
                   prior.load,
-                  estimation){
+                  estimation,
+                  mcmc.opt){
 
   res.mat <- matrix(response, byrow = F, nrow = df$n, ncol = df$Tmax)
 
@@ -24,13 +25,15 @@ stepF <- function(response,
   if(estimation == "Normal"){
     load.draws <- sample_lambda(y = response, fi = fi, Time = df$Tmax,
                                 timeidx = df$timeidx, sigma2 = sigma2v,
-                                alpha = alpha_lambda, pri.lambda = prior.load)
+                                alpha = alpha_lambda, pri.lambda = prior.load,
+                                mcmc.opt = mcmc.opt)
   }
   if(estimation == "PG"){
     load.draws <- sample_lambda.PG(z = response, zit = res.mat, fi = fi,
                                    Time = df$Tmax, timeidx = df$timeidx,
                                    alpha = alpha_lambda, pri.lambda = prior.load,
-                                   W.sparse = W.sparse, W.dense = W.dense)
+                                   W.sparse = W.sparse, W.dense = W.dense,
+                                   mcmc.opt = mcmc.opt)
     rm(W.sparse, W.dense)
   }
 
@@ -96,7 +99,7 @@ sample.facs.PG <- function(zit, lambda, W.dense){
 
 ## Step 2 (sample factor loadings and hyperparameters)
 
-sample_lambda <- function (y, fi, Time, timeidx, alpha, pri.lambda, sigma2){
+sample_lambda <- function (y, fi, Time, timeidx, alpha, pri.lambda, sigma2, mcmc.opt){
 
   n <- length(fi)
 
@@ -147,6 +150,20 @@ sample_lambda <- function (y, fi, Time, timeidx, alpha, pri.lambda, sigma2){
 
     alpha_lambda <- sample_alpha(y = y, d = 1, Z = Zlambda, A0 = A0lambda,
                                  sigma2 = sigma2)
+
+    # optional ASIS step
+
+    if(mcmc.opt$asis){
+      res_ASIS_fac <- ASIS(beta_tilde = lambda_tilde,
+                           tau = pri.lambda$phi,
+                           xi = pri.lambda$zeta,
+                           d = 1,
+                           hyp.c = pri.lambda$c,
+                           alpha = alpha_lambda,
+                           reg.type = pri.lambda$type)
+      alpha_lambda <- res_ASIS_fac$alpha
+      lambda_tilde <- res_ASIS_fac$beta_tilde
+    }
 
     lambdah <- transform_to_centered(beta_tilde = lambda_tilde,
                                      alpha = alpha_lambda,

@@ -45,10 +45,10 @@
 #'     (double Gamma, triple Gamma)
 #'    \item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.tau} used as starting value, if FALSE
-#'     \eqn{a^\tau =} \code{a.tau} (not learned under alternative triple Gamma)
+#'     \eqn{a^\tau =} \code{a.tau}
 #'    \item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.xi} used as starting value, if FALSE
-#'     \eqn{a^\xi =} \code{a.xi} (not learned under alternative triple Gamma)
+#'     \eqn{a^\xi =} \code{a.xi}
 #'     \item \code{alpha.a.tau}: hyperparameter for learning \eqn{a^\tau}
 #'      (argument is ignored when \code{learn.a.tau = FALSE})
 #'     \item \code{alpha.a.xi}: hyperparameter for learning \eqn{a^\xi}
@@ -75,10 +75,10 @@
 #'     (only triple Gamma)
 #'    \item \code{learn.c.tau}: if TRUE \eqn{c^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.tau} used as starting value, if FALSE
-#'     \eqn{c^\tau =} \code{c.tau} (not learned under alternative triple Gamma)
+#'     \eqn{c^\tau =} \code{c.tau}
 #'    \item \code{learn.c.xi}: if TRUE \eqn{c^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.xi} used as starting value, if FALSE
-#'     \eqn{c^\xi =} \code{c.xi} (not learned under alternative triple Gamma)
+#'     \eqn{c^\xi =} \code{c.xi}
 #'     \item \code{alpha.c.tau}: hyperparameter for learning \eqn{c^\tau}
 #'      (argument is ignored when \code{learn.c.tau = FALSE})
 #'     \item \code{alpha.c.xi}: hyperparameter for learning \eqn{c^\xi}
@@ -135,8 +135,6 @@
 #'     triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
 #'     be used. If \code{TG.alternative = FALSE}, the original triple Gamma
 #'     representation based on Cadonna et al. (2020) will be used instead.
-#'     Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
-#'     and have to be set to fixed values in the alternative representation.
 #'     If \code{TG = FALSE}, this argument is ignored
 #'   }
 #' @param prior.var a list of arguments for estimating the homoscedastic error variance
@@ -189,11 +187,11 @@
 #'     (double Gamma, triple Gamma) (count component)
 #'    \item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.tau} used as starting value, if FALSE
-#'     \eqn{a^\tau =} \code{a.tau} (not learned under alternative triple Gamma)
+#'     \eqn{a^\tau =} \code{a.tau}
 #'     (count component)
 #'    \item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.xi} used as starting value, if FALSE
-#'     \eqn{a^\xi =} \code{a.xi} (not learned under alternative triple Gamma)
+#'     \eqn{a^\xi =} \code{a.xi}
 #'      (count component)
 #'     \item \code{alpha.a.tau}: hyperparameter for learning \eqn{a^\tau}
 #'      (argument is ignored when \code{learn.a.tau = FALSE}) (count component)
@@ -221,11 +219,11 @@
 #'     (only triple Gamma) (count component)
 #'    \item \code{learn.c.tau}: if TRUE \eqn{c^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.tau} used as starting value, if FALSE
-#'     \eqn{c^\tau =} \code{c.tau} (not learned under alternative triple Gamma)
+#'     \eqn{c^\tau =} \code{c.tau}
 #'      (count component)
 #'    \item \code{learn.c.xi}: if TRUE \eqn{c^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.xi} used as starting value, if FALSE
-#'     \eqn{c^\xi =} \code{c.xi} (not learned under alternative triple Gamma)
+#'     \eqn{c^\xi =} \code{c.xi}
 #'      (count component)
 #'     \item \code{alpha.c.tau}: hyperparameter for learning \eqn{c^\tau}
 #'      (argument is ignored when \code{learn.c.tau = FALSE}) (count component)
@@ -287,8 +285,6 @@
 #'     triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
 #'     be used. If \code{TG.alternative = FALSE}, the original triple Gamma
 #'     representation based on Cadonna et al. (2020) will be used instead.
-#'     Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
-#'     and have to be set to fixed values in the alternative representation.
 #'     If \code{TG = FALSE}, this argument is ignored (count component)
 #'   }
 #' @param prior.load_zinb.count A list of arguments for estimating the parameters of the factor
@@ -332,11 +328,11 @@
 #'     (double Gamma, triple Gamma) (inflation component)
 #'    \item \code{learn.a.tau}: if TRUE \eqn{a^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.tau} used as starting value, if FALSE
-#'     \eqn{a^\tau =} \code{a.tau} (not learned under alternative triple Gamma)
+#'     \eqn{a^\tau =} \code{a.tau}
 #'     (inflation component)
 #'    \item \code{learn.a.xi}: if TRUE \eqn{a^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{a.xi} used as starting value, if FALSE
-#'     \eqn{a^\xi =} \code{a.xi} (not learned under alternative triple Gamma)
+#'     \eqn{a^\xi =} \code{a.xi}
 #'      (inflation component)
 #'     \item \code{alpha.a.tau}: hyperparameter for learning \eqn{a^\tau}
 #'      (argument is ignored when \code{learn.a.tau = FALSE}) (inflation component)
@@ -364,11 +360,11 @@
 #'     (only triple Gamma) (inflation component)
 #'    \item \code{learn.c.tau}: if TRUE \eqn{c^\tau} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.tau} used as starting value, if FALSE
-#'     \eqn{c^\tau =} \code{c.tau} (not learned under alternative triple Gamma)
+#'     \eqn{c^\tau =} \code{c.tau}
 #'      (inflation component)
 #'    \item \code{learn.c.xi}: if TRUE \eqn{c^\xi} is updated using Metropolis-Hastings
 #'     with the value of argument \code{c.xi} used as starting value, if FALSE
-#'     \eqn{c^\xi =} \code{c.xi} (not learned under alternative triple Gamma)
+#'     \eqn{c^\xi =} \code{c.xi}
 #'      (inflation component)
 #'     \item \code{alpha.c.tau}: hyperparameter for learning \eqn{c^\tau}
 #'      (argument is ignored when \code{learn.c.tau = FALSE}) (inflation component)
@@ -430,8 +426,6 @@
 #'     triple Gamma representation of Knaus and Frühwirth-Schnatter (2025) should
 #'     be used. If \code{TG.alternative = FALSE}, the original triple Gamma
 #'     representation based on Cadonna et al. (2020) will be used instead.
-#'     Note that the hyperparameters \eqn{a} and \eqn{c} will not be sampled
-#'     and have to be set to fixed values in the alternative representation.
 #'     If \code{TG = FALSE}, this argument is ignored (inflation component)
 #'   }
 #' @param prior.load_zinb.inflation A list of arguments for estimating the parameters of the factor
@@ -665,8 +659,6 @@
 #'  }
 #'  This new representation of the Triple Gamma shrinkage prior fascilitates posterior inference
 #'  as the parameters are sampled from standard distributions.
-#'  Following Knaus and Frühwirth-Schnatter (2025), the hyperparameters \eqn{a} and \eqn{c}
-#'  are assumed to be fixed by the researcher.
 #'
 #'  The function \code{panelTVP} can handle the following popular regression models
 #'   \itemize{
@@ -1180,9 +1172,6 @@ panelTVP <- function(formula = NULL,
     if(!prior.reg$TG){
       result$learning.settings[3:4, 3] <- NA
     }
-    if(prior.reg$TG && prior.reg$TG.alternative){
-      result$learning.settings[1:6, 3] <- NA
-    }
     # adding mcmc setting to output (incl. ASIS Boolean)
     result$mcmc.settings <- mcmc.opt
     # adding matrix to match effect ids to variable names (for user information)
@@ -1289,12 +1278,6 @@ panelTVP <- function(formula = NULL,
     }
     if(!prior.reg_logit$TG){
       result$learning.settings_nb[3:4, 3] <- NA
-    }
-    if(prior.reg_nb$TG && prior.reg_nb$TG.alternative){
-      result$learning.settings_nb[1:6, 3] <- NA
-    }
-    if(prior.reg_logit$TG && prior.reg_logit$TG.alternative){
-      result$learning.settings_logit[1:6, 3] <- NA
     }
     # adding mcmc setting to output (incl. ASIS Boolean)
     result$mcmc.settings <- mcmc.opt

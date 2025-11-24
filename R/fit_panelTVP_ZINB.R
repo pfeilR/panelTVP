@@ -222,7 +222,7 @@ fit_panelTVP_ZINB <- function(formula,
   settings.NegBin$r.accept <- c()
 
   ## regression part
-  if(prior.reg_nb$type != "ind" && !prior.reg_nb$TG.alternative){
+  if(prior.reg_nb$type != "ind"){
     prior.reg_nb$a.xi.accept <- c()
     prior.reg_nb$a.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
     prior.reg_nb$a.tau.accept <- c()
@@ -234,7 +234,7 @@ fit_panelTVP_ZINB <- function(formula,
       prior.reg_nb$c.tau.accept[1] <- 1 # we let metropolis start in 2nd iteration
     }
   }
-  if(prior.reg_logit$type != "ind" && !prior.reg_logit$TG.alternative){
+  if(prior.reg_logit$type != "ind"){
     prior.reg_logit$a.xi.accept <- c()
     prior.reg_logit$a.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
     prior.reg_logit$a.tau.accept <- c()

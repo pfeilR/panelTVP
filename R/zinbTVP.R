@@ -461,7 +461,7 @@ zinbTVP <- function(df,
 
   # computing acceptance rates of Metropolis-based parameters
   acceptance.rates_logit <- matrix(nrow = 1, ncol = 4)
-  if(prior.reg_logit$type != "ind" && !prior.reg_logit$TG.alternative){
+  if(prior.reg_logit$type != "ind"){
     acceptance.rates_logit[,1] <- accept.rate(accept = prior.reg_logit$a.xi.accept, mcmc.opt = mcmc.opt)
     acceptance.rates_logit[,2] <- accept.rate(accept = prior.reg_logit$a.tau.accept, mcmc.opt = mcmc.opt)
     if(prior.reg_logit$TG){
@@ -470,7 +470,7 @@ zinbTVP <- function(df,
     }
   }
   acceptance.rates_nb <- matrix(nrow = 1, ncol = 4)
-  if(prior.reg_nb$type != "ind" && !prior.reg_nb$TG.alternative){
+  if(prior.reg_nb$type != "ind"){
     acceptance.rates_nb <- matrix(nrow = 1, ncol = 4)
     acceptance.rates_nb[,1] <- accept.rate(accept = prior.reg_nb$a.xi.accept, mcmc.opt = mcmc.opt)
     acceptance.rates_nb[,2] <- accept.rate(accept = prior.reg_nb$a.tau.accept, mcmc.opt = mcmc.opt)

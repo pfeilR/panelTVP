@@ -151,7 +151,7 @@ fit_panelTVP <- function(formula,
   }
 
   ## regression part
-  if(prior.reg$type != "ind" && !prior.reg$TG.alternative){
+  if(prior.reg$type != "ind"){
     prior.reg$a.xi.accept <- c()
     prior.reg$a.xi.accept[1] <- 1 # we let metropolis start in 2nd iteration
     prior.reg$a.tau.accept <- c()

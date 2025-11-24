@@ -309,15 +309,15 @@ stepR <- function(response,
          ## c_tau
 
          c_tau_state <- MH_c_triple(c = prior.reg$c.tau,
-                                   a = prior.reg$a.tau,
-                                   par = alpha[1:df$d],
-                                   iota = prior.reg$iota.c.tau,
-                                   prior_hp1 = prior.reg$alpha.c.tau,
-                                   prior_hp2 = prior.reg$beta.c.tau, # scaled Beta prior
-                                   k = prior.reg$kappa.tau,
-                                   var.check = prior.reg$tau.check,
-                                   accept = prior.reg$c.tau.accept,
-                                   target.rate = prior.reg$target.rate.c.tau)
+                                    a = prior.reg$a.tau,
+                                    par = alpha[1:df$d],
+                                    iota = prior.reg$iota.c.tau,
+                                    prior_hp1 = prior.reg$alpha.c.tau,
+                                    prior_hp2 = prior.reg$beta.c.tau, # scaled Beta prior
+                                    k = prior.reg$kappa.tau,
+                                    var.check = prior.reg$tau.check,
+                                    accept = prior.reg$c.tau.accept,
+                                    target.rate = prior.reg$target.rate.c.tau)
 
          if(c_tau_state[[1]] != prior.reg$c.tau){
            prior.reg$c.tau.accept[i] <- 1
@@ -398,6 +398,128 @@ stepR <- function(response,
     prior.reg$tau[prior.reg$tau<0.1^8]=0.1^8
 
     } else{ # new representation of Triple Gamma
+
+      # Sampling of a parameters
+
+      if(prior.reg$learn.a.xi){
+
+        if(i>1){ # metropolis step starting in second iteration
+
+          ## a_xi
+
+          a_xi_state <- MH_a_triple_alternative(a = prior.reg$a.xi,
+                                                c = prior.reg$c.xi,
+                                                iota = prior.reg$iota.a.xi,
+                                                prior_hp1 = prior.reg$alpha.a.xi,
+                                                prior_hp2 = prior.reg$beta.a.xi, # scaled Beta prior
+                                                chi.j = prior.reg$chi.xi.j,
+                                                accept = prior.reg$a.xi.accept,
+                                                target.rate = prior.reg$target.rate.a.xi)
+
+          if(a_xi_state[[1]] != prior.reg$a.xi){
+            prior.reg$a.xi.accept[i] <- 1
+          } else{
+            prior.reg$a.xi.accept[i] <- 0
+          }
+          prior.reg$a.xi <- a_xi_state[[1]]
+          prior.reg$a.xi[prior.reg$a.xi>10^8]=10^8
+          prior.reg$a.xi[prior.reg$a.xi<0.1^8]=0.1^8
+          prior.reg$iota.a.xi <- a_xi_state[[2]]
+
+        }
+
+      }
+
+      if(prior.reg$learn.a.tau){
+
+        if(i>1){ # metropolis step starting in second iteration
+
+          ## a_tau
+
+          a_tau_state <- MH_a_triple_alternative(a = prior.reg$a.tau,
+                                                 c = prior.reg$c.tau,
+                                                 iota = prior.reg$iota.a.tau,
+                                                 prior_hp1 = prior.reg$alpha.a.tau,
+                                                 prior_hp2 = prior.reg$beta.a.tau, # scaled Beta prior
+                                                 chi.j = prior.reg$chi.tau.j,
+                                                 accept = prior.reg$a.tau.accept,
+                                                 target.rate = prior.reg$target.rate.a.tau)
+
+          if(a_tau_state[[1]] != prior.reg$a.tau){
+            prior.reg$a.tau.accept[i] <- 1
+          } else{
+            prior.reg$a.tau.accept[i] <- 0
+          }
+          prior.reg$a.tau <- a_tau_state[[1]]
+          prior.reg$a.tau[prior.reg$a.tau>10^8]=10^8
+          prior.reg$a.tau[prior.reg$a.tau<0.1^8]=0.1^8
+          prior.reg$iota.a.tau <- a_tau_state[[2]]
+
+        }
+
+      }
+
+      # Sampling of c parameters
+
+      if(prior.reg$learn.c.xi){
+
+        if(i>1){ # metropolis step starting in second iteration
+
+          ## c_xi
+
+          c_xi_state <- MH_c_triple_alternative(c = prior.reg$c.xi,
+                                                a = prior.reg$a.xi,
+                                                vari = prior.reg$xi,
+                                                iota = prior.reg$iota.c.xi,
+                                                prior_hp1 = prior.reg$alpha.c.xi,
+                                                prior_hp2 = prior.reg$beta.c.xi, # scaled Beta prior
+                                                chi.j = prior.reg$chi.xi.j,
+                                                accept = prior.reg$c.xi.accept,
+                                                target.rate = prior.reg$target.rate.c.xi)
+
+          if(c_xi_state[[1]] != prior.reg$c.xi){
+            prior.reg$c.xi.accept[i] <- 1
+          } else{
+            prior.reg$c.xi.accept[i] <- 0
+          }
+          prior.reg$c.xi <- c_xi_state[[1]]
+          prior.reg$c.xi[prior.reg$c.xi>10^8]=10^8
+          prior.reg$c.xi[prior.reg$c.xi<0.1^8]=0.1^8
+          prior.reg$iota.c.xi <- c_xi_state[[2]]
+
+        }
+
+      }
+
+      if(prior.reg$learn.c.tau){
+
+        if(i>1){ # metropolis step starting in second iteration
+
+          ## c_tau
+
+          c_tau_state <- MH_c_triple_alternative(c = prior.reg$c.tau,
+                                                a = prior.reg$a.tau,
+                                                vari = prior.reg$tau,
+                                                iota = prior.reg$iota.c.tau,
+                                                prior_hp1 = prior.reg$alpha.c.tau,
+                                                prior_hp2 = prior.reg$beta.c.tau, # scaled Beta prior
+                                                chi.j = prior.reg$chi.tau.j,
+                                                accept = prior.reg$c.tau.accept,
+                                                target.rate = prior.reg$target.rate.c.tau)
+
+          if(c_tau_state[[1]] != prior.reg$c.tau){
+            prior.reg$c.tau.accept[i] <- 1
+          } else{
+            prior.reg$c.tau.accept[i] <- 0
+          }
+          prior.reg$c.tau <- c_tau_state[[1]]
+          prior.reg$c.tau[prior.reg$c.tau>10^8]=10^8
+          prior.reg$c.tau[prior.reg$c.tau<0.1^8]=0.1^8
+          prior.reg$iota.c.tau <- c_tau_state[[2]]
+
+        }
+
+      }
 
       # Sampling of hyperparameters chi.xi.j and chi.tau.j
       prior.reg$chi.xi.j <- rgamma(df$d,
@@ -958,7 +1080,103 @@ MH_c_triple <- function(c, a, par, iota, prior_hp1, prior_hp2, k, var.check, acc
   }
   return(list(res, iota))
 }
+log_q_a_triple_alternative <- function(a, c, b1, b2, chi.j){
 
+  # compute log q
+  partA <- a*log(a)-a*log(c)-lgamma(a)+(a-1)*sum(log(chi.j))-(a/c)*sum(chi.j)
+  partB <- (b1-1)*log(2*a)+(b2-1)*log(1-2*a)
+  partC <- log(a)+log(0.5-a)
+  log.q <- partA + partB + partC
+
+  return(log.q)
+
+}
+MH_a_triple_alternative <- function(a, c, iota, prior_hp1, prior_hp2, chi.j, accept, target.rate){
+
+  if(!is.na(target.rate)){
+
+    # adaptive step
+    accept.rate <- sum(accept) / length(accept)
+    adapt.factor <- exp(0.01 * (accept.rate - target.rate))
+    iota <- iota * adapt.factor
+
+  }
+
+  #draw a value from the proposal distribution as in Cadonna et al.
+  z.old <- log(a/(0.5-a))
+  z.star <- rnorm(1, mean = z.old, sd = iota)
+  a.star <- 0.5*plogis(z.star)
+  eps <- 1e-08
+  a.star <- max(min(a.star, 0.5 - eps), eps)
+
+  # compute the q-values
+  log.q.old <- log_q_a_triple_alternative(a = a, c = c,
+                                          b1 = prior_hp1, b2 = prior_hp2,
+                                          chi.j = chi.j)
+  log.q.star <- log_q_a_triple_alternative(a = a.star, c = c,
+                                           b1 = prior_hp1, b2 = prior_hp2,
+                                           chi.j = chi.j)
+
+  acc_prob <- min(0, log.q.star - log.q.old)
+  acc_prob
+
+  u <- runif(1)
+
+  if(log(u) < acc_prob){
+    res <- a.star
+  }else{
+    res <- a
+  }
+  return(list(res, iota))
+}
+log_q_c_triple_alternative <- function(c, a, b1, b2, vari, chi.j){
+
+  # compute log q
+  partA <- c*sum(log(chi.j))-lgamma(c)-(c+1)*sum(log(vari))
+  partB <- -a*log(c)-(a/c)*sum(chi.j)
+  partC <- (b1-1)*log(2*c)+(b2-1)*log(1-2*c)
+  partD <- log(c)+log(0.5-c)
+  log.q <- partA + partB + partC + partD
+  return(log.q)
+
+}
+MH_c_triple_alternative <- function(c, a, vari, iota, prior_hp1, prior_hp2, chi.j, accept, target.rate){
+
+  if(!is.na(target.rate)){
+
+    # adaptive step
+    accept.rate <- sum(accept) / length(accept)
+    adapt.factor <- exp(0.01 * (accept.rate - target.rate))
+    iota <- iota * adapt.factor
+
+  }
+
+  #draw a value from the proposal distribution as in Cadonna et al.
+  z.old <- log(c/(0.5-c))
+  z.star <- rnorm(1, mean = z.old, sd = iota)
+  c.star <- 0.5*plogis(z.star)
+  eps <- 1e-08
+  c.star <- max(min(c.star, 0.5 - eps), eps)
+
+  # compute the q-values
+  log.q.old <- log_q_c_triple_alternative(c = c, a = a,
+                                          b1 = prior_hp1, b2 = prior_hp2,
+                                          vari = vari, chi.j = chi.j)
+  log.q.star <- log_q_c_triple_alternative(c = c.star, a = a,
+                                           b1 = prior_hp1, b2 = prior_hp2,
+                                           vari = vari, chi.j = chi.j)
+
+  acc_prob <- min(0, log.q.star - log.q.old)
+
+  u <- runif(1)
+
+  if(log(u) < acc_prob){
+    res <- c.star
+  }else{
+    res <- c
+  }
+  return(list(res, iota))
+}
 sample_GIG <- function(a, l, par){
 
   p1 <- a-0.5

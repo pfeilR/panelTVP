@@ -233,7 +233,7 @@ LogitTVP <- function(df,
   Y <- Y[,seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)]
 
   # computing acceptance rates of Metropolis-based parameters
-  if(prior.reg$type != "ind" && !prior.reg$TG.alternative){
+  if(prior.reg$type != "ind"){
     acceptance.rates <- matrix(nrow = 1, ncol = 4)
     acceptance.rates[,1] <- accept.rate(accept = prior.reg$a.xi.accept, mcmc.opt = mcmc.opt)
     acceptance.rates[,2] <- accept.rate(accept = prior.reg$a.tau.accept, mcmc.opt = mcmc.opt)

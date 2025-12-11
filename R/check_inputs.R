@@ -102,7 +102,7 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
   }
   # data, id, t
   if(is.null(data) || !is.data.frame(data)){
-    stop("Argument 'data' must be a (Tn x d) data frame.")
+    stop("Argument 'data' must be a data frame.")
   }
   if(model != "ZINB"){
     vars <- all.vars(formula)
@@ -155,6 +155,8 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
 
   # response variable check
   resp <- data[, as.character(formula[[2]])]
+  miss <- ifelse(is.na(resp), TRUE, FALSE)
+  resp <- resp[!miss] # the checks only affect the observed response data
   if(length(unique(resp)) == 1){
     stop("There is no variation in your response variable.")
   }
@@ -173,6 +175,11 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
     if(any(abs(resp - round(resp)) > .Machine$double.eps^0.5)){
       stop("Response must be integer-valued (count data) for count data regression.")
     }
+  }
+
+  # check if all other variables have no NAs
+  if(any(is.na(data[,!names(data) %in% as.character(formula[[2]])]))){
+    stop("Only response variable is allowed to have missing data.")
   }
 
   # hyperparameter checks for non-ZINB models

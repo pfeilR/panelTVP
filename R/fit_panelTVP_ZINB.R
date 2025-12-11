@@ -24,13 +24,13 @@ fit_panelTVP_ZINB <- function(formula,
     tv.load_logit = TRUE
   }
 
-  if(any(colnames(data) == "t")) dat <- data[,names(data) != "t"]
-  if(any(colnames(dat) == "id")) dat <- dat[,names(dat) != "id"]
-
   resp <- all.vars(formula)[1]
   miss <- ifelse(is.na(data[,resp]), TRUE, FALSE)
   N.miss <- sum(miss)
-  data$y[miss] <- MASS::rnegbin(N.miss, mu = 1, theta = 2)
+  data[miss, resp] <- MASS::rnegbin(N.miss, mu = 1, theta = 2)
+
+  if(any(colnames(data) == "t")) dat <- data[,names(data) != "t"]
+  if(any(colnames(dat) == "id")) dat <- dat[,names(dat) != "id"]
 
   rhs <- formula[[3]]
   rhs_str <- paste(deparse(rhs), collapse = "")
@@ -82,8 +82,13 @@ fit_panelTVP_ZINB <- function(formula,
     reff_logit <- c(t(matrix(lambda_logit, ncol=df$n, nrow=df$Tmax)))*fv_logit
   }
 
-  alpha_lambda_nb <- matrix(c(1.2,0.5))
-  alpha_lambda_logit <- matrix(c(1.2,0.5))
+  if(random.effects){
+    alpha_lambda_nb <- matrix(c(1.2,0.5))
+    alpha_lambda_logit <- matrix(c(1.2,0.5))
+  } else{
+    alpha_lambda_nb <- matrix(c(0,0))
+    alpha_lambda_logit <- matrix(c(0,0))
+  }
 
   if(tv.load_nb & length(prior.load_nb$L0) == 1){
     prior.load_nb$L0 <- rep(prior.load_nb$L0, Tmax)

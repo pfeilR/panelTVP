@@ -498,14 +498,14 @@ stepR <- function(response,
           ## c_tau
 
           c_tau_state <- MH_c_triple_alternative(c = prior.reg$c.tau,
-                                                a = prior.reg$a.tau,
-                                                vari = prior.reg$tau,
-                                                iota = prior.reg$iota.c.tau,
-                                                prior_hp1 = prior.reg$alpha.c.tau,
-                                                prior_hp2 = prior.reg$beta.c.tau, # scaled Beta prior
-                                                chi.j = prior.reg$chi.tau.j,
-                                                accept = prior.reg$c.tau.accept,
-                                                target.rate = prior.reg$target.rate.c.tau)
+                                                 a = prior.reg$a.tau,
+                                                 vari = prior.reg$tau,
+                                                 iota = prior.reg$iota.c.tau,
+                                                 prior_hp1 = prior.reg$alpha.c.tau,
+                                                 prior_hp2 = prior.reg$beta.c.tau, # scaled Beta prior
+                                                 chi.j = prior.reg$chi.tau.j,
+                                                 accept = prior.reg$c.tau.accept,
+                                                 target.rate = prior.reg$target.rate.c.tau)
 
           if(c_tau_state[[1]] != prior.reg$c.tau){
             prior.reg$c.tau.accept[i] <- 1
@@ -1082,8 +1082,9 @@ MH_c_triple <- function(c, a, par, iota, prior_hp1, prior_hp2, k, var.check, acc
 }
 log_q_a_triple_alternative <- function(a, c, b1, b2, chi.j){
 
+  d <- length(chi.j)
   # compute log q
-  partA <- a*log(a)-a*log(c)-lgamma(a)+(a-1)*sum(log(chi.j))-(a/c)*sum(chi.j)
+  partA <- a*log(a)*d-a*log(c)*d-lgamma(a)*d+(a-1)*sum(log(chi.j))-(a/c)*sum(chi.j)
   partB <- (b1-1)*log(2*a)+(b2-1)*log(1-2*a)
   partC <- log(a)+log(0.5-a)
   log.q <- partA + partB + partC
@@ -1131,9 +1132,10 @@ MH_a_triple_alternative <- function(a, c, iota, prior_hp1, prior_hp2, chi.j, acc
 }
 log_q_c_triple_alternative <- function(c, a, b1, b2, vari, chi.j){
 
+  d <- length(chi.j)
   # compute log q
-  partA <- c*sum(log(chi.j))-lgamma(c)-(c+1)*sum(log(vari))
-  partB <- -a*log(c)-(a/c)*sum(chi.j)
+  partA <- c*sum(log(chi.j))-lgamma(c)*d-(c+1)*sum(log(vari))
+  partB <- -a*log(c)*d-(a/c)*sum(chi.j)
   partC <- (b1-1)*log(2*c)+(b2-1)*log(1-2*c)
   partD <- log(c)+log(0.5-c)
   log.q <- partA + partB + partC + partD

@@ -253,7 +253,8 @@ AWOL_fac <- function(yf, fi, Time, psi, pri.type, hyp.c, sgma2){
 
   return(lambda_tilde)
 }
-sample_lambda.PG <- function(z, zit, fi, Time, timeidx, alpha, pri.lambda, W.sparse, W.dense){
+sample_lambda.PG <- function(z, zit, fi, Time, timeidx, alpha, pri.lambda, W.sparse, W.dense,
+                             mcmc.opt){
 
   n <- length(fi)
 
@@ -306,6 +307,20 @@ sample_lambda.PG <- function(z, zit, fi, Time, timeidx, alpha, pri.lambda, W.spa
 
     alpha_lambda <- sample_alpha.PG(z = z, d = 1, Z = Zlambda,
                                     A0 = A0lambda, W = W.sparse)
+
+    # optional ASIS step
+
+    if(mcmc.opt$asis){
+      res_ASIS_fac <- ASIS(beta_tilde = lambda_tilde,
+                           tau = pri.lambda$phi,
+                           xi = pri.lambda$zeta,
+                           d = 1,
+                           hyp.c = pri.lambda$c,
+                           alpha = alpha_lambda,
+                           reg.type = pri.lambda$type)
+      alpha_lambda <- res_ASIS_fac$alpha
+      lambda_tilde <- res_ASIS_fac$beta_tilde
+    }
 
     lambdah <- transform_to_centered(beta_tilde = lambda_tilde,
                                      alpha = alpha_lambda,

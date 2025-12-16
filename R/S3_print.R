@@ -271,3 +271,74 @@ You may use the following functions to get additional information:\n
 ")
   invisible(x)
 }
+
+#' @title Print basic model information output for a \code{panelTVP.IV} object
+#'
+#' @description
+#'  This basic \code{print} method gives a general overview
+#'    of the information that is contained in an object of class \code{panelTVP.IV}.
+#'
+#' @param x an object of class \code{panelTVP.IV}
+#' @param ... optional arguments passed to the function (those are ignored)
+#'
+#' @name print.panelTVP.IV
+#' @rdname print.panelTVP.IV
+#' @author Roman Pfeiler, Helga Wagner
+#' @exportS3Method print panelTVP.IV
+#' @examples
+#' # Printing object of class panelTVP.IV
+#' # NB: To reduce computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#'
+#' sim.iv <- sim_panelTVP_IV(n = 1000,
+#'                           Tmax = 4,
+#'                           beta_stage1 = c(1, 0.7),
+#'                           theta_stage1 = c(0.2, 0.01),
+#'                           beta_stage2 = c(0, 4, 1),
+#'                           theta_stage2 = c(0, 3, 0),
+#'                           lambda_stage2 = 1.3,
+#'                           psi_stage2 = 0.1,
+#'                           beta_D = 2,
+#'                           theta_D = 0.7,
+#'                           rho = 0.1,
+#'                           sigma2 = 1,
+#'                           n.instruments = 1)
+#' res.iv <- panelTVP_IV(formula_stage1 = D ~ X_stage1.Z1,
+#'                       formula_stage2 = y ~ X_stage2.W1 + X_stage2.W2 + D,
+#'                       data = sim.iv$observed,
+#'                       id = sim.iv$observed$id,
+#'                       t = sim.iv$observed$t,
+#'                       prior.rho = list(
+#'                       mean.rho = atanh(0.1), sd.rho = 0.1,
+#'                        expansion.steps = 10, width = 0.1
+#'                       ),
+#'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE))
+#' print(res.iv)
+print.panelTVP.IV <- function(x, ...){
+  cat("\nThis is an object of class panelTVP.IV. It contains:\n
+  - learning.settings_stage1: Information on learning status of hyperparameters. (stage 1) \n
+  - learning.settings_stage2: Information on learning status of hyperparameters. (stage 2) \n
+  - variable.codes_stage1: Information on which variable is associated with which regression parameter. (stage 1) \n
+  - variable.codes_stage2: Information on which variable is associated with which regression parameter. (stage 2) \n
+  - data: Input data and additional context information derived from the data.\n
+  - mcmc_stage1: Markov Chains for every parameter. (stage 1) \n
+  - mcmc_stage2: Markov Chains for every parameter except for factor scores. (stage 2) \n
+  - mcmc_rho: Markov Chain for rho. \n
+  - posterior_stage1: Posterior summary. (stage 1) \n
+  - posterior_stage2: Posterior summary. (stage 2) \n
+  - posterior_rho: Posterior summary of rho. \n
+  - fmean_stage2: Posterior means of random intercepts. (stage 2) \n
+  - model: The model you have fitted.\n
+  - acceptance.rates: The achieved acceptance rates of Metropolis-Hastings.\n
+  - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
+  - runtime: The total time for fitting the model (measured in seconds).\n
+  - Treatment.Variable: The name of the (endogenous) treatment variable of the model. \n
+  - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
+  - mcmc.settings: Details on MCMC sampler. \n
+You may use the following functions to get additional information:\n
+  - summary(): This will give you a formatted summary of the most important parameters.\n
+  - plot(): This will give you plots of the coefficient estimates.\n
+  - LATE(): This will extract the local average treatment effect (LATE). \n
+")
+  invisible(x)
+}

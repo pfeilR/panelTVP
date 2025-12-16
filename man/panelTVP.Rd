@@ -485,7 +485,7 @@ of draws)
 \item \code{thin}: the thinning factor
 \item \code{asis}: if set to TRUE, an ancillarity sufficiency interweaving
 step is added for increasing the sampling efficiency of the regression
-effects
+effects and factor loadings
 }
 Note that the final Markov Chain (after applying burn-in and thinning)
 is of length \deqn{\frac{\text{chain.length}-\text{burnin}}{\text{thin}}}}
@@ -564,6 +564,10 @@ the returned object contains a list of the following elements:
 for the zero-inflation component of the model}
 \item{learning.settings_nb}{information on which parameters have been learned
 for the count component of the model}
+\item{variable.codes_logit}{information on which covariate is associated with which parameter
+for the zero-inflation component of the model}
+\item{variable.codes_nb}{information on which covariate is associated with which parameter
+for the count component of the model}
 \item{data}{the data used for fitting the model and additional context information
 derived from the data}
 \item{Y}{the \eqn{Tn \times M} response data matrix of every iteration of the chain,
@@ -595,10 +599,6 @@ i.e., missing data are fully ignored when computing WAIC)}
 \item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 predictive distribution for each observation (rows) and each MCMC draw (columns)}
 \item{mcmc.settings}{details on the MCMC sampler}
-\item{variable.codes_logit}{information on which covariate is associated with which parameter
-for the zero-inflation component of the model}
-\item{variable.codes_nb}{information on which covariate is associated with which parameter
-for the count component of the model}
 }
 }
 \description{

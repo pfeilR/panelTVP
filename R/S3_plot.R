@@ -212,6 +212,65 @@ plot.panelTVP.ZINB <- function(x, component = NULL, nplots = 4, ...){
   }
 }
 
+#' @title Get plots of time-varying parameters based on a \code{panelTVP.IV} object
+#'
+#' @description
+#'  This \code{plot} function produces effect plots for the time-varying parameters,
+#'  of an instrumental variable model. Plots are produced
+#'   using the \code{ggplot2} library. Note that this
+#'   function either plots the effects of the first stage (Probit model) or the
+#'   second stage (Gaussian model), where the treatment variable effect is included.
+#'
+#' @param x an object of class \code{panelTVP.IV}
+#' @param component either 'stage1' or 'stage2' to create plots for either the first
+#'  stage or the second stage
+#' @param nplots indicates how many plots should be printed on one page
+#' @param ... optional arguments passed to the function (those are ignored)
+#'
+#' @author Roman Pfeiler, Helga Wagner
+#' @exportS3Method plot panelTVP.IV
+#' @references
+#'  Wickham, H. (2016). \code{ggplot2}: Elegant Graphics for Data Analysis.
+#'  Springer Verlag, New York.
+#' @examples
+#' # Plot results from an object of class panelTVP.IV
+#' # NB: To reduce computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.iv <- sim_panelTVP_IV(n = 1000,
+#'                           Tmax = 4,
+#'                           beta_stage1 = c(1, 0.7),
+#'                           theta_stage1 = c(0.2, 0.01),
+#'                           beta_stage2 = c(0, 4, 1),
+#'                           theta_stage2 = c(0, 3, 0),
+#'                           lambda_stage2 = 1.3,
+#'                           psi_stage2 = 0.1,
+#'                           beta_D = 2,
+#'                           theta_D = 0.7,
+#'                           rho = 0.1,
+#'                           sigma2 = 1,
+#'                           n.instruments = 1)
+#' res.iv <- panelTVP_IV(formula_stage1 = D ~ X_stage1.Z1,
+#'                       formula_stage2 = y ~ X_stage2.W1 + X_stage2.W2 + D,
+#'                       data = sim.iv$observed,
+#'                       id = sim.iv$observed$id,
+#'                       t = sim.iv$observed$t,
+#'                       prior.rho = list(
+#'                       mean.rho = atanh(0.1), sd.rho = 0.1,
+#'                        expansion.steps = 10, width = 0.1
+#'                       ),
+#'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE))
+#' plot(res.iv, nplots = 1, component = "stage1") # Probit component
+#' plot(res.iv, nplots = 1, component = "stage2") # Gaussian component
+plot.panelTVP.IV <- function(x, component = NULL, nplots = 4, ...){
+  if(is.null(component) || length(component) != 1 || !(component %in% c("stage1", "stage2"))){
+    stop("Argument 'component' must be either 'stage1' or 'stage2'.")
+  }
+  if(component == "stage1"){
+    return(plot_effects(summary_table = x$posterior_stage1, Tmax = x$data$Tmax, X = x$data$X_stage1, nplots = nplots))
+  } else{
+    return(plot_effects(summary_table = x$posterior_stage2, Tmax = x$data$Tmax, X = x$data$X_stage2, nplots = nplots))
+  }
+}
 
 plot_effects <- function(summary_table, Tmax, X, nplots = 4){
 
@@ -266,7 +325,10 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
   plot_list <- plot_list[order(sapply(plot_list, function(x) unique(x$var)) == "Factor Loading")]
   plot_objs <- list()
   for(i in 1:length(plot_list)) plot_objs[[i]] <- make_plot(plot_list[[i]])
-  plot_objs[[1]] <- plot_objs[[1]] + ggplot2::ylab(expression(hat(lambda)))
+  if(randoms){
+  plot_objs[[length(plot_list)]] <- plot_objs[[length(plot_list)]] +
+    ggplot2::ylab(expression(hat(lambda)))
+  }
   n_total <- length(plot_objs)
   i <- 1
   while(i <= n_total) {

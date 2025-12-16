@@ -2,23 +2,17 @@ fit_panelTVP_IV <- function(formula_stage1,
                             formula_stage2,
                             data = data,
                             prior.reg_stage1,
-                            prior.load_stage1,
                             prior.reg_stage2,
                             prior.load_stage2,
                             prior.var_stage2,
+                            prior.rho,
                             mcmc.opt,
                             HPD.coverage,
-                            random.effects_stage1,
-                            random.effects_stage2,
+                            random.effects,
                             progress.bar){
 
   # Initialization
 
-  if(prior.load_stage1$type == "cps"){
-    tv.load_stage1 = FALSE
-  } else{
-    tv.load_stage1 = TRUE
-  }
   if(prior.load_stage2$type == "cps"){
     tv.load_stage2 = FALSE
   } else{
@@ -40,7 +34,6 @@ fit_panelTVP_IV <- function(formula_stage1,
   mt_stage2 <- attr(mf_stage2, "terms")
   x_stage2 <- model.matrix(mt_stage2, mf_stage2)
 
-  # hier brauchen wir noch einen Check, dass niemand D für eine andere Kovariable nehmen darf !!!
   D <- model.response(mf_stage1)
 
   tind <- data$t
@@ -62,26 +55,16 @@ fit_panelTVP_IV <- function(formula_stage1,
   # sigma2 only for second stage!
   sigma2 <- 1
   sigma2v <- sigma2
-  C0 <- 1
 
   # rho (correlation of errors between stages)
-  rho <- 0.3
+  rho <- 0
 
   alpha_stage1 <- rnorm(df$d_stage1*2)
   alpha_stage2 <- rnorm(df$d_stage2*2)
 
-  fi_stage1 <- rep(0, df$n)
-  fv_stage1 <- rep(fi_stage1, df$Tmax)
   fi_stage2 <- rep(0, df$n)
   fv_stage2 <- rep(fi_stage2, df$Tmax)
 
-  if(!tv.load_stage1){
-    lambda_stage1 <- 0
-    reff_stage1 <- lambda_stage1*fv_stage1
-  } else{
-    lambda_stage1 <- rep(0, df$Tmax)
-    reff_stage1 <- c(t(matrix(lambda_stage1, ncol=df$n, nrow=df$Tmax)))*fv_stage1
-  }
   if(!tv.load_stage2){
     lambda_stage2 <- 0
     reff_stage2 <- lambda_stage2*fv_stage2
@@ -90,29 +73,18 @@ fit_panelTVP_IV <- function(formula_stage1,
     reff_stage2 <- c(t(matrix(lambda_stage2, ncol=df$n, nrow=df$Tmax)))*fv_stage2
   }
 
-  if(random.effects_stage1){
-    alpha_lambda_stage1 <- matrix(c(1.2,0.5))
-  } else{
-    alpha_lambda_stage1 <- matrix(c(0,0))
-  }
-  if(random.effects_stage2){
+  if(random.effects){
     alpha_lambda_stage2 <- matrix(c(1.2,0.5))
   } else{
     alpha_lambda_stage2 <- matrix(c(0,0))
   }
 
-  if(tv.load_stage1 & length(prior.load_stage1$L0) == 1){
-    prior.load_stage1$L0 <- rep(prior.load_stage1$L0, Tmax)
-  }
   if(tv.load_stage2 & length(prior.load_stage2$L0) == 1){
     prior.load_stage2$L0 <- rep(prior.load_stage2$L0, Tmax)
   }
 
   prior.reg_stage1$tau <- rep(10, df$d_stage1)
   prior.reg_stage1$xi <- rep(10, df$d_stage1)
-  prior.load_stage1$phi <- 1
-  prior.load_stage1$zeta <- 1
-
   prior.reg_stage2$tau <- rep(10, df$d_stage2)
   prior.reg_stage2$xi <- rep(10, df$d_stage2)
   prior.load_stage2$phi <- 1
@@ -158,35 +130,23 @@ fit_panelTVP_IV <- function(formula_stage1,
     namesxi_stage2 <- paste0("xi2", 1:df$d_stage2)
   }
 
-  if(!tv.load_stage1){
-    nameslambdat_stage1 <-"lambda_t"
-  } else{
-    nameslambdat_stage1 <- paste0("lambda_t",1:df$Tmax)
-  }
   if(prior.reg_stage1$type == "ind"){
-    cnames_stage1 <- c("SimNr", namesbetat_stage1, nameslambdat_stage1)
+    cnames_stage1 <- c("SimNr", namesbetat_stage1)
   } else if(prior.reg_stage1$TG && !prior.reg_stage1$TG.alternative){ # original Triple Gamma
     kappa.tau.j_stage1 <- paste0("kappa.tau_", 1:df$d_stage1)
     kappa.xi.j_stage1 <- paste0("kappa.xi_", 1:df$d_stage1)
     cnames_stage1 <- c("SimNr",namesbetat_stage1, namesbeta_stage1, namestheta_stage1,
                    namestau_stage1, namesxi_stage1, c("a.tau","kappa.tau","a.xi","kappa.xi",
-                                              "c.tau", kappa.tau.j_stage1, "c.xi", kappa.xi.j_stage1),
-                   nameslambdat_stage1)
+                                              "c.tau", kappa.tau.j_stage1, "c.xi", kappa.xi.j_stage1))
   } else if(prior.reg_stage1$TG && prior.reg_stage1$TG.alternative){ # alternative Triple Gamma
     chi.tau.j_stage1 <- paste0("chi.tau_", 1:df$d_stage1)
     chi.xi.j_stage1 <- paste0("chi.xi_", 1:df$d_stage1)
     cnames_stage1 <- c("SimNr", namesbetat_stage1, namesbeta_stage1, namestheta_stage1,
                    namestau_stage1, namesxi_stage1, c("a.tau", "a.xi", "c.tau", "c.xi",
-                                              chi.tau.j_stage1, chi.xi.j_stage1),
-                   nameslambdat_stage1)
+                                              chi.tau.j_stage1, chi.xi.j_stage1))
   } else{ # double Gamma
     cnames_stage1 <- c("SimNr",namesbetat_stage1, namesbeta_stage1, namestheta_stage1,
-                   namestau_stage1, namesxi_stage1, c("a.tau","kappa.tau","a.xi","kappa.xi"),
-                   nameslambdat_stage1)
-  }
-  if(prior.load_stage1$type=="rw1" || prior.load_stage1$type=="rw2"){
-    cnames_stage1 <- c(cnames_stage1,"lambda","psi","phi2","zeta2", "a.phi", "kappa.phi",
-                   "a.zeta", "kappa.zeta")
+                   namestau_stage1, namesxi_stage1, c("a.tau","kappa.tau","a.xi","kappa.xi"))
   }
   col_res_stage1 <- length(cnames_stage1)
   res_frame_stage1 <- matrix(0, nrow = mcmc.opt$chain.length, ncol = col_res_stage1)
@@ -228,9 +188,6 @@ fit_panelTVP_IV <- function(formula_stage1,
   res_frame_stage2 <- matrix(0, nrow = mcmc.opt$chain.length, ncol = col_res_stage2)
   colnames(res_frame_stage2) <- cnames_stage2
 
-  f_sum_stage1 <- rep(0, df$n)
-  f_mat_stage1 <- matrix(NA, nrow = (mcmc.opt$chain.length-mcmc.opt$burnin)/mcmc.opt$thin,
-                     ncol = length(y))
   f_sum_stage2 <- rep(0, df$n)
   f_mat_stage2 <- matrix(NA, nrow = (mcmc.opt$chain.length-mcmc.opt$burnin)/mcmc.opt$thin,
                         ncol = length(y))
@@ -263,37 +220,31 @@ fit_panelTVP_IV <- function(formula_stage1,
 
   # Fitting the IV model
 
+  Treatment.Variable <- as.character(formula_stage1[[2]])
   result <- InstrumentalTVP(df = df,
                             prior.reg_stage1 = prior.reg_stage1,
                             prior.reg_stage2 = prior.reg_stage2,
-                            prior.load_stage1 = prior.load_stage1,
-                            prior.load_stage2 = prior.load_stage2,
                             prior.var_stage2 = prior.var_stage2,
+                            prior.load_stage2 = prior.load_stage2,
+                            prior.rho = prior.rho,
                             mcmc.opt = mcmc.opt,
                             alpha_stage1 = alpha_stage1,
                             alpha_stage2 = alpha_stage2,
-                            lambda_stage1 = lambda_stage1,
                             lambda_stage2 = lambda_stage2,
-                            alpha_lambda_stage1 = alpha_lambda_stage1,
                             alpha_lambda_stage2 = alpha_lambda_stage2,
-                            reff_stage1 = reff_stage1,
                             reff_stage2 = reff_stage2,
-                            tv.load_stage1 = tv.load_stage1,
                             tv.load_stage2 = tv.load_stage2,
                             res_frame_stage1 = res_frame_stage1,
                             res_frame_stage2 = res_frame_stage2,
-                            f_sum_stage1 = f_sum_stage1,
                             f_sum_stage2 = f_sum_stage2,
-                            f_mat_stage1 = f_mat_stage1,
                             f_mat_stage2 = f_mat_stage2,
                             miss = miss,
                             sigma2v = sigma2v,
-                            C0 = C0,
                             rho = rho,
                             HPD.coverage = HPD.coverage,
-                            random.effects_stage1 = random.effects_stage1,
-                            random.effects_stage2 = random.effects_stage2,
-                            progress.bar = progress.bar)
+                            random.effects = random.effects,
+                            progress.bar = progress.bar,
+                            Treatment.Variable = Treatment.Variable)
   class(result) <- "panelTVP.IV"
 
   return(result)

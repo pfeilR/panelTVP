@@ -1,36 +1,34 @@
 InstrumentalTVP <- function(df,
                             prior.reg_stage1,
                             prior.reg_stage2,
-                            prior.load_stage1,
-                            prior.load_stage2,
                             prior.var_stage2,
+                            prior.load_stage2,
+                            prior.rho,
                             mcmc.opt,
                             alpha_stage1,
                             alpha_stage2,
-                            lambda_stage1,
                             lambda_stage2,
-                            alpha_lambda_stage1,
                             alpha_lambda_stage2,
-                            reff_stage1,
                             reff_stage2,
-                            tv.load_stage1,
                             tv.load_stage2,
                             res_frame_stage1,
                             res_frame_stage2,
-                            f_sum_stage1,
                             f_sum_stage2,
-                            f_mat_stage1,
                             f_mat_stage2,
                             miss,
                             sigma2v,
-                            C0,
                             rho,
                             HPD.coverage,
-                            random.effects_stage1,
-                            random.effects_stage2,
-                            progress.bar){
+                            random.effects,
+                            progress.bar,
+                            Treatment.Variable){
 
-  fi.count_stage1 <- 1
+  # return object for saving of rho
+  rho_vec <- numeric(mcmc.opt$chain.length)
+
+  # return object for saving D.star (only saved for fitted values)
+  D_save <- matrix(nrow = mcmc.opt$chain.length, ncol = length(df$y))
+
   fi.count_stage2 <- 1
 
   df.stage2 <- df
@@ -68,13 +66,11 @@ InstrumentalTVP <- function(df,
       if(i == 1){
          betat_stage1 <- matrix(rnorm(df$d_stage1*df$Tmax), nrow = df$Tmax, ncol = df$d_stage1)
       }
-      reff.t_stage1 <- cbind(reff_stage1, t = X.t_stage1[,"t"])
       b.t_stage1 <- cbind(c(t(betat_stage1)), rep(1:df$Tmax, each = df$d_stage1))
       colnames(b.t_stage1) <- c("b", "t")
       eta_stage1 <- lapply(1:df$Tmax, FUN = function(t){
         as.matrix(X.t_stage1[X.t_stage1[,"t"] == t, -ncol(X.t_stage1)]) %*%
-          b.t_stage1[b.t_stage1[,"t"] == t, -ncol(b.t_stage1)] +
-          reff.t_stage1[reff.t_stage1[,"t"]==t,-ncol(reff.t_stage1)]
+          b.t_stage1[b.t_stage1[,"t"] == t, -ncol(b.t_stage1)]
       })
       eta_stage1 <- do.call("rbind", eta_stage1)
 
@@ -125,7 +121,7 @@ InstrumentalTVP <- function(df,
                                      timeidx = df.stage2$timeidx,
                                      betat = betat_stage2)
 
-      if(random.effects_stage2){
+      if(random.effects){
 
         res.y_stage2 <- y.tilde - linpred_stage2
         stepF.out_stage2 <- stepF(response = res.y_stage2,
@@ -156,10 +152,9 @@ InstrumentalTVP <- function(df,
 
       # Step 3: Sampling 1st stage effects -------------------------------------
 
-      # Step R
+      # Step R (there is NO Step F in 1st stage equation!)
 
-      ybeta_stage1 <- D.star - reff_stage1
-      stepR.out_stage1 <- stepR(response = ybeta_stage1,
+      stepR.out_stage1 <- stepR(response = D.star,
                                 df = df.stage1,
                                 prior.reg = prior.reg_stage1,
                                 sigma2v = 1,
@@ -171,58 +166,31 @@ InstrumentalTVP <- function(df,
       alpha_stage1 <- stepR.out_stage1$alpha
       prior.reg_stage1 <- stepR.out_stage1$prior.reg
 
-      # Step F
-
       linpred_stage1 <- construct.lp(X = df.stage1$X,
                                      Time = df.stage1$Tmax,
                                      timeidx = df.stage1$timeidx,
                                      betat = betat_stage1)
 
-      if(random.effects_stage1){
+      # Step 4: Joint sampling of sigma2 and rho based on 2D-Slice-Sampling ----
 
-        res.y_stage1 <- D.star - linpred_stage1
-        stepF.out_stage1 <- stepF(response = res.y_stage1,
-                                  df = df.stage1,
-                                  sigma2v = 1,
-                                  lambda = lambda_stage1,
-                                  alpha_lambda = alpha_lambda_stage1,
-                                  prior.load = prior.load_stage1,
-                                  estimation = "Normal",
-                                  mcmc.opt = mcmc.opt)
-        fi_stage1 <- stepF.out_stage1$fi
-        lambda_stage1 <- stepF.out_stage1$lambda
-        alpha_lambda_stage1 <- stepF.out_stage1$alpha_lambda
-        prior.load_stage1 <- stepF.out_stage1$prior.load
-        fv_stage1 <- rep(fi_stage1, df.stage1$Tmax)
-        if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
-          f_mat_stage1[fi.count_stage1,] <- fi_stage1
-          fi.count_stage1 <- fi.count_stage1+1
-          f_sum_stage1 <- f_sum_stage1+fi_stage1
-        }
-        if(!tv.load_stage1){
-          reff_stage1 <- lambda_stage1*fv_stage1
-        } else{
-          reff_stage1 <- c(t(matrix(lambda_stage1, ncol=df.stage1$n, nrow=df.stage1$Tmax)))*fv_stage1
-        }
+      cov.par <- slice_IV_2D(response = df$y - linpred_stage2 - reff_stage2,
+                             residual.stage1 = D.star - linpred_stage1,
+                             sigma2 = sigma2v,
+                             rho = rho,
+                             prior.var_stage2 = prior.var_stage2,
+                             prior.rho = prior.rho)
+      sigma2v <- cov.par[["sigma2"]]
+      rho <- cov.par[["rho"]]
 
-      }
+      # Step 5: Data augmentation in case of missing response data -------------
 
-      # Step 4: Sampling error variance ----------------------------------------
-
-     # u <- df$y - linpred_stage2 - reff_stage2 - rho * (D.star - linpred_stage1 - reff_stage1)
-    #  stepV.out <- stepV(response = u / sqrt(1-rho^2),
-    #                     df = df,
-     #                    prior.var = prior.var_stage2,
-    #                     C0 = C0)
-    #  sigma2v <- stepV.out$sigma2
-    #  C0 <- stepV.out$C0
-    #  prior.var_stage2 <- stepV.out$prior.var
-
-      # Step 5: Sampling correlation between errors ----------------------------
-
-      # Step 6: Data augmentation in case of missing response data -------------
+      df$y[miss] <- StepAugment(eta.miss = c(linpred_stage2)[miss] + reff_stage2[miss],
+                                model = "Gaussian",
+                                sigma2 = sigma2v)
 
       # Returning --------------------------------------------------------------
+
+      # STAGE 2
 
       if(prior.reg_stage2$type %in% c("rw1", "rw2")){ # shrinkage
 
@@ -305,7 +273,7 @@ InstrumentalTVP <- function(df,
 
       res_frame_stage2[i,] <- res.i_stage2
 
-      #
+      # STAGE 1
 
       if(prior.reg_stage1$type %in% c("rw1", "rw2")){ # shrinkage
 
@@ -324,8 +292,7 @@ InstrumentalTVP <- function(df,
                         prior.reg_stage1$c.tau,
                         prior.reg_stage1$kappa.tau.check,
                         prior.reg_stage1$c.xi,
-                        prior.reg_stage1$kappa.xi.check,
-                        lambda_stage1)
+                        prior.reg_stage1$kappa.xi.check)
 
         } else if(prior.reg_stage1$TG && prior.reg_stage1$TG.alternative){
 
@@ -340,8 +307,7 @@ InstrumentalTVP <- function(df,
                         prior.reg_stage1$c.tau,
                         prior.reg_stage1$c.xi,
                         prior.reg_stage1$chi.tau.j,
-                        prior.reg_stage1$chi.xi.j,
-                        lambda_stage1)
+                        prior.reg_stage1$chi.xi.j)
 
         } else{ # double Gamma
 
@@ -354,35 +320,23 @@ InstrumentalTVP <- function(df,
                         prior.reg_stage1$a.tau,
                         prior.reg_stage1$kappa.tau,
                         prior.reg_stage1$a.xi,
-                        prior.reg_stage1$kappa.xi,
-                        lambda_stage1
+                        prior.reg_stage1$kappa.xi
           )
         }
 
       } else{ # independence prior
 
         res.i_stage1 <- c(i,
-                      betat_stage1,
-                      lambda_stage1
+                      betat_stage1
         )
 
       }
 
-      if(prior.load_stage1$type %in% c("rw1", "rw2")){
-
-        res.i_stage1 <- c(res.i_stage1,
-                      m_lambda = alpha_lambda_stage1[1],
-                      psi = alpha_lambda_stage1[2],
-                      phi = prior.load_stage1$phi,
-                      zeta = prior.load_stage1$zeta,
-                      a.phi = prior.load_stage1$a.phi,
-                      kappa.phi = prior.load_stage1$kappa.phi,
-                      a.zeta = prior.load_stage1$a.zeta,
-                      kappa.zeta = prior.load_stage1$kappa.zeta)
-
-      }
-
       res_frame_stage1[i,] <- res.i_stage1
+
+      rho_vec[i] <- rho
+      D_save[i,] <- D.star
+
       Y[,i] <- df$y # important for missings and computation of WAIC
       if(progress.bar) utils::setTxtProgressBar(pb, i) # tracking progress
 
@@ -426,8 +380,6 @@ InstrumentalTVP <- function(df,
   res_mcmc_stage1 <- coda::mcmc(data = res_stage1[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
   res_stage1[,startsWith(colnames(res_stage1), "theta")] <- abs(res_stage1[,startsWith(colnames(res_stage1), "theta")])
   colnames(res_stage1)[startsWith(colnames(res_stage1), "theta")] <- paste0("abs(theta", 1:df.stage1$d, ")")
-  res_stage1[,startsWith(colnames(res_stage1), "psi")] <- abs(res_stage1[,startsWith(colnames(res_stage1), "psi")])
-  colnames(res_stage1)[startsWith(colnames(res_stage1), "psi")] <- "abs(psi)"
   res_stage1 <- coda::mcmc(data = res_stage1[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
   hpint_stage1 <- coda::HPDinterval(res_stage1, prob = HPD.coverage)
   mcmcsummary_stage1 <- cbind(hpint_stage1[,"lower"],
@@ -437,7 +389,65 @@ InstrumentalTVP <- function(df,
                           c(apply(res_stage1,2,sd))
   )
   colnames(mcmcsummary_stage1) <- c("LO", "mean","median","UP","sd")
-  fmean_stage1 <- f_sum_stage1/nmc
+
+  # correlation of errors (degree of endogeneity)
+
+  rho_vec <- rho_vec[(mcmc.opt$burnin+1):mcmc.opt$chain.length]
+  rho_vec <- coda::mcmc(data = rho_vec[seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)])
+  rho_mcmc <- coda::mcmc(data = rho_vec, start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
+  rho_interval <- coda::HPDinterval(rho_vec, prob = HPD.coverage)
+  mcmcsummary_rho <- matrix(c(rho_interval[1], mean(rho_mcmc), median(rho_mcmc), rho_interval[2], sd(rho_mcmc)), nrow = 1)
+  colnames(mcmcsummary_rho) <- c("LO", "mean","median","UP","sd")
+  rownames(mcmcsummary_rho) <- "rho"
+
+  # latent utility D.star
+  D_save <- D_save[(mcmc.opt$burnin+1):mcmc.opt$chain.length,]
+  D_save <- coda::mcmc(data = D_save[seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin),])
+  D_mcmc <- coda::mcmc(data = D_save, start = mcmc.opt$burnin+1, end = mcmc.opt$chain.length, thin = mcmc.opt$thin)
+
+  # computing acceptance rates of Metropolis-based parameters
+  acceptance.rates_stage1 <- matrix(nrow = 1, ncol = 4)
+  if(prior.reg_stage1$type != "ind"){
+    acceptance.rates_stage1[,1] <- accept.rate(accept = prior.reg_stage1$a.xi.accept, mcmc.opt = mcmc.opt)
+    acceptance.rates_stage1[,2] <- accept.rate(accept = prior.reg_stage1$a.tau.accept, mcmc.opt = mcmc.opt)
+    if(prior.reg_stage1$TG){
+      acceptance.rates_stage1[,3] <- accept.rate(accept = prior.reg_stage1$c.xi.accept, mcmc.opt = mcmc.opt)
+      acceptance.rates_stage1[,4] <- accept.rate(accept = prior.reg_stage1$c.tau.accept, mcmc.opt = mcmc.opt)
+    }
+  }
+  acceptance.rates_stage2 <- matrix(nrow = 1, ncol = 4)
+  if(prior.reg_stage2$type != "ind"){
+    acceptance.rates_stage2 <- matrix(nrow = 1, ncol = 4)
+    acceptance.rates_stage2[,1] <- accept.rate(accept = prior.reg_stage2$a.xi.accept, mcmc.opt = mcmc.opt)
+    acceptance.rates_stage2[,2] <- accept.rate(accept = prior.reg_stage2$a.tau.accept, mcmc.opt = mcmc.opt)
+    if(prior.reg_stage2$TG){
+      acceptance.rates_stage2[,3] <- accept.rate(accept = prior.reg_stage2$c.xi.accept, mcmc.opt = mcmc.opt)
+      acceptance.rates_stage2[,4] <- accept.rate(accept = prior.reg_stage2$c.tau.accept, mcmc.opt = mcmc.opt)
+    }
+  }
+  acceptance.rates <- cbind(acceptance.rates_stage1, acceptance.rates_stage2)
+  colnames(acceptance.rates) <- c("a.xi (stage1)", "a.tau (stage1)", "c.xi (stage1)", "c.tau (stage1)",
+                                  "a.xi (stage2)", "a.tau (stage2)", "c.xi (stage2)", "c.tau (stage2)")
+  if(sum(is.na(acceptance.rates)) == 8) acceptance.rates <- NULL
+
+  # return
+  df$y[miss] <- NA
+  ret <- list(data = df,
+              Y = Y,
+              mcmc_stage1 = res_mcmc_stage1, mcmc_stage2 = res_mcmc_stage2, mcmc_rho = rho_mcmc,
+              posterior_stage1 = mcmcsummary_stage1, posterior_stage2 = mcmcsummary_stage2,
+              posterior_rho = mcmcsummary_rho,
+              fmcmc_stage2 = f_mat_stage2[,1:df$n], fmean_stage2 = fmean_stage2,
+              D_mcmc = D_mcmc,
+              model = "Probit-IV",
+              acceptance.rates = acceptance.rates,
+              HPD.coverage = HPD.coverage,
+              runtime = paste("Total Runtime for Bayesian Probit Instrumental Variable Model:",
+                              round(time[3], 3), "seconds"),
+              Treatment.Variable = Treatment.Variable)
+  if(sum(miss) == 0) ret$Y <- NULL
+
+  return(ret)
 
 }
 

@@ -51,7 +51,7 @@ slice_r <- function(y, psi, r, a, b, steps, w, p.overrelax, acc){
     if(r.val <= 0) return(-Inf)
     log.prior <- dgamma(r.val, shape = a, rate = b, log = TRUE)
     log.lik <- ll.nb(y = y, psi = psi, r = r.val)
-    val <- log.lik + log.prior
+    val <- log.lik + log.prior + log.r.val # 15.12.25: Jacobian added!
     if(!is.finite(val)) return(-Inf)
     return(val)
   }

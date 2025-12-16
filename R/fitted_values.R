@@ -173,3 +173,107 @@ compute_fitted_ZINB_no.fac <- function(result){
   return(y.fit)
 
 }
+
+compute_fitted_IV <- function(result){
+
+  X1 <- result$data$X_stage1
+  X2 <- result$data$X_stage2
+  D_mcmc <- result$D_mcmc
+  f_mcmc <- result$fmcmc_stage2
+  mcmc1 <- result$mcmc_stage1
+  mcmc2 <- result$mcmc_stage2
+  rho_mcmc <- result$mcmc_rho
+  N <- nrow(X1)
+  S <- nrow(mcmc1)
+  id <- result$data$idx
+  time <- result$data$timeidx
+  Tmax <- max(time)
+  d1 <- ncol(X1)
+  d2 <- ncol(X2)
+
+  y.fit <- matrix(nrow = N, ncol = S)
+
+  if(sum(startsWith(colnames(mcmc2), "lambda_t")) == 1){ # cps
+    la <- replicate(Tmax, mcmc2[,"lambda_t"])
+    colnames(la) <- paste0("lambda_t",1:Tmax)
+    mcmc2 <- cbind(mcmc2, la)
+  }
+
+  beta1_list <- lapply(1:Tmax, function(t) {
+    mcmc1[, paste0("beta_t", 1:d1, t), drop = FALSE]
+  })
+  beta2_list <- lapply(1:Tmax, function(t) {
+    mcmc2[, paste0("beta_t", 1:d2, t), drop = FALSE]
+  })
+  lambda_list <- lapply(1:Tmax, function(t) {
+    mcmc2[, paste0("lambda_t", t)]
+  })
+
+  for(o in 1:N){
+    t <- time[o]
+    i <- id[o]
+    x1_row <- X1[o, ]
+    x2_row <- X2[o,]
+    beta1_t <- beta1_list[[t]]
+    beta2_t <- beta2_list[[t]]
+    lambda_t <- lambda_list[[t]]
+    f_i <- f_mcmc[,i]
+
+    eta1 <- rowSums(beta1_t * matrix(rep(x1_row, each = S), nrow = S))
+    eta2 <- rowSums(beta2_t * matrix(rep(x2_row, each = S), nrow = S)) +
+      f_i * lambda_t
+
+    mu <- eta2 + rho_mcmc * sqrt(mcmc2[,"sigma2"]) * (D_mcmc[,o] - eta1)
+    y.fit[o, ] <- rnorm(S, mean = mu, sd = sqrt(mcmc2[,"sigma2"] * (1 - rho_mcmc^2)))
+
+  }
+
+  return(y.fit)
+
+}
+
+compute_fitted_IV_no.fac <- function(result){
+
+  X1 <- result$data$X_stage1
+  X2 <- result$data$X_stage2
+  D_mcmc <- result$D_mcmc
+  mcmc1 <- result$mcmc_stage1
+  mcmc2 <- result$mcmc_stage2
+  rho_mcmc <- result$mcmc_rho
+  N <- nrow(X1)
+  S <- nrow(mcmc1)
+  id <- result$data$idx
+  time <- result$data$timeidx
+  Tmax <- max(time)
+  d1 <- ncol(X1)
+  d2 <- ncol(X2)
+
+  y.fit <- matrix(nrow = N, ncol = S)
+
+  beta1_list <- lapply(1:Tmax, function(t) {
+    mcmc1[, paste0("beta_t", 1:d1, t), drop = FALSE]
+  })
+  beta2_list <- lapply(1:Tmax, function(t) {
+    mcmc2[, paste0("beta_t", 1:d2, t), drop = FALSE]
+  })
+
+  for(o in 1:N){
+    t <- time[o]
+    i <- id[o]
+    x1_row <- X1[o, ]
+    x2_row <- X2[o,]
+    beta1_t <- beta1_list[[t]]
+    beta2_t <- beta2_list[[t]]
+
+    eta1 <- rowSums(beta1_t * matrix(rep(x1_row, each = S), nrow = S))
+    eta2 <- rowSums(beta2_t * matrix(rep(x2_row, each = S), nrow = S))
+
+    mu <- eta2 + rho_mcmc * sqrt(mcmc2[,"sigma2"]) * (D_mcmc[,o] - eta1)
+    y.fit[o, ] <- rnorm(S, mean = mu, sd = sqrt(mcmc2[,"sigma2"] * (1 - rho_mcmc^2)))
+
+  }
+
+  return(y.fit)
+
+}
+

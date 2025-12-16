@@ -250,6 +250,68 @@ Posterior Summary of the Bayesian Zero-Inflated Negative Binomial Model with Tim
 
 }
 
+#' @title Summary output for a \code{panelTVP.IV} object
+#'
+#' @description
+#'   This \code{summary} function prints out a table that contains HPD-intervals,
+#'   posterior means and standard deviations based on the posterior distributions of the
+#'   time-varying parameters in a Bayesian IV model.
+#'   The results are sorted either by covariate (default) or by time point.
+#'
+#' @param object an object of class \code{panelTVP.IV}
+#' @param by a single character that is either 'timepoint' or 'covariate'
+#'  to sort the output either by time point or covariate, respectively (default is covariate)
+#' @param ... optional arguments passed to the function (those are ignored)
+#'
+#' @author Roman Pfeiler, Helga Wagner
+#' @exportS3Method summary panelTVP.IV
+#' @examples
+#' # Computing summary table for object of class panelTVP.IV
+#' # NB: To reduce computational effort, we have drastically reduced the length
+#' # of the Markov Chain. You should use a much longer chain in your applications.
+#' sim.iv <- sim_panelTVP_IV(n = 1000,
+#'                           Tmax = 4,
+#'                           beta_stage1 = c(1, 0.7),
+#'                           theta_stage1 = c(0.2, 0.01),
+#'                           beta_stage2 = c(0, 4, 1),
+#'                           theta_stage2 = c(0, 3, 0),
+#'                           lambda_stage2 = 1.3,
+#'                           psi_stage2 = 0.1,
+#'                           beta_D = 2,
+#'                           theta_D = 0.7,
+#'                           rho = 0.1,
+#'                           sigma2 = 1,
+#'                           n.instruments = 1)
+#' res.iv <- panelTVP_IV(formula_stage1 = D ~ X_stage1.Z1,
+#'                       formula_stage2 = y ~ X_stage2.W1 + X_stage2.W2 + D,
+#'                       data = sim.iv$observed,
+#'                       id = sim.iv$observed$id,
+#'                       t = sim.iv$observed$t,
+#'                       prior.rho = list(
+#'                       mean.rho = atanh(0.1), sd.rho = 0.1,
+#'                        expansion.steps = 10, width = 0.1
+#'                       ),
+#'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE))
+#' summary(res.iv) # default = ordering by covariate
+#' summary(res.iv, by = "timepoint") # ordering by time point
+summary.panelTVP.IV <- function(object, by = "covariate", ...){
+  if(length(by)>1 | !is.character(by)){
+    stop("by is a scalar character")
+  }
+  if((!by %in% c("timepoint", "covariate"))){
+    stop("you can only sort it by timepoint or covariate")
+  }
+  cat("---------------------------------------------------------------------------------------------
+Posterior Summary of the Bayesian Instrumental Variable Model with Time-Varying Coefficients:
+---------------------------------------------------------------------------------------------\n")
+  if(by == "timepoint"){
+    cat(craft.summary_iv(object))
+  } else{
+    cat(craft.summary_iv_by_covariate(object))
+  }
+
+}
+
 craft.summary <- function(x, by = by){
 
   res <- crafti(X = x$data$X, posterior = x$posterior, by = by, ntime = x$data$Tmax)
@@ -371,6 +433,90 @@ craft.summary_zinb_by_covariate <- function(x){
 
 }
 
+craft.summary_iv <- function(x){
+
+  res_stage1 <- crafti(X = x$data$X_stage1, posterior = x$posterior_stage1, by = "timepoint",
+                   ntime = x$data$Tmax)
+  res_stage2 <- crafti(X = x$data$X_stage2, posterior = x$posterior_stage2, by = "timepoint",
+                      ntime = x$data$Tmax)
+
+  output_lines <- c()
+  for (i in 1:length(res_stage2)) {
+    s1 <- round(res_stage1[[i]], 4)
+    s2 <- round(res_stage2[[i]], 4)
+
+    # Header
+    output_lines <- c(
+      output_lines,
+      strrep("=", 50),
+      center_text(paste("Estimates: Timepoint", i)),
+      strrep("=", 50),
+      ""
+    )
+
+    # Probit model (1st stage)
+    output_lines <- c(output_lines, center_text("---- Stage 1 (Probit Model) ----"), "")
+    output_lines <- c(output_lines, utils::capture.output(print(s1)), "")
+
+    # Gaussian model (2nd stage)
+    output_lines <- c(output_lines, center_text("---- Stage 2 (Gaussian Model) ----"), "")
+    output_lines <- c(output_lines, utils::capture.output(print(s2)), "", "")
+  }
+
+  # Combine into a single string if needed
+  output_string <- paste(output_lines, collapse = "\n")
+  return(output_string)
+
+}
+
+craft.summary_iv_by_covariate <- function(x){
+
+  res_stage1 <- crafti(X = x$data$X_stage1, posterior = x$posterior_stage1, by = "covariate",
+                       ntime = x$data$Tmax)
+  res_stage2 <- crafti(X = x$data$X_stage2, posterior = x$posterior_stage2, by = "covariate",
+                       ntime = x$data$Tmax)
+  nami_stage1 <- names(res_stage1)
+  nami_stage2 <- names(res_stage2)
+
+  output_lines <- c()
+  for (i in 1:length(res_stage1)) {
+    s1 <- round(res_stage1[[i]], 4)
+
+    # Header
+    output_lines <- c(
+      output_lines,
+      strrep("=", 50),
+      center_text(paste("Estimates for", nami_stage1[i])),
+      strrep("=", 50),
+      ""
+    )
+    output_lines <- c(output_lines, utils::capture.output(print(s1)), "")
+
+  }
+  output_lines <- c(strrep("-", 50), center_text("Stage 1 (Probit Model)"), strrep("-", 50),
+                    output_lines, strrep("-", 50), center_text("Stage 2 (Gaussian Model)"), strrep("-", 50))
+
+  for (i in 1:length(res_stage2)) {
+    s2 <- round(res_stage2[[i]], 4)
+
+    # Header
+    output_lines <- c(
+      output_lines,
+      strrep("=", 50),
+      center_text(paste("Estimates for", nami_stage2[i])),
+      strrep("=", 50),
+      ""
+    )
+    output_lines <- c(output_lines, utils::capture.output(print(s2)), "")
+
+  }
+
+  # Combine into a single string if needed
+  output_string <- paste(output_lines, collapse = "\n")
+  return(output_string)
+
+}
+
 crafti <- function(X, posterior, by = NULL, ntime){
 
   d <- posterior[,c(1,2,4,5)]
@@ -454,3 +600,9 @@ center_text <- function(text, width = 50) {
   padding <- floor((width - nchar(text)) / 2)
   paste0(strrep(" ", padding), text)
 }
+
+
+
+
+
+

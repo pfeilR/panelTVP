@@ -1,15 +1,64 @@
+#' Simulate data for an instrumental variable model with time-varying parameters
+#'  and a binary treatment
+#'
+#' @param n number of subjects (scalar)
+#' @param Tmax number of time points / repeated measurements per subject (scalar)
+#' @param beta_stage1 fixed regression effects of first stage (Probit model)
+#' with the first value representing the global intercept (vector of dimension d1)
+#' @param theta_stage1 standard deviations of random walk for regression effects
+#'  of first stage (Probit model); larger values yield regression effects
+#'  that vary stronger over time (vector of dimension d1)
+#' @param beta_stage2 fixed regression effects of second stage (Gaussian model)
+#'  with the first value representing the global intercept (vector of dimension d2)
+#' @param theta_stage2 standard deviations of random walk for regression effects
+#'  of second stage (Gaussian model); larger values yield regression effects
+#'  that vary stronger over time (vector of dimension d2)
+#' @param lambda_stage2 fixed factor loading in second stage (Gaussian model) (scalar)
+#' @param psi_stage2 standard deviation of random walk for factor loading
+#' in second stage (Gaussian model) (scalar)
+#' @param beta_D fixed regression effect of treatment variable, which will be
+#'  added to the linear predictor of the second stage (scalar)
+#' @param theta_D standard deviation of random walk for treatment effect (scalar)
+#' @param rho correlation between errors of both stages controlling the extent of
+#'  endogeneity (scalar)
+#' @param sigma2 homoscedastic variance of the error term of the second stage (scalar)
+#' @param n.instruments number of instruments used in the analysis. For convenience,
+#'  the last \code{n.instruments} of the first stage design matrix are interpreted
+#'  as instruments. Hence, \code{n.instruments} cannot be larger than the number
+#'  of predictors in the first stage model, i.e. d1 (scalar)
+#'
+#' @description
+#' This function simulates panel data with time-varying parameters for treatment
+#'  effect analysis using instrumental variables. The (endogenous) treatment
+#'  has to be binary and a Gaussian observation equation is considered. Data
+#'  are then simulated as for non-treatment-effects models with the function [sim_panelTVP()]
+#'
+#' @export
+#'
+#' @examples
+#' sim.iv <- sim_panelTVP_IV(n = 1000,
+#'                           Tmax = 4,
+#'                           beta_stage1 = c(1, 0.7),
+#'                           theta_stage1 = c(0.2, 0.01),
+#'                           beta_stage2 = c(0, 4, 1),
+#'                           theta_stage2 = c(0, 3, 0),
+#'                           lambda_stage2 = 1.3,
+#'                           psi_stage2 = 0.1,
+#'                           beta_D = 2,
+#'                           theta_D = 0.7,
+#'                           rho = 0.1,
+#'                           sigma2 = 1,
+#'                           n.instruments = 1)
 sim_panelTVP_IV <- function(n,
                             Tmax,
                             beta_stage1,
                             theta_stage1,
-                            lambda_stage1,
-                            psi_stage1,
                             beta_stage2,
                             theta_stage2,
                             lambda_stage2,
+                            psi_stage2,
                             beta_D,
                             theta_D,
-                            psi_stage2,
                             rho,
                             sigma2,
                             n.instruments = 1){
@@ -24,6 +73,9 @@ sim_panelTVP_IV <- function(n,
 
   # STAGE 1 --------------------------------------------------------------------
 
+  # no factor model in stage 1 due to identification and it would also not
+  # make sense ...
+
   # beta
   beta0_stage1 <- rnorm(d1)
   betat_nc_stage1 <- apply(matrix(c(beta0_stage1, rnorm(t*d1)), byrow = TRUE, ncol = d1), 2, cumsum)
@@ -32,19 +84,13 @@ sim_panelTVP_IV <- function(n,
     t(apply(betat_nc_stage1, 1, function(x) Dmat1 %*% x))
   beta_t_stage1 <- beta_t_stage1[-1, , drop = FALSE]
 
-  # lambda
-  lambda_t_stage1 <- matrix(lambda_stage1 + psi_stage1 * rnorm(t), ncol = 1)
-
   # design matrices
   X_stage1 <- matrix(rnorm(n*t*d1), n*t, d1)
   X_stage1 <- model.matrix(~X_stage1[,-1])
   linpred_stage1 <- numeric(n*t)
-  F_stage1 <- numeric(n*t)
-  fi_stage1 <- base::scale(rnorm(n))
   for(tt in 1:t){
     ind <- ((tt-1)*n + 1):(n*tt)
     linpred_stage1[ind] <- X_stage1[ind, ] %*% beta_t_stage1[tt, ]
-    F_stage1[ind] <- fi_stage1 * lambda_t_stage1[tt]
   }
 
   # STAGE 2 --------------------------------------------------------------------
@@ -87,7 +133,7 @@ sim_panelTVP_IV <- function(n,
 
   # Treatment simulation -------------------------------------------------------
 
-  D_star <- linpred_stage1 + F_stage1 + epsilon1
+  D_star <- linpred_stage1 + epsilon1
   D <- ifelse(D_star > 0, 1, 0)
   D_ <- numeric(n*t)
   for(tt in 1:t){
@@ -119,7 +165,6 @@ sim_panelTVP_IV <- function(n,
               D_star = D_star,
               treatment_effect = beta_t_D,
               beta_t_stage1 = beta_t_stage1,
-              lambda_t_stage1 = lambda_t_stage1,
               beta_t_stage2 = beta_t_stage2,
               lambda_t_stage2 = lambda_t_stage2,
               epsilon = data.frame(epsilon1 = epsilon1, epsilon2 = epsilon2),

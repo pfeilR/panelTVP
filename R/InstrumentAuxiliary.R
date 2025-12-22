@@ -1,19 +1,18 @@
 slice_IV_2D <- function(response, residual.stage1, sigma2, rho, prior.var_stage2, prior.rho){
 
-  # transform to make support of both parameters unbounded
-  val <- c(log(sigma2), atanh(rho)) # val[1] = log(sigma2), val[2] = Fisher-Z(rho)
+  val <- c(log(sigma2), rho)
 
   # auxiliary function to compute log-posterior in two dimensions
   log_post_2D <- function(vals){
 
     sigma2.val <- exp(vals[1])
-    rho.val <- tanh(vals[2])
+    rho.val <- vals[2]
     if(sigma2.val <= 0 || abs(rho.val) >= 1) return(-Inf)
     e <- response - rho.val * sqrt(sigma2.val) * residual.stage1
     log.lik <- sum(dnorm(e, mean = 0, sd = sqrt(sigma2.val * (1 - rho.val^2)), log = TRUE))
-    log.prior_sigma <- dgamma(sigma2.val, prior.var_stage2$alpha.sigma,
-                              prior.var_stage2$beta.sigma, log = TRUE)
-    log.prior_rho <- dnorm(vals[2], mean = prior.rho$mean.rho, sd = prior.rho$sd.rho, log = TRUE)
+    a <- prior.var_stage2$alpha.sigma; b <- prior.var_stage2$beta.sigma
+    log.prior_sigma <- a*log(b)-lgamma(a)-(a+1)*log(sigma2.val)-b/sigma2.val # IG-priori
+    log.prior_rho <- dbeta((rho.val+1)/2, prior.rho$alpha.rho, prior.rho$beta.rho, log = TRUE)
 
     return(log.lik + log.prior_sigma + vals[1] + log.prior_rho) # Jacobian for log(sigma^2)
 
@@ -51,7 +50,7 @@ slice_IV_2D <- function(response, residual.stage1, sigma2, rho, prior.var_stage2
 
   # deliver back-transformed value
   sigma2.new <- exp(val.new[1])
-  rho.new <- tanh(val.new[2])
+  rho.new <- val.new[2]
 
   return(list(sigma2 = sigma2.new, rho = rho.new))
 

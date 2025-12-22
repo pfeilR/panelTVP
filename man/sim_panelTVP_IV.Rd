@@ -18,7 +18,8 @@ sim_panelTVP_IV(
   theta_D,
   rho,
   sigma2,
-  n.instruments = 1
+  n.instruments = 1,
+  latent.utility.targeted = FALSE
 )
 }
 \arguments{

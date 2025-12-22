@@ -44,8 +44,8 @@ part of the second-stage Gaussian model. The prior arguments are the ones of \co
 \item{prior.var_stage2}{a list of arguments for estimating the error variance
 of the second-stage Gaussian model using 2D-Slice sampling. The arguments are:
 \itemize{
-\item \code{alpha.sigma}: shape parameter of Gamma prior
-\item \code{beta.sigma}: rate parameter of Gamma prior
+\item \code{alpha.sigma}: shape parameter of Inverse-Gamma prior
+\item \code{beta.sigma}: rate parameter of Inverse-Gamma prior
 \item \code{expansion.steps}: number of steps in stepping-out phase
 \item \code{width}: width of the slice interval (on log-scale of error variance)
 }}
@@ -142,7 +142,7 @@ shrinkage priors are used to classify effects to time-varying, constant and
 zero. Unobserved heterogeneity is captured by random effects at the second stage
 via a factor model. The error variance of the second stage model as well as
 the correlation between errors of both stages are sampled jointly via
-2D-Slice sampling (Neal, 2003). For this, a Gamma prior is used for the variance
+2D-Slice sampling (Neal, 2003). For this, an Inverse-Gamma prior is used for the variance
 whereas a Normal prior is placed on the Fisher-Z scale of the correlation
 coefficient. Time-varying effects are modelled with the same priors as in
 the non-treatment-effects models in \code{\link[=panelTVP]{panelTVP()}}.

@@ -21,7 +21,8 @@ InstrumentalTVP <- function(df,
                             HPD.coverage,
                             random.effects,
                             progress.bar,
-                            Treatment.Variable){
+                            Treatment.Variable,
+                            latent.utility.targeted){
 
   # return object for saving of rho
   rho_vec <- numeric(mcmc.opt$chain.length)
@@ -37,6 +38,12 @@ InstrumentalTVP <- function(df,
   X.t_stage2 <- cbind(df.stage2$X, t = df.stage2$timeidx)
   df.stage2[["X_stage1"]] <- NULL
   df.stage2[["d_stage1"]] <- NULL
+
+  if(latent.utility.targeted){
+    # replace with working utility
+    X.t_stage2[,"D"] <- rnorm(nrow(X.t_stage2))
+    df.stage2$X[,"D"] <- X.t_stage2[,"D"]
+  }
 
   df.stage1 <- df
   names(df.stage1)[names(df.stage1) == "X_stage1"] <- "X"
@@ -91,8 +98,15 @@ InstrumentalTVP <- function(df,
       D.star <- numeric(length(df$D))
       idx.zero <- df$D == 0
       idx.one <- df$D == 1
-      D.star[idx.zero] <- truncnorm::rtruncnorm(n = sum(idx.zero), b = 0, mean = mu[idx.zero,], sd = sqrt(1-rho^2))
-      D.star[idx.one] <- truncnorm::rtruncnorm(n = sum(idx.one), a = 0, mean = mu[idx.one,], sd = sqrt(1-rho^2))
+      D.star[idx.zero] <- truncnorm::rtruncnorm(n = sum(idx.zero), b = 0,
+                                                mean = mu[idx.zero,], sd = sqrt(1-rho^2))
+      D.star[idx.one] <- truncnorm::rtruncnorm(n = sum(idx.one), a = 0,
+                                               mean = mu[idx.one,], sd = sqrt(1-rho^2))
+      if(latent.utility.targeted){
+        # replace with working utility
+        X.t_stage2[,"D"] <- D.star
+        df.stage2$X[,"D"] <- D.star
+      }
 
       # Step 2: Sampling 2nd stage effects -------------------------------------
 

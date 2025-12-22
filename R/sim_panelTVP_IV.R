@@ -61,7 +61,8 @@ sim_panelTVP_IV <- function(n,
                             theta_D,
                             rho,
                             sigma2,
-                            n.instruments = 1){
+                            n.instruments = 1,
+                            latent.utility.targeted = FALSE){
 
   # Input Checks ---------------------------------------------------------------
 
@@ -138,7 +139,8 @@ sim_panelTVP_IV <- function(n,
   D_ <- numeric(n*t)
   for(tt in 1:t){
     ind <- ((tt-1)*n + 1):(n*tt)
-    D_[ind] <- D[ind] * beta_t_D[tt,]
+    if(latent.utility.targeted) D_[ind] <- D_star[ind] * beta_t_D[tt,]
+    else D_[ind] <- D[ind] * beta_t_D[tt,]
   }
 
   # Outcome simulation ---------------------------------------------------------

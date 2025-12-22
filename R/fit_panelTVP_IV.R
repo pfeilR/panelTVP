@@ -9,7 +9,8 @@ fit_panelTVP_IV <- function(formula_stage1,
                             mcmc.opt,
                             HPD.coverage,
                             random.effects,
-                            progress.bar){
+                            progress.bar,
+                            latent.utility.targeted){
 
   # Initialization
 
@@ -244,7 +245,8 @@ fit_panelTVP_IV <- function(formula_stage1,
                             HPD.coverage = HPD.coverage,
                             random.effects = random.effects,
                             progress.bar = progress.bar,
-                            Treatment.Variable = Treatment.Variable)
+                            Treatment.Variable = Treatment.Variable,
+                            latent.utility.targeted = latent.utility.targeted)
   class(result) <- "panelTVP.IV"
 
   return(result)

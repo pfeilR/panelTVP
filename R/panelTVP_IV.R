@@ -32,8 +32,8 @@
 #' @param prior.var_stage2 a list of arguments for estimating the error variance
 #'  of the second-stage Gaussian model using 2D-Slice sampling. The arguments are:
 #'   \itemize{
-#'    \item \code{alpha.sigma}: shape parameter of Gamma prior
-#'    \item \code{beta.sigma}: rate parameter of Gamma prior
+#'    \item \code{alpha.sigma}: shape parameter of Inverse-Gamma prior
+#'    \item \code{beta.sigma}: rate parameter of Inverse-Gamma prior
 #'    \item \code{expansion.steps}: number of steps in stepping-out phase
 #'    \item \code{width}: width of the slice interval (on log-scale of error variance)
 #'   }
@@ -78,7 +78,7 @@
 #'  zero. Unobserved heterogeneity is captured by random effects at the second stage
 #'  via a factor model. The error variance of the second stage model as well as
 #'  the correlation between errors of both stages are sampled jointly via
-#'  2D-Slice sampling (Neal, 2003). For this, a Gamma prior is used for the variance
+#'  2D-Slice sampling (Neal, 2003). For this, an Inverse-Gamma prior is used for the variance
 #'  whereas a Normal prior is placed on the Fisher-Z scale of the correlation
 #'  coefficient. Time-varying effects are modelled with the same priors as in
 #'  the non-treatment-effects models in [panelTVP()].
@@ -210,9 +210,9 @@ panelTVP_IV <- function(formula_stage1 = NULL,
                           d.phi = 0.001, d.zeta = 0.001,
                           e.phi = 0.001, e.zeta = 0.001,
                           type = "rw-t1", c = 1, L0 = 1
-                          ),
+                        ),
                         prior.rho = list(
-                          mean.rho = atanh(0), sd.rho = 0.1,
+                          alpha.rho = 1, beta.rho = 1,
                           expansion.steps = 10, width = 0.1
                         ),
                         mcmc.opt = list(
@@ -221,7 +221,8 @@ panelTVP_IV <- function(formula_stage1 = NULL,
                         HPD.coverage = 0.95,
                         posterior.predictive.matrix = FALSE,
                         random.effects = TRUE,
-                        progress.bar = FALSE
+                        progress.bar = FALSE,
+                        latent.utility.targeted = FALSE
 ){
 
   # HERE INPUT CHECKS ARE NEEDED !!!
@@ -249,7 +250,8 @@ panelTVP_IV <- function(formula_stage1 = NULL,
                             mcmc.opt = mcmc.opt,
                             HPD.coverage = HPD.coverage,
                             random.effects = random.effects,
-                            progress.bar = progress.bar)
+                            progress.bar = progress.bar,
+                            latent.utility.targeted = latent.utility.targeted)
 
   # if not random effects structure requested, delete placeholders
   if(!random.effects){

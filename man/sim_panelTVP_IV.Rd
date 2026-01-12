@@ -18,7 +18,7 @@ sim_panelTVP_IV(
   theta_D,
   rho,
   sigma2,
-  n.instruments = 1
+  binary.instrument = FALSE
 )
 }
 \arguments{
@@ -54,11 +54,6 @@ added to the linear predictor of the second stage (scalar)}
 endogeneity (scalar)}
 
 \item{sigma2}{homoscedastic variance of the error term of the second stage (scalar)}
-
-\item{n.instruments}{number of instruments used in the analysis. For convenience,
-the last \code{n.instruments} of the first stage design matrix are interpreted
-as instruments. Hence, \code{n.instruments} cannot be larger than the number
-of predictors in the first stage model, i.e. d1 (scalar)}
 }
 \description{
 This function simulates panel data with time-varying parameters for treatment
@@ -78,6 +73,5 @@ sim.iv <- sim_panelTVP_IV(n = 1000,
                           beta_D = 2,
                           theta_D = 0.7,
                           rho = 0.1,
-                          sigma2 = 1,
-                          n.instruments = 1)
+                          sigma2 = 1)
 }

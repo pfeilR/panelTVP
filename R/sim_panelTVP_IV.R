@@ -22,10 +22,6 @@
 #' @param rho correlation between errors of both stages controlling the extent of
 #'  endogeneity (scalar)
 #' @param sigma2 homoscedastic variance of the error term of the second stage (scalar)
-#' @param n.instruments number of instruments used in the analysis. For convenience,
-#'  the last \code{n.instruments} of the first stage design matrix are interpreted
-#'  as instruments. Hence, \code{n.instruments} cannot be larger than the number
-#'  of predictors in the first stage model, i.e. d1 (scalar)
 #'
 #' @description
 #' This function simulates panel data with time-varying parameters for treatment
@@ -47,8 +43,7 @@
 #'                           beta_D = 2,
 #'                           theta_D = 0.7,
 #'                           rho = 0.1,
-#'                           sigma2 = 1,
-#'                           n.instruments = 1)
+#'                           sigma2 = 1)
 sim_panelTVP_IV <- function(n,
                             Tmax,
                             beta_stage1,
@@ -61,7 +56,7 @@ sim_panelTVP_IV <- function(n,
                             theta_D,
                             rho,
                             sigma2,
-                            n.instruments = 1){
+                            binary.instrument = FALSE){
 
   # Input Checks ---------------------------------------------------------------
 
@@ -85,7 +80,12 @@ sim_panelTVP_IV <- function(n,
   beta_t_stage1 <- beta_t_stage1[-1, , drop = FALSE]
 
   # design matrices
-  X_stage1 <- matrix(rnorm(n*t*d1), n*t, d1)
+  if(binary.instrument){
+    X_stage1 <- matrix(rnorm(n*t*(d1-1)), n*t, d1-1)
+    X_stage1 <- cbind(X_stage1, sample(n*t, size = 1, replace = TRUE, prob = c(0.5, 0.5)))
+  } else{
+    X_stage1 <- matrix(rnorm(n*t*d1), n*t, d1)
+  }
   X_stage1 <- model.matrix(~X_stage1[,-1])
   linpred_stage1 <- numeric(n*t)
   for(tt in 1:t){
@@ -153,7 +153,7 @@ sim_panelTVP_IV <- function(n,
   X_stage1 <- as.matrix(X_stage1[,-1])
   # if((ncol(X_stage1)-1)==1) X_stage1 <- as.matrix(X_stage1)
   if(ncol(X_stage1) == 1) colnames(X_stage1) <- "X_stage1.Z1"
-  else colnames(X_stage1) <- c(paste0("W", 1:(d1-n.instruments-1)), paste0("Z", 1:n.instruments))
+  else colnames(X_stage1) <- c(paste0("W", 1:(d1-1-1)), paste0("Z", 1:1))
 
   X_stage2 <- X_stage2[,-1]
   if((d2-1)==1) X_stage2 <- as.matrix(X_stage2)

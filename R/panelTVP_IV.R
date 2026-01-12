@@ -221,8 +221,7 @@ panelTVP_IV <- function(formula_stage1 = NULL,
                         HPD.coverage = 0.95,
                         posterior.predictive.matrix = FALSE,
                         random.effects = TRUE,
-                        progress.bar = FALSE,
-                        latent.utility.targeted = FALSE
+                        progress.bar = FALSE
 ){
 
   # HERE INPUT CHECKS ARE NEEDED !!!
@@ -250,8 +249,7 @@ panelTVP_IV <- function(formula_stage1 = NULL,
                             mcmc.opt = mcmc.opt,
                             HPD.coverage = HPD.coverage,
                             random.effects = random.effects,
-                            progress.bar = progress.bar,
-                            latent.utility.targeted = latent.utility.targeted)
+                            progress.bar = progress.bar)
 
   # if not random effects structure requested, delete placeholders
   if(!random.effects){

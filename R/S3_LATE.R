@@ -35,9 +35,9 @@
 #'                       id = sim.iv$observed$id,
 #'                       t = sim.iv$observed$t,
 #'                       prior.rho = list(
-#'                       mean.rho = atanh(0.1), sd.rho = 0.1,
+#'                        alpha.rho = 1, beta.rho = 1,
 #'                        expansion.steps = 10, width = 0.1
-#'                       )
+#'                       ),
 #'                       mcmc.opt = list(chain.length = 200, burnin = 100, thin = 1, asis = TRUE))
 #' LATE(res.iv)
 LATE.panelTVP.IV <- function(x, ...){

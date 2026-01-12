@@ -22,6 +22,7 @@
 #' @param rho correlation between errors of both stages controlling the extent of
 #'  endogeneity (scalar)
 #' @param sigma2 homoscedastic variance of the error term of the second stage (scalar)
+#' @param binary.instrument if TRUE, the instrument is binary otherwise its continuous (scalar)
 #'
 #' @description
 #' This function simulates panel data with time-varying parameters for treatment
@@ -43,7 +44,8 @@
 #'                           beta_D = 2,
 #'                           theta_D = 0.7,
 #'                           rho = 0.1,
-#'                           sigma2 = 1)
+#'                           sigma2 = 1,
+#'                           binary.instrument = FALSE)
 sim_panelTVP_IV <- function(n,
                             Tmax,
                             beta_stage1,

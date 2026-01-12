@@ -54,6 +54,8 @@ added to the linear predictor of the second stage (scalar)}
 endogeneity (scalar)}
 
 \item{sigma2}{homoscedastic variance of the error term of the second stage (scalar)}
+
+\item{binary.instrument}{if TRUE, the instrument is binary otherwise its continuous (scalar)}
 }
 \description{
 This function simulates panel data with time-varying parameters for treatment
@@ -73,5 +75,6 @@ sim.iv <- sim_panelTVP_IV(n = 1000,
                           beta_D = 2,
                           theta_D = 0.7,
                           rho = 0.1,
-                          sigma2 = 1)
+                          sigma2 = 1,
+                          binary.instrument = FALSE)
 }

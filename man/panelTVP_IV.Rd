@@ -56,10 +56,10 @@ part of the second-stage Gaussian model. The prior arguments are the ones of \co
 \item{prior.rho}{a list of arguments for estimating the correlation of errors,
 i.e. the degree of endogeneity using 2D-Slice sampling. The arguments are:
 \itemize{
-\item \code{mean.rho}: mean of Normal prior on Fisher-Z scale of \code{rho}
-\item \code{sd.rho}: standard deviation of Normal prior on Fisher-Z scale of \code{rho}
+\item \code{alpha.rho}: shape1 parameter of Beta prior of \code{rho}
+\item \code{beta.rho}: shape2 parameter of Beta prior of \code{rho}
 \item \code{expansion.steps}: number of steps in stepping-out phase
-\item \code{width}: width of the slice interval (on Fisher-Z scale of \code{rho})
+\item \code{width}: width of the slice interval (on original scale of \code{rho})
 }}
 
 \item{mcmc.opt}{a list containing information on the overall sampler.

@@ -84,7 +84,7 @@ sim_panelTVP_IV <- function(n,
   # design matrices
   if(binary.instrument){
     X_stage1 <- matrix(rnorm(n*t*(d1-1)), n*t, d1-1)
-    X_stage1 <- cbind(X_stage1, sample(n*t, size = 1, replace = TRUE, prob = c(0.5, 0.5)))
+    X_stage1 <- cbind(X_stage1, sample(0:1, size = n*t, replace = TRUE, prob = c(0.5, 0.5)))
   } else{
     X_stage1 <- matrix(rnorm(n*t*d1), n*t, d1)
   }

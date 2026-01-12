@@ -79,7 +79,7 @@
 #'  via a factor model. The error variance of the second stage model as well as
 #'  the correlation between errors of both stages are sampled jointly via
 #'  2D-Slice sampling (Neal, 2003). For this, an Inverse-Gamma prior is used for the variance
-#'  whereas a Normal prior is placed on the Fisher-Z scale of the correlation
+#'  whereas a scaled Beta prior is use for the correlation
 #'  coefficient. Time-varying effects are modelled with the same priors as in
 #'  the non-treatment-effects models in [panelTVP()].
 #'
@@ -143,8 +143,7 @@
 #'                           beta_D = 2,
 #'                           theta_D = 0.7,
 #'                           rho = 0.1,
-#'                           sigma2 = 1,
-#'                           n.instruments = 1)
+#'                           sigma2 = 1)
 #' res.iv <- panelTVP_IV(formula_stage1 = D ~ X_stage1.Z1,
 #'                       formula_stage2 = y ~ X_stage2.W1 + X_stage2.W2 + D,
 #'                       data = sim.iv$observed,

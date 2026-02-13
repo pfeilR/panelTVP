@@ -324,7 +324,7 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
   plot_objs <- list()
   for(i in 1:length(plot_list)) plot_objs[[i]] <- make_plot(plot_list[[i]])
   if(randoms){
-  plot_objs[[length(plot_list)]] <- plot_objs[[1]] +
+  plot_objs[[1]] <- plot_objs[[1]] +
     ggplot2::ylab(expression(hat(lambda)))
   }
   n_total <- length(plot_objs)

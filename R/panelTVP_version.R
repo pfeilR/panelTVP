@@ -1,3 +1,3 @@
 panelTVP_version <- function(){
-  print("This package was updated for the last time on 05.02.2026.")
+  print("This package was updated for the last time on 13.02.2026.")
 }

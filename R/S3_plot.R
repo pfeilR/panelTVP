@@ -292,7 +292,7 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
     index_df <- matrix(nrow = (ncol(X)+1)*Tmax, ncol = 2)
     index_df[,1] <- c(rep(paste0("x",1:ncol(X)), each = Tmax), rep("Factor Loading", Tmax))
     index_df[,2] <- rep(1:Tmax, ncol(X)+1)
-    true_names <- c(colnames(X), "Random Effect")
+    true_names <- c(colnames(X), "Factor Loading")
   } else{
     index_df <- matrix(nrow = ncol(X)*Tmax, ncol = 2)
     index_df[,1] <- c(rep(paste0("x",1:ncol(X)), each = Tmax))
@@ -313,15 +313,14 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
   plot_list <- dplyr::group_split(dplyr::group_by(plot_df, var))
   plot_list <- plot_list[order(
     sapply(plot_list, function(x){
-      var_value <- x$var[1]
-      if(var_value == "Factor Loading"){
-        return(0)
-      }else{
-        return(as.numeric(sub("x", "", var_value)))
+      v <- x$var[1]
+      if(v == "Factor Loading"){
+        return(-Inf)  # plotting of factor loading at the beginning
+      } else{
+        return(as.numeric(sub("x", "", v)))
       }
     })
   )]
-  plot_list <- plot_list[order(sapply(plot_list, function(x) unique(x$var)) == "Factor Loading")]
   plot_objs <- list()
   for(i in 1:length(plot_list)) plot_objs[[i]] <- make_plot(plot_list[[i]])
   if(randoms){

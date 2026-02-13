@@ -1,3 +1,19 @@
+#' @title Print method for summary S3 objects
+#'
+#' @param x a summary object
+#' @param ... optioonal arguments passed to the function (those are ignored)
+#'
+#' @exportS3Method print summary.panelTVP
+#'
+print.summary.panelTVP <- function(x, ...) {
+
+  cat("\nPosterior Summary\n")
+  cat("Model:", x$model, "\n\n")
+
+  cat(x$text)
+  invisible(x)
+}
+
 #' @title Summary output for a \code{panelTVP.Gaussian} object
 #'
 #' @description
@@ -34,17 +50,22 @@
 #'                          model = "Gaussian")
 #' summary(res.gaussian) # default = ordering by covariate
 #' summary(res.gaussian, by = "timepoint") # ordering by time point
-summary.panelTVP.Gaussian <- function(object, by = "covariate", ...){
+summary.panelTVP.Gaussian <- function(object, by = "covariate",
+                                      format = c("text", "latex"), ...){
   if(length(by)>1 | !is.character(by)){
     stop("by is a scalar character")
   }
   if((!by %in% c("timepoint", "covariate"))){
     stop("you can only sort it by timepoint or covariate")
   }
-  cat("\n------------------------------------------------------------------------------
-Posterior Summary of the Bayesian Normal Model with Time-Varying Coefficients:
-------------------------------------------------------------------------------\n")
-  cat(craft.summary(object, by = by))
+  out <- craft.summary(object, by = by)
+  structure(
+    list(
+      text = out, by = by, model = "Bayesian Gaussian TVP"
+    ),
+    class = "summary.panelTVP"
+  )
+
 }
 
 #' @title Summary output for a \code{panelTVP.Probit} object
@@ -89,10 +110,13 @@ summary.panelTVP.Probit <- function(object, by = "covariate", ...){
   if((!by %in% c("timepoint", "covariate"))){
     stop("you can only sort it by timepoint or covariate")
   }
-  cat("------------------------------------------------------------------------------
-Posterior Summary of the Bayesian Probit Model with Time-Varying Coefficients:
-------------------------------------------------------------------------------\n")
-  cat(craft.summary(object, by = by))
+  out <- craft.summary(object, by = by)
+  structure(
+    list(
+      text = out, by = by, model = "Bayesian Probit TVP"
+    ),
+    class = "summary.panelTVP"
+  )
 }
 
 #' @title Summary output for a \code{panelTVP.Logit} object
@@ -137,10 +161,13 @@ summary.panelTVP.Logit <- function(object, by = "covariate", ...){
   if((!by %in% c("timepoint", "covariate"))){
     stop("you can only sort it by timepoint or covariate")
   }
-  cat("------------------------------------------------------------------------------
-Posterior Summary of the Bayesian Logit Model with Time-Varying Coefficients:
------------------------------------------------------------------------------\n")
-  cat(craft.summary(object, by = by))
+  out <- craft.summary(object, by = by)
+  structure(
+    list(
+      text = out, by = by, model = "Bayesian Logit TVP"
+    ),
+    class = "summary.panelTVP"
+  )
 }
 
 #' @title Summary output for a \code{panelTVP.NegBin} object
@@ -186,10 +213,13 @@ summary.panelTVP.NegBin <- function(object, by = "covariate", ...){
   if((!by %in% c("timepoint", "covariate"))){
     stop("you can only sort it by timepoint or covariate")
   }
-  cat("-----------------------------------------------------------------------------------------
-Posterior Summary of the Bayesian Negative Binomial Model with Time-Varying Coefficients:
------------------------------------------------------------------------------------------\n")
-  cat(craft.summary(object, by = by))
+  out <- craft.summary(object, by = by)
+  structure(
+    list(
+      text = out, by = by, model = "Bayesian Negative Binomial TVP"
+    ),
+    class = "summary.panelTVP"
+  )
 }
 
 #' @title Summary output for a \code{panelTVP.ZINB} object
@@ -239,14 +269,17 @@ summary.panelTVP.ZINB <- function(object, by = "covariate", ...){
   if((!by %in% c("timepoint", "covariate"))){
     stop("you can only sort it by timepoint or covariate")
   }
-  cat("-------------------------------------------------------------------------------------------------------
-Posterior Summary of the Bayesian Zero-Inflated Negative Binomial Model with Time-Varying Coefficients:
--------------------------------------------------------------------------------------------------------\n")
   if(by == "timepoint"){
-    cat(craft.summary_zinb(object))
+    out <- craft.summary_zinb(object)
   } else{
-    cat(craft.summary_zinb_by_covariate(object))
+    out <- craft.summary_zinb_by_covariate(object)
   }
+  structure(
+    list(
+      text = out, by = by, model = "Bayesian ZINB TVP"
+    ),
+    class = "summary.panelTVP"
+  )
 
 }
 
@@ -600,9 +633,5 @@ center_text <- function(text, width = 50) {
   padding <- floor((width - nchar(text)) / 2)
   paste0(strrep(" ", padding), text)
 }
-
-
-
-
 
 

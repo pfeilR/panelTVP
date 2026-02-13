@@ -333,7 +333,19 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
   while(i <= n_total) {
     end <- min(i + nplots - 1, n_total)
     grid_plots <- plot_objs[i:end]
-    gridExtra::grid.arrange(grobs = grid_plots, ncol = 1)
+    n_current <- length(grid_plots)
+    if(n_current == 1) {
+      ncol <- 1
+      nrow <- 1
+    } else{
+      ncol <- 2
+      nrow <- ceiling(n_current / ncol)
+    }
+    gridExtra::grid.arrange(
+      grobs = grid_plots,
+      ncol = ncol,
+      nrow = nrow
+    )
     i <- end + 1
     if(i <= n_total) readline("The plots are out there, hit [Return] to see ...")
   }

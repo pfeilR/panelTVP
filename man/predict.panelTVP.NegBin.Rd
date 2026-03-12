@@ -9,7 +9,7 @@
   X.new,
   timepoint,
   coverage = 0.95,
-  pop.pred = FALSE,
+  subject.specific.pred = TRUE,
   n.replicates = 100,
   ...
 )
@@ -28,8 +28,8 @@ function}
 
 \item{coverage}{coverage probability for prediction intervals - defaults to 95 percent coverage}
 
-\item{pop.pred}{logical value, if TRUE population-based predictions are made,
-that ignore the random effects structure, if FALSE the random effects structure
+\item{subject.specific.pred}{logical value, if FALSE global predictions are made,
+that ignore the random effects structure, if TRUE the random effects structure
 is included as well where the unknown factor scores are sampled from their
 standard Normal prior - defaults to FALSE}
 

@@ -9,7 +9,7 @@
   X.new,
   timepoint,
   coverage = 0.95,
-  pop.pred = FALSE,
+  subject.specific.pred = TRUE,
   n.replicates = 100,
   ...
 )
@@ -28,15 +28,15 @@ function}
 
 \item{coverage}{coverage probability for prediction intervals - defaults to 95 percent coverage}
 
-\item{n.replicates}{number of replicates within each Monte Carlo draw and for each subject
-for integrating over the unknown subject-specific factors (ignored when \code{pop.pred = TRUE})}
-
-\item{...}{optional arguments passed to the function (those are ignored)}
-
 \item{subject.specific.pred}{logical value, if FALSE global predictions are made,
 that ignore the random effects structure, if TRUE the random effects structure
 is included as well where the unknown factor scores are sampled from their
 standard Normal prior - defaults to FALSE}
+
+\item{n.replicates}{number of replicates within each Monte Carlo draw and for each subject
+for integrating over the unknown subject-specific factors (ignored when \code{pop.pred = TRUE})}
+
+\item{...}{optional arguments passed to the function (those are ignored)}
 }
 \value{
 a list containing the following elements

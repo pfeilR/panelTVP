@@ -188,7 +188,7 @@ sample_china <- function(y, eta, r.old, r.alpha, r.beta){
   ell <- numeric(n)
   for(i in seq_len(n)){
     if(y[i] > 0){
-      ell[i] <- sum(rbinom(y[i],1,r.old/(r.old+(1:y[i])-1)))
+      ell[i] <- sum(rbinom(y[i],1,r.old/(r.old+seq_len(y[i])-1)))
     }
   }
 

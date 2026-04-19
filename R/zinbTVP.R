@@ -173,11 +173,12 @@ zinbTVP <- function(df,
       #                          accuracy.overrelax = settings.NegBin$accuracy.overrelax)
       # r <- sample.r.list$r
 
-      r <- sample_china(y = y.risk,
-                                    eta = matrix(eta_nb[risk,]),
-                                    r.old = r.prev,
-                                    r.alpha = settings.NegBin$alpha.r,
-                                    r.beta = settings.NegBin$beta.r)
+      # r <- sample_china(y = y.risk,
+      #                               eta = matrix(eta_nb[risk,]),
+      #                               r.old = r.prev,
+      #                               r.alpha = settings.NegBin$alpha.r,
+      #                               r.beta = settings.NegBin$beta.r)
+      r <- 1.5 # only test!!!
 
       # Negative Binomial Component --------------------------------------------
 

@@ -178,4 +178,23 @@ efficient_PG_sampling <- function(h, z){
 
 }
 
+# NEW (added on 19.04.2026): Chinese-Restaurant-Table Distribution Gibbs sampling
 
+sample_china <- function(y, eta, r.old, r.alpha, r.beta){
+
+  n <- length(y)
+
+  # sampling of l_i
+  ell <- numeric(n)
+  for(i in seq_len(n)){
+    if(y[i] > 0){
+      ell[i] <- sum(rbinom(y[i],1,r.old/(r.old+(1:y[i])-1)))
+    }
+  }
+
+  # sampling of r
+  r <- rgamma(1, r.alpha + sum(ell), r.beta + sum(log1p(exp(eta))))
+
+  return(r)
+
+}

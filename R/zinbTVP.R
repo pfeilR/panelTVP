@@ -161,16 +161,22 @@ zinbTVP <- function(df,
       n.risk <- sum(risk)
 
       r.prev <- r
-      sample.r.list <- NB.para(y = y.risk,
-                               eta = matrix(eta_nb[risk,]),
-                               r.old = r.prev,
-                               sample.r = TRUE,
-                               r.alpha = settings.NegBin$alpha.r,
-                               r.beta = settings.NegBin$beta.r,
-                               expansion.steps = settings.NegBin$expansion.steps,
-                               width = settings.NegBin$width,
-                               p.overrelax = settings.NegBin$p.overrelax,
-                               accuracy.overrelax = settings.NegBin$accuracy.overrelax)
+      # sample.r.list <- NB.para(y = y.risk,
+      #                          eta = matrix(eta_nb[risk,]),
+      #                          r.old = r.prev,
+      #                          sample.r = TRUE,
+      #                          r.alpha = settings.NegBin$alpha.r,
+      #                          r.beta = settings.NegBin$beta.r,
+      #                          expansion.steps = settings.NegBin$expansion.steps,
+      #                          width = settings.NegBin$width,
+      #                          p.overrelax = settings.NegBin$p.overrelax,
+      #                          accuracy.overrelax = settings.NegBin$accuracy.overrelax)
+
+      sample.r.list <- sample_china(y = y.risk,
+                                    eta = matrix(eta_nb[risk,]),
+                                    r.old = r.prev,
+                                    r.alpha = settings.NegBin$alpha.r,
+                                    r.beta = settings.NegBin$beta.r)
       r <- sample.r.list$r
       r <- r
 

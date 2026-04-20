@@ -1,6 +1,6 @@
 # NegBinTVP - This function contains the full MCMC sampler for the Negative Binomial model.
 
-# Last update: 06.04.25 (RP)
+# Last update: 20.04.26 -> CRT distribution (RP)
 
 NegBinTVP <- function(df,
                       prior.reg,
@@ -19,6 +19,8 @@ NegBinTVP <- function(df,
                       HPD.coverage,
                       random.effects,
                       progress.bar){
+
+  r <- 1
 
   X.t <- cbind(df$X, t = df$timeidx)
   r <- c()
@@ -53,12 +55,14 @@ NegBinTVP <- function(df,
       eta <- do.call("rbind", eta)
 
       # sample r
-      if(i == 1){
-        r[i] <- 1
-      } else{
+
+      r.prev <- r
+
+      if(settings.NegBin$slice){
+
         sample.r.list <- NB.para(y = df$y,
                                  eta = eta,
-                                 r.old = r[i-1],
+                                 r.old = r.prev,
                                  sample.r = TRUE,
                                  r.alpha = settings.NegBin$alpha.r,
                                  r.beta = settings.NegBin$beta.r,
@@ -66,20 +70,29 @@ NegBinTVP <- function(df,
                                  width = settings.NegBin$width,
                                  p.overrelax = settings.NegBin$p.overrelax,
                                  accuracy.overrelax = settings.NegBin$accuracy.overrelax)
-        r[i] <- sample.r.list$r
+        r <- sample.r.list$r
+
+      } else{
+
+        r <- sample_china(y = df$y,
+                          eta = eta,
+                          r.old = r.prev,
+                          r.alpha = settings.NegBin$alpha.r,
+                          r.beta = settings.NegBin$beta.r)
+
       }
 
       # sample omega
       if(i == 1){
         omega <- rep(1, length(df$y))
       } else{
-        omega <- efficient_PG_sampling(h = df$y + r[i], z = c(eta))
+        omega <- efficient_PG_sampling(h = df$y + r, z = c(eta))
       }
       W.sparse <- Matrix::Diagonal(n = length(omega), x = omega)
       W.dense <- matrix(omega, nrow = df$n, ncol = df$Tmax)
 
       # update z deterministically
-      z <- NB.para(y = df$y, r.old = r[i], omega.old = omega, compute.z = TRUE)
+      z <- NB.para(y = df$y, r.old = r, omega.old = omega, compute.z = TRUE)
 
       # Step R
 
@@ -136,7 +149,7 @@ NegBinTVP <- function(df,
       # Step Augment (only in the presence of missings)
       df$y[miss] <- StepAugment(eta.miss = c(linpred)[miss] + reff[miss],
                                 model = "NegBin",
-                                r = r[i])
+                                r = r)
 
       # Returning
 
@@ -220,7 +233,7 @@ NegBinTVP <- function(df,
 
       }
 
-      res.i <- c(res.i, r[i]) # appending dispersion parameter of NegBin dist
+      res.i <- c(res.i, r) # appending dispersion parameter of NegBin dist
 
       res_frame[i,] <- res.i
       Y[,i] <- df$y

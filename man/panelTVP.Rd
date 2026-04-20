@@ -98,7 +98,8 @@ panelTVP(formula = NULL,
          ),
          settings.NegBin = list(
           alpha.r = 2, beta.r = 1, expansion.steps = 10,
-          width = 1, p.overrelax = 0, accuracy.overrelax = 10
+          width = 1, p.overrelax = 0, accuracy.overrelax = 10,
+          slice = FALSE
          ),
          HPD.coverage = 0.95,
          R.WAIC = 5,
@@ -574,7 +575,8 @@ is of length \deqn{\frac{\text{chain.length}-\text{burnin}}{\text{thin}}}}
 
 \item{settings.NegBin}{a list containing information for sampling the dispersion
 parameter \eqn{r} in the Negative Binomial and Zero-Inflated Negative Binomial
-model using univariate Slice sampling.
+model using univariate Slice sampling or conjugate Gibbs updates based on the
+Chinese Restaurant Table (CRT) distribution.
 For other response distributions, this is ignored. The arguments are:
 \itemize{
 \item \code{alpha.r}: shape parameter of Gamma proposal
@@ -585,9 +587,12 @@ For other response distributions, this is ignored. The arguments are:
 performing overrelaxation might increase sampling efficiency; when overrelaxation
 should not be used, set \code{p.overrelax = 0}
 \item \code{accuracy.overrelax}: accuracy in overrelaxation phase
+\item \code{slice}: should Slice sampling or the conjugate sampler based on
+the CRT distribution be used for sampling of r
 }
 For more information on overrelaxation and Slice sampling in general,
-see the original paper on Slice sampling by Neal (2003)}
+see the original paper on Slice sampling by Neal (2003). Information on the
+conjugate updating scheme for r can be found in Zhou and Carin (2015)}
 
 \item{HPD.coverage}{coverage probability of highest posterior density intervals
 (default yields 95 percent coverage)}
@@ -1078,6 +1083,9 @@ Statistical Association, 108, 1339-1349.
 Pfeiler, R. and Wagner, H. (2024). Shrinkage in a Bayesian Panel Data Model
 with Time-Varying Coefficients. In: Einbeck, J. Maeng, H., Ogundium, E. and
 Perrakis, K. (Editors): Developments in Statistical Modelling, Springer, 109-115.
+
+Zhou, M. and Carin, L. (2015). Negative Binomial Process Count and Mixture Modeling.
+In: IEEE Transactions on Pattern Analysis and Machine Intelligence, 37, 307-320.
 }
 \author{
 Roman Pfeiler, Helga Wagner

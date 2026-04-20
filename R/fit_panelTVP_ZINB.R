@@ -177,7 +177,7 @@ fit_panelTVP_ZINB <- function(formula,
     cnames_nb <- c(cnames_nb,"lambda","psi","phi2","zeta2", "a.phi", "kappa.phi",
                    "a.zeta", "kappa.zeta")
   }
-  cnames_nb <- append(cnames_nb, "r", paste0("delta_t",1:df$Tmax))
+  cnames_nb <- c(cnames_nb, "r", paste0("delta_t",1:df$Tmax))
   col_res_nb <- length(cnames_nb)
   res_frame_nb <- matrix(0, nrow = mcmc.opt$chain.length, ncol = col_res_nb)
   colnames(res_frame_nb) <- cnames_nb

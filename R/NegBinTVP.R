@@ -107,6 +107,7 @@ NegBinTVP <- function(df,
                          i = i)
       betat <- stepR.out$betat
       alpha <- stepR.out$alpha
+      delta <- betat[,1] + log(r) # intercept is always in model, therefore fine
       prior.reg <- stepR.out$prior.reg
 
       # Step F
@@ -233,7 +234,7 @@ NegBinTVP <- function(df,
 
       }
 
-      res.i <- c(res.i, r) # appending dispersion parameter of NegBin dist
+      res.i <- c(res.i, r, delta) # appending r and delta = beta_0t + log(r)
 
       res_frame[i,] <- res.i
       Y[,i] <- df$y

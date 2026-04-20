@@ -86,6 +86,11 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
 
   if(is.null(formula) || is.null(data)) stop("Arguments 'formula' and 'data' are required with no defaults.")
 
+  # intercept must be included
+  if(attr(terms(formula), "intercept") == 0){
+    stop("An intercept term must be included in the model.")
+  }
+
   # checking model type
   if(is.null(model) || !model %in% c("Gaussian", "Probit", "Logit", "NegBin", "ZINB")){
     stop("Argument 'model' must be either 'Gaussian', 'Probit', 'Logit', 'NegBin' or 'ZINB'.")

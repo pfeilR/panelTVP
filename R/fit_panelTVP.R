@@ -140,7 +140,7 @@ fit_panelTVP <- function(formula,
   # modification for Negative-Binomial model as we also want chain for r
 
   if(model == "NegBin"){
-    cnames <- append(cnames, "r")
+    cnames <- append(cnames, "r", paste0("delta_t",1:df$Tmax))
     col_res <- length(cnames)
     res_frame <- matrix(0, nrow = mcmc.opt$chain.length, ncol = col_res)
     colnames(res_frame) <- cnames

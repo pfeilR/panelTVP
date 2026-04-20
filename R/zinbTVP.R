@@ -412,7 +412,7 @@ zinbTVP <- function(df,
 
       }
 
-      res_frame_nb[i,] <- c(res.i_nb, c(r, delta))
+      res_frame_nb[i,] <- c(res.i_nb, r, delta)
       Y[,i] <- df$y # important for missings and computation of WAIC
       if(progress.bar) utils::setTxtProgressBar(pb, i) # tracking progress
 

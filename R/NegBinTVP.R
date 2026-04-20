@@ -234,7 +234,7 @@ NegBinTVP <- function(df,
 
       }
 
-      res.i <- c(res.i, r, delta) # appending r and delta = beta_0t + log(r)
+      res.i <- c(res.i, c(r, delta)) # appending r and delta = beta_0t + log(r)
 
       res_frame[i,] <- res.i
       Y[,i] <- df$y

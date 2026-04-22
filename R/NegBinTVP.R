@@ -23,7 +23,6 @@ NegBinTVP <- function(df,
   r <- 1
 
   X.t <- cbind(df$X, t = df$timeidx)
-  r <- c()
   fi.count <- 1
 
   Y <- matrix(nrow = length(df$y), ncol = mcmc.opt$chain.length)

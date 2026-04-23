@@ -209,7 +209,6 @@ zinbTVP <- function(df,
                             mcmc.opt = mcmc.opt,
                             i = i)
       betat_nb <- stepR.out_nb$betat
-      delta <- betat_nb[,1] + log(r)
       alpha_nb <- stepR.out_nb$alpha
       prior.reg_nb <- stepR.out_nb$prior.reg
 
@@ -412,7 +411,7 @@ zinbTVP <- function(df,
 
       }
 
-      res_frame_nb[i,] <- c(res.i_nb, r, delta)
+      res_frame_nb[i,] <- c(res.i_nb, r)
       Y[,i] <- df$y # important for missings and computation of WAIC
       if(progress.bar) utils::setTxtProgressBar(pb, i) # tracking progress
 

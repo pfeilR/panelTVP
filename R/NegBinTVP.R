@@ -51,35 +51,51 @@ NegBinTVP <- function(df,
         as.matrix(X.t[X.t[,"t"] == t, -ncol(X.t)]) %*% b.t[b.t[,"t"] == t, -ncol(b.t)] +
           reff.t[reff.t[,"t"]==t,-ncol(reff.t)]
       })
-      eta <- do.call("rbind", eta)
+      lp <- do.call("rbind", eta)
 
       # sample r
 
       r.prev <- r
 
-      if(settings.NegBin$slice){
+      # if(settings.NegBin$slice){
+      #
+      #   sample.r.list <- NB.para(y = df$y,
+      #                            eta = eta+log(r),
+      #                            r.old = r.prev,
+      #                            sample.r = TRUE,
+      #                            r.alpha = settings.NegBin$alpha.r,
+      #                            r.beta = settings.NegBin$beta.r,
+      #                            expansion.steps = settings.NegBin$expansion.steps,
+      #                            width = settings.NegBin$width,
+      #                            p.overrelax = settings.NegBin$p.overrelax,
+      #                            accuracy.overrelax = settings.NegBin$accuracy.overrelax)
+      #   r <- sample.r.list$r
+      #
+      # } else{
+      #
+      #   r <- sample_china(y = df$y,
+      #                     eta = eta,
+      #                     r.old = r.prev,
+      #                     r.alpha = settings.NegBin$alpha.r,
+      #                     r.beta = settings.NegBin$beta.r)
+      #
+      # }
 
-        sample.r.list <- NB.para(y = df$y,
-                                 eta = eta,
-                                 r.old = r.prev,
-                                 sample.r = TRUE,
-                                 r.alpha = settings.NegBin$alpha.r,
-                                 r.beta = settings.NegBin$beta.r,
-                                 expansion.steps = settings.NegBin$expansion.steps,
-                                 width = settings.NegBin$width,
-                                 p.overrelax = settings.NegBin$p.overrelax,
-                                 accuracy.overrelax = settings.NegBin$accuracy.overrelax)
-        r <- sample.r.list$r
+      # new
+      sample.r.list <- slice_r_reparam(
+        y = df$y,
+        lp = c(lp),
+        r = r.prev,
+        a = settings.NegBin$alpha.r,
+        b = settings.NegBin$beta.r,
+        steps = settings.NegBin$expansion.steps,
+        w = settings.NegBin$width,
+        p.overrelax = settings.NegBin$p.overrelax,
+        acc = settings.NegBin$accuracy.overrelax
+      )
 
-      } else{
-
-        r <- sample_china(y = df$y,
-                          eta = eta,
-                          r.old = r.prev,
-                          r.alpha = settings.NegBin$alpha.r,
-                          r.beta = settings.NegBin$beta.r)
-
-      }
+      r <- sample.r.list$r
+      eta <- lp - log(r)
 
       # sample omega
       if(i == 1){
@@ -95,7 +111,8 @@ NegBinTVP <- function(df,
 
       # Step R
 
-      zbeta <- z - reff
+      # zbeta <- z - reff
+      zbeta <- z + log(r) - reff
       stepR.out <- stepR(response = zbeta,
                          df = df,
                          prior.reg = prior.reg,
@@ -117,7 +134,8 @@ NegBinTVP <- function(df,
 
       if(random.effects){
 
-        res.z <- z - linpred
+        # res.z <- z - linpred
+        res.z <- z + log(r) - linpred
         stepF.out <- stepF(response = res.z,
                            df = df,
                            W.sparse = W.sparse,

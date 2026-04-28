@@ -199,3 +199,58 @@ sample_china <- function(y, eta, r.old, r.alpha, r.beta){
   return(r)
 
 }
+
+# for new parametrization
+
+slice_r_reparam <- function(y, lp, r, a, b, steps, w, p.overrelax = 0, acc = 0){
+
+  log.post.r <- function(log.r.val){
+    r.val <- exp(log.r.val)
+    eta <- lp - log.r.val
+
+    log.lik <- sum(
+      lgamma(y + r.val) - lgamma(r.val) - lgamma(y + 1) +
+        y * eta -
+        (y + r.val) * log1p(exp(eta))
+    )
+
+    log.prior <- dgamma(r.val, shape = a, rate = b, log = TRUE)
+
+    val <- log.lik + log.prior + log.r.val
+    if(!is.finite(val)) return(-Inf)
+    val
+  }
+
+  log.r <- log(r)
+  slice.level <- log.post.r(log.r) + log(runif(1))
+
+  u <- runif(1, max = w)
+  L <- log.r - u
+  R <- log.r + (w - u)
+
+  J <- floor(runif(1, 0, steps))
+  K <- steps - 1 - J
+
+  while(J > 0 && log.post.r(L) > slice.level){
+    L <- L - w
+    J <- J - 1
+  }
+
+  while(K > 0 && log.post.r(R) > slice.level){
+    R <- R + w
+    K <- K - 1
+  }
+
+  repeat{
+    log.r.new <- runif(1, L, R)
+    if(log.post.r(log.r.new) >= slice.level) break
+
+    if(log.r.new < log.r){
+      L <- log.r.new
+    } else {
+      R <- log.r.new
+    }
+  }
+
+  list(r = exp(log.r.new))
+}

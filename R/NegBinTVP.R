@@ -1,6 +1,6 @@
 # NegBinTVP - This function contains the full MCMC sampler for the Negative Binomial model.
 
-# Last update: 20.04.26 -> CRT distribution (RP)
+# Last update: 28.04.26 -> reparameterization to increase sampling efficiency!!!
 
 NegBinTVP <- function(df,
                       prior.reg,

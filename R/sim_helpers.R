@@ -60,8 +60,7 @@ sim_Gaussian_Probit_Logit_NegBin <- function(n,
     }
 
     else if(model == "NegBin"){
-      # mu <- r * exp(eta) # old version
-      mu <- exp(eta) # new reparametrisation
+      mu <- r * exp(eta) # old version
       y <- MASS::rnegbin(length(mu), mu = mu, theta = r)
     }
 

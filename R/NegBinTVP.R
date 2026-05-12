@@ -1,6 +1,6 @@
 # NegBinTVP - This function contains the full MCMC sampler for the Negative Binomial model.
 
-# Last update: 28.04.26 -> reparameterization to increase sampling efficiency!!!
+# Last update: 20.04.26 -> CRT distribution (RP)
 
 NegBinTVP <- function(df,
                       prior.reg,
@@ -30,10 +30,10 @@ NegBinTVP <- function(df,
   #progress bar
   if(progress.bar){
     pb <- utils::txtProgressBar(min = 0,
-                         max = mcmc.opt$chain.length,
-                         char = "=",
-                         style = 3,
-                         width = 30)
+                                max = mcmc.opt$chain.length,
+                                char = "=",
+                                style = 3,
+                                width = 30)
   }
   time <- system.time({
 
@@ -51,51 +51,35 @@ NegBinTVP <- function(df,
         as.matrix(X.t[X.t[,"t"] == t, -ncol(X.t)]) %*% b.t[b.t[,"t"] == t, -ncol(b.t)] +
           reff.t[reff.t[,"t"]==t,-ncol(reff.t)]
       })
-      lp <- do.call("rbind", eta)
+      eta <- do.call("rbind", eta)
 
       # sample r
 
       r.prev <- r
 
-      # if(settings.NegBin$slice){
-      #
-      #   sample.r.list <- NB.para(y = df$y,
-      #                            eta = eta+log(r),
-      #                            r.old = r.prev,
-      #                            sample.r = TRUE,
-      #                            r.alpha = settings.NegBin$alpha.r,
-      #                            r.beta = settings.NegBin$beta.r,
-      #                            expansion.steps = settings.NegBin$expansion.steps,
-      #                            width = settings.NegBin$width,
-      #                            p.overrelax = settings.NegBin$p.overrelax,
-      #                            accuracy.overrelax = settings.NegBin$accuracy.overrelax)
-      #   r <- sample.r.list$r
-      #
-      # } else{
-      #
-      #   r <- sample_china(y = df$y,
-      #                     eta = eta,
-      #                     r.old = r.prev,
-      #                     r.alpha = settings.NegBin$alpha.r,
-      #                     r.beta = settings.NegBin$beta.r)
-      #
-      # }
+      if(settings.NegBin$slice){
 
-      # new
-      sample.r.list <- slice_r_reparam(
-        y = df$y,
-        lp = c(lp),
-        r = r.prev,
-        a = settings.NegBin$alpha.r,
-        b = settings.NegBin$beta.r,
-        steps = settings.NegBin$expansion.steps,
-        w = settings.NegBin$width,
-        p.overrelax = settings.NegBin$p.overrelax,
-        acc = settings.NegBin$accuracy.overrelax
-      )
+        sample.r.list <- NB.para(y = df$y,
+                                 eta = eta,
+                                 r.old = r.prev,
+                                 sample.r = TRUE,
+                                 r.alpha = settings.NegBin$alpha.r,
+                                 r.beta = settings.NegBin$beta.r,
+                                 expansion.steps = settings.NegBin$expansion.steps,
+                                 width = settings.NegBin$width,
+                                 p.overrelax = settings.NegBin$p.overrelax,
+                                 accuracy.overrelax = settings.NegBin$accuracy.overrelax)
+        r <- sample.r.list$r
 
-      r <- sample.r.list$r
-      eta <- lp - log(r)
+      } else{
+
+        r <- sample_china(y = df$y,
+                          eta = eta,
+                          r.old = r.prev,
+                          r.alpha = settings.NegBin$alpha.r,
+                          r.beta = settings.NegBin$beta.r)
+
+      }
 
       # sample omega
       if(i == 1){
@@ -111,8 +95,7 @@ NegBinTVP <- function(df,
 
       # Step R
 
-      # zbeta <- z - reff
-      zbeta <- z + log(r) - reff
+      zbeta <- z - reff
       stepR.out <- stepR(response = zbeta,
                          df = df,
                          prior.reg = prior.reg,
@@ -134,8 +117,7 @@ NegBinTVP <- function(df,
 
       if(random.effects){
 
-        # res.z <- z - linpred
-        res.z <- z + log(r) - linpred
+        res.z <- z - linpred
         stepF.out <- stepF(response = res.z,
                            df = df,
                            W.sparse = W.sparse,
@@ -162,6 +144,28 @@ NegBinTVP <- function(df,
         }
 
       }
+
+      # Step B (blocked sampling of (r, beta1)
+
+      eta <- c(linpred) + reff
+      blocki <- sample_r_beta1(y = df$y,
+                               eta = eta,
+                               r = r,
+                               beta1 = alpha[1],
+                               eps.sd = settings.NegBin$eps.sd,
+                               r.alpha = settings.NegBin$alpha.r,
+                               r.beta = settings.NegBin$beta.r,
+                               tau1 = prior.reg$tau[1])
+      r <- blocki$r
+      alpha[1] <- blocki$beta1
+      betat[,1] <- betat[,1] - blocki$eps
+      linpred <- construct.lp(
+        X = df$X,
+        Time = df$Tmax,
+        timeidx = df$timeidx,
+        betat = betat
+      )
+      eta <- c(linpred) + reff
 
       # Step Augment (only in the presence of missings)
       df$y[miss] <- StepAugment(eta.miss = c(linpred)[miss] + reff[miss],

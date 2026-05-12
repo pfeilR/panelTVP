@@ -200,57 +200,49 @@ sample_china <- function(y, eta, r.old, r.alpha, r.beta){
 
 }
 
-# for new parametrization
+# NEW (added on 12.05.2026): Blocked MH-Sampling of (r, beta1)
 
-slice_r_reparam <- function(y, lp, r, a, b, steps, w, p.overrelax = 0, acc = 0){
+sample_r_beta1 <- function(y,
+                           eta,
+                           r,
+                           beta1,
+                           eps.sd,
+                           r.alpha,
+                           r.beta,
+                           tau1){
 
-  log.post.r <- function(log.r.val){
-    r.val <- exp(log.r.val)
-    eta <- lp - log.r.val
+  # old values
+  log.r_old <- log(r)
+  r_old <- r
+  beta1_old <- beta1
+  psi_old <- plogis(eta)
+  psi_old <- pmin(pmax(psi_old, 1e-10), 1 - 1e-10)
 
-    log.lik <- sum(
-      lgamma(y + r.val) - lgamma(r.val) - lgamma(y + 1) +
-        y * eta -
-        (y + r.val) * log1p(exp(eta))
-    )
+  # candidates
+  eps <- rnorm(1, sd = eps.sd)
+  log.r_star <- log.r_old + eps
+  r_star <- exp(log.r_star)
+  beta1_star <- beta1 - eps
+  psi_star <- plogis(eta - eps)
+  psi_star <- pmin(pmax(psi_star, 1e-10), 1 - 1e-10)
 
-    log.prior <- dgamma(r.val, shape = a, rate = b, log = TRUE)
+  # computing acceptance probability
+  num <- ll.nb(y = y, r = r_star, psi = psi_star) +
+    dgamma(r_star, shape = r.alpha, rate = r.beta, log = TRUE) +
+    dnorm(beta1_star, mean = 0, sd = sqrt(tau1), log = TRUE) + log.r_star
 
-    val <- log.lik + log.prior + log.r.val
-    if(!is.finite(val)) return(-Inf)
-    val
+  den <- ll.nb(y = y, r = r_old, psi = psi_old) +
+    dgamma(r_old, shape = r.alpha, rate = r.beta, log = TRUE) +
+    dnorm(beta1_old, mean = 0, sd = sqrt(tau1), log = TRUE) + log.r_old
+
+  alpha <- min(0, num - den)
+
+  u <- runif(1)
+
+  if(alpha < log(u)){
+    return(list(r = r_old, beta1 = beta1_old, eps = 0))
+  } else{
+    return(list(r = r_star, beta1 = beta1_star, eps = eps))
   }
 
-  log.r <- log(r)
-  slice.level <- log.post.r(log.r) + log(runif(1))
-
-  u <- runif(1, max = w)
-  L <- log.r - u
-  R <- log.r + (w - u)
-
-  J <- floor(runif(1, 0, steps))
-  K <- steps - 1 - J
-
-  while(J > 0 && log.post.r(L) > slice.level){
-    L <- L - w
-    J <- J - 1
-  }
-
-  while(K > 0 && log.post.r(R) > slice.level){
-    R <- R + w
-    K <- K - 1
-  }
-
-  repeat{
-    log.r.new <- runif(1, L, R)
-    if(log.post.r(log.r.new) >= slice.level) break
-
-    if(log.r.new < log.r){
-      L <- log.r.new
-    } else {
-      R <- log.r.new
-    }
-  }
-
-  list(r = exp(log.r.new))
 }

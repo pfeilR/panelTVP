@@ -16,8 +16,7 @@ StepAugment <- function(eta.miss, model, sigma2 = NULL, r = NULL, risk.miss = NU
   }
 
   if(model == "NegBin"){
-    # y.miss <- MASS::rnegbin(m, mu = r * exp(eta.miss), theta = r)
-    y.miss <- MASS::rnegbin(m, mu = exp(eta.miss), theta = r)
+    y.miss <- MASS::rnegbin(m, mu = r * exp(eta.miss), theta = r)
   }
 
   if(model == "ZINB"){

@@ -352,6 +352,8 @@ NegBinTVP <- function(df,
   if(settings.NegBin$blocked){
     acceptance.rate.blocked <- accept.rate(accept = settings.NegBin$blocked.accept,
                                            mcmc.opt = mcmc.opt)
+  } else{
+    acceptance.rate.blocked <- NA
   }
 
   # return
@@ -359,7 +361,8 @@ NegBinTVP <- function(df,
   ret <- list(data = df, mcmc = res_mcmc[,colnames(res_mcmc) != "sigma2"],
               posterior = mcmcsummary[rownames(mcmcsummary) != "sigma2",],
               fmcmc = f_mat[,1:df$n],
-              fmean = fmean, model = "NegBin", acceptance.rates = acceptance.rates,
+              fmean = fmean, model = "NegBin",
+              acceptance.rates = acceptance.rates, acceptance.rate.blocked = acceptance.rate.blocked,
               HPD.coverage = HPD.coverage,
               runtime = paste("Total Runtime for Bayesian Negative Binomial Model:", round(time[3], 3), "seconds"))
   if(sum(miss) == 0) ret$Y <- NULL

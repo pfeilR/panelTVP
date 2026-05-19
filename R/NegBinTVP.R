@@ -349,6 +349,10 @@ NegBinTVP <- function(df,
   } else{
     acceptance.rates <- NULL
   }
+  if(settings.NegBin$blocked){
+    acceptance.rate.blocked <- accept.rate(accept = settings.NegBin$blocked.accept,
+                                           mcmc.opt = mcmc.opt)
+  }
 
   # return
   df$y[miss] <- NA

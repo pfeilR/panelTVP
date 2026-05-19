@@ -1161,7 +1161,9 @@ panelTVP <- function(formula = NULL,
                      settings.NegBin = list(
                        alpha.r = 2, beta.r = 1, expansion.steps = 10,
                        width = 1, p.overrelax = 0, accuracy.overrelax = 10,
-                       slice = FALSE, eps.sd = 0.25
+                       slice = FALSE, Metropolis = FALSE, blocked = TRUE,
+                       eps.sd.r = 0.25, eps.sd.blocked = 0.25,
+                       target.rate.r = 0.44, target.rate.blocked = 0.44
                      ),
                      HPD.coverage = 0.95,
                      R.WAIC = 5,

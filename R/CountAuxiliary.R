@@ -206,10 +206,17 @@ sample_r_beta1 <- function(y,
                            eta,
                            r,
                            beta1,
-                           eps.sd,
+                           eps.sd.blocked,
                            r.alpha,
                            r.beta,
-                           tau1){
+                           tau1,
+                           accept,
+                           target.rate){
+
+  # adaptive step
+  accept.rate <- sum(accept) / length(accept)
+  adapt.factor <- exp(0.01 * (accept.rate - target.rate))
+  eps.sd.blocked <- eps.sd.blocked * adapt.factor
 
   # old values
   log.r_old <- log(r)
@@ -219,7 +226,7 @@ sample_r_beta1 <- function(y,
   psi_old <- pmin(pmax(psi_old, 1e-10), 1 - 1e-10)
 
   # candidates
-  eps <- rnorm(1, sd = eps.sd)
+  eps <- rnorm(1, sd = eps.sd.blocked)
   log.r_star <- log.r_old + eps
   r_star <- exp(log.r_star)
   beta1_star <- beta1 - eps
@@ -240,9 +247,48 @@ sample_r_beta1 <- function(y,
   u <- runif(1)
 
   if(alpha < log(u)){
-    return(list(r = r_old, beta1 = beta1_old, eps = 0))
+    return(list(r = r_old, beta1 = beta1_old, eps = 0, eps.sd.blocked = eps.sd.blocked))
   } else{
-    return(list(r = r_star, beta1 = beta1_star, eps = eps))
+    return(list(r = r_star, beta1 = beta1_star, eps = eps, eps.sd.blocked = eps.sd.blocked))
   }
 
 }
+
+# NEW (added on 19.05.2026): Instead of CRT and Slice, Metropolis for log(r)
+
+sample_r_metro <- function(y, eta, r.old, eps.sd.r, r.alpha, r.beta, accept, target.rate){
+
+  # adaptive step
+  accept.rate <- sum(accept) / length(accept)
+  adapt.factor <- exp(0.01 * (accept.rate - target.rate))
+  eps.sd.r <- eps.sd.r * adapt.factor
+
+  rho.old <- log(r.old)
+
+  eps <- rnorm(1, mean = 0, sd = eps.sd.r)
+
+  rho.star <- rho.old + eps
+  r.star <- exp(rho.star)
+
+  psi <- pmin(pmax(plogis(eta), 1e-10), 1 - 1e-10)
+
+  num <- ll.nb(y = y, r = r.star, psi = psi) +
+    dgamma(r.star, shape = r.alpha, rate = r.beta, log = TRUE) +
+    rho.star
+
+  den <- ll.nb(y = y, r = r.old, psi = psi) +
+    dgamma(r.old, shape = r.alpha, rate = r.beta, log = TRUE) +
+    rho.old
+
+  logacc <- min(0, num - den)
+
+  if(log(runif(1)) < logacc){
+    return(list(r = r.star, eps.sd.r = eps.sd.r))
+  } else {
+    return(list(r = r.old, eps.sd.r = eps.sd.r))
+  }
+
+}
+
+
+

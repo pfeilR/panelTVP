@@ -71,7 +71,26 @@ NegBinTVP <- function(df,
                                  accuracy.overrelax = settings.NegBin$accuracy.overrelax)
         r <- sample.r.list$r
 
-      } else{
+      } else if(settings.NegBin$Metropolis){
+
+          sample.r.list <- sample_r_metro(y = df$y,
+                                          eta = eta,
+                                          r.old = r.prev,
+                                          eps.sd.r = settings.NegBin$eps.sd.r,
+                                          r.alpha = settings.NegBin$alpha.r,
+                                          r.beta = settings.NegBin$beta.r,
+                                          accept = settings.NegBin$r.accept,
+                                          target.rate = settings.NegBin$target.rate.r)
+
+          r <- sample.r.list[[1]]
+          settings.NegBin$eps.sd.r <- sample.r.list[[2]]
+          if(r != r.prev){
+            settings.NegBin$r.accept[i] <- 1
+          } else{
+            settings.NegBin$r.accept[i] <- 0
+          }
+
+        } else{
 
         r <- sample_china(y = df$y,
                           eta = eta,
@@ -147,25 +166,40 @@ NegBinTVP <- function(df,
 
       # Step B (blocked sampling of (r, beta1)
 
-      eta <- c(linpred) + reff
-      blocki <- sample_r_beta1(y = df$y,
-                               eta = eta,
-                               r = r,
-                               beta1 = alpha[1],
-                               eps.sd = settings.NegBin$eps.sd,
-                               r.alpha = settings.NegBin$alpha.r,
-                               r.beta = settings.NegBin$beta.r,
-                               tau1 = prior.reg$tau[1])
-      r <- blocki$r
-      alpha[1] <- blocki$beta1
-      betat[,1] <- betat[,1] - blocki$eps
-      linpred <- construct.lp(
-        X = df$X,
-        Time = df$Tmax,
-        timeidx = df$timeidx,
-        betat = betat
-      )
-      eta <- c(linpred) + reff
+      if(settings.NegBin$blocked){
+
+        eta <- c(linpred) + reff
+        blocki <- sample_r_beta1(y = df$y,
+                                 eta = eta,
+                                 r = r,
+                                 beta1 = alpha[1],
+                                 eps.sd.blocked = settings.NegBin$eps.sd.blocked,
+                                 r.alpha = settings.NegBin$alpha.r,
+                                 r.beta = settings.NegBin$beta.r,
+                                 tau1 = prior.reg$tau[1],
+                                 accept = settings.NegBin$blocked.accept,
+                                 target.rate = settings.NegBin$target.rate.blocked)
+
+        if(r != blocki$r){
+          settings.NegBin$blocked.accept[i] <- 1
+        } else{
+          settings.NegBin$blocked.accept[i] <- 0
+        }
+
+        r <- blocki$r
+        alpha[1] <- blocki$beta1
+        betat[,1] <- betat[,1] - blocki$eps
+        settings.NegBin$eps.sd.blocked <- blocki$eps.sd.blocked
+
+        linpred <- construct.lp(
+          X = df$X,
+          Time = df$Tmax,
+          timeidx = df$timeidx,
+          betat = betat
+        )
+        eta <- c(linpred) + reff
+
+      }
 
       # Step Augment (only in the presence of missings)
       df$y[miss] <- StepAugment(eta.miss = c(linpred)[miss] + reff[miss],

@@ -152,6 +152,8 @@ fit_panelTVP <- function(formula,
   if(model == "NegBin"){
     settings.NegBin$r.accept <- c()
     settings.NegBin$r.accept[1] <- 1 # we let metropolis start in 2nd iteration
+    settings.NegBin$blocked.accept <- c()
+    settings.NegBin$blocked.accept[1] <- 1
   }
 
   ## regression part

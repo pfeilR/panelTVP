@@ -1247,7 +1247,7 @@ panelTVP <- function(formula = NULL,
         result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin_no.fac(result)
       }
     }
-    result$fmcmc <- NULL
+    # result$fmcmc <- NULL
 
     # adding learning settings to output
     hyperpara <- c("a.xi", "a.tau", "c.xi", "c.tau", "kappa.xi", "kappa.tau", "kappa.zeta", "kappa.phi")

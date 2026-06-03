@@ -102,6 +102,8 @@ Probit, Logit and Negative Binomial model)}
 \item{lambda}{a T x 1 matrix of factor loadings, i.e., each row contains
 the factor loading of the corresponding time point (only in Gaussian,
 Probit, Logit and Negative Binomial model)}
+\item{fi}{an n x 1 matrix of factor scores (only in Gaussian, Probit, Logit
+and Negative Binomial model)}
 \item{beta_zinb.inflation}{a T x d_logit matrix of regression effects
 in zero-inflation component of the model, i.e., each row contains
 the regression effects of the corresponding time point (only in ZINB model)}
@@ -114,6 +116,10 @@ the factor loading of the corresponding time point (only in ZINB model)}
 \item{lambda_zinb.count}{a T x 1 matrix of factor loadings in
 count component of the model, i.e., each row contains
 the factor loading of the corresponding time point (only in ZINB model)}
+\item{fi_zinb.inflation}{an n x 1 matrix of factor scores in the
+zero-inflation component of the model (only in ZINB model)}
+\item{fi_zinb.count}{an n x 1 matrix of factor scores in the
+count component of the model (only in ZINB model)}
 \item{sigma2}{a scalar containing the value of \eqn{\sigma^2} (only in
 Gaussian model)}
 \item{r}{a scalar containing the value of \eqn{r} (only in Negative

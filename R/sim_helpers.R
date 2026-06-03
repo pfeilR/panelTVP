@@ -114,6 +114,7 @@ sim_Gaussian_Probit_Logit_NegBin <- function(n,
     ret <- list(observed = observed,
                 beta = betat,
                 lambda = lambdat,
+                fi = fi,
                 r = r,
                 model = "NegBin")
 
@@ -220,6 +221,8 @@ sim_ZINB <- function(n,
               beta_zinb.count = betat.nb,
               lambda_zinb.inflation = lambdat.logit,
               lambda_zinb.count = lambdat.nb,
+              fi_zinb.inflation = fi.logit,
+              fi_zinb.count = fi.nb,
               r = r,
               model = "ZINB")
   return(ret)

@@ -183,7 +183,7 @@ sample_china <- function(y, eta, r.old, r.alpha, r.beta){
 
   n <- length(y)
 
-  # sampling of l_i
+  # sampling of l_it
   ell <- numeric(n)
   for(i in seq_len(n)){
     if(y[i] > 0){

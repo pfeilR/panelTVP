@@ -86,6 +86,7 @@ sim_Gaussian_Probit_Logit_NegBin <- function(n,
     ret <- list(observed = observed,
                 beta = betat,
                 lambda = lambdat,
+                fi = fi,
                 sigma2 = sigma2,
                 model = "Gaussian")
 
@@ -96,6 +97,7 @@ sim_Gaussian_Probit_Logit_NegBin <- function(n,
     ret <- list(observed = observed,
                 beta = betat,
                 lambda = lambdat,
+                fi = fi,
                 model = "Probit")
 
   }
@@ -105,6 +107,7 @@ sim_Gaussian_Probit_Logit_NegBin <- function(n,
     ret <- list(observed = observed,
                 beta = betat,
                 lambda = lambdat,
+                fi = fi,
                 model = "Logit")
 
   }

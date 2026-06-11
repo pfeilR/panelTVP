@@ -17,8 +17,6 @@ zinbTVP <- function(df,
                     tv.load_logit,
                     res_frame_nb,
                     res_frame_logit,
-                    f_sum_nb,
-                    f_sum_logit,
                     f_mat_nb,
                     f_mat_logit,
                     miss,
@@ -145,7 +143,6 @@ zinbTVP <- function(df,
         if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
           f_mat_logit[fi.count_logit,] <- fi_logit
           fi.count_logit <- fi.count_logit+1
-          f_sum_logit <- f_sum_logit+fi_logit
         }
         if(!tv.load_logit){
           reff_logit <- lambda_logit*fv_logit
@@ -158,7 +155,6 @@ zinbTVP <- function(df,
       # Sampling of dispersion parameter r -------------------------------------
 
       y.risk <- df$y[risk]
-      n.risk <- sum(risk)
 
       r.prev <- r
 
@@ -239,7 +235,6 @@ zinbTVP <- function(df,
         if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
           f_mat_nb[fi.count_nb,] <- fi_nb
           fi.count_nb <- fi.count_nb+1
-          f_sum_nb <- f_sum_nb+fi_nb
         }
         if(!tv.load_nb){
           reff_nb <- lambda_nb*fv_nb
@@ -425,17 +420,30 @@ zinbTVP <- function(df,
 
   # Setting Up Return Object ---------------------------------------------------
 
-  nmc <- (mcmc.opt$chain.length-mcmc.opt$burnin)/mcmc.opt$thin
-
   # logit component
 
   res_logit <- res_frame_logit[res_frame_logit[,"SimNr"] > mcmc.opt$burnin,]
   res_logit <- res_logit[seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin),]
+  if(random.effects){
+    flip.id_logit <- res_logit[, "lambda_t1"] < 0
+    res_logit[flip.id_logit, startsWith(colnames(res_logit), "lambda")] <-
+      -res_logit[flip.id_logit, startsWith(colnames(res_logit), "lambda")]
+    f_mat_logit[flip.id_logit, ] <- -f_mat_logit[flip.id_logit, ]
+    fmean_logit <- colMeans(f_mat_logit)
+    if(prior.load_logit$type %in% c("rw1", "rw2")){
+      res_logit[flip.id_logit, "psi"] <- -res_logit[flip.id_logit, "psi"]
+    }
+  } else{
+    f_mat_logit <- NULL
+    fmean_logit <- NULL
+  }
   res_mcmc_logit <- coda::mcmc(data = res_logit[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
   res_logit[,startsWith(colnames(res_logit), "theta")] <- abs(res_logit[,startsWith(colnames(res_logit), "theta")])
   colnames(res_logit)[startsWith(colnames(res_logit), "theta")] <- paste0("abs(theta", 1:df.logit$d, ")")
-  res_logit[,startsWith(colnames(res_logit), "psi")] <- abs(res_logit[,startsWith(colnames(res_logit), "psi")])
-  colnames(res_logit)[startsWith(colnames(res_logit), "psi")] <- "abs(psi)"
+  if(random.effects){
+    res_logit[,startsWith(colnames(res_logit), "psi")] <- abs(res_logit[,startsWith(colnames(res_logit), "psi")])
+    colnames(res_logit)[startsWith(colnames(res_logit), "psi")] <- "abs(psi)"
+  }
   res_logit <- coda::mcmc(data = res_logit[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
   hpint_logit <- coda::HPDinterval(res_logit, prob = HPD.coverage)
   mcmcsummary_logit <- cbind(hpint_logit[,"lower"],
@@ -445,17 +453,31 @@ zinbTVP <- function(df,
                              c(apply(res_logit,2,sd))
   )
   colnames(mcmcsummary_logit) <- c("LO", "mean","median","UP","sd")
-  fmean_logit <- f_sum_logit/nmc
 
   # negative binomial component
 
   res_nb <- res_frame_nb[res_frame_nb[,"SimNr"] > mcmc.opt$burnin,]
   res_nb <- res_nb[seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin),]
+  if(random.effects){
+    flip.id_nb <- res_nb[, "lambda_t1"] < 0
+    res_nb[flip.id_nb, startsWith(colnames(res_nb), "lambda")] <-
+      -res_nb[flip.id_nb, startsWith(colnames(res_nb), "lambda")]
+    f_mat_nb[flip.id_nb, ] <- -f_mat_nb[flip.id_nb, ]
+    fmean_nb <- colMeans(f_mat_nb)
+    if(prior.load_nb$type %in% c("rw1", "rw2")){
+      res_nb[flip.id_nb, "psi"] <- -res_nb[flip.id_nb, "psi"]
+    }
+  } else{
+    f_mat_nb <- NULL
+    fmean_nb <- NULL
+  }
   res_mcmc_nb <- coda::mcmc(data = res_nb[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
   res_nb[,startsWith(colnames(res_nb), "theta")] <- abs(res_nb[,startsWith(colnames(res_nb), "theta")])
   colnames(res_nb)[startsWith(colnames(res_nb), "theta")] <- paste0("abs(theta", 1:df.nb$d, ")")
-  res_nb[,startsWith(colnames(res_nb), "psi")] <- abs(res_nb[,startsWith(colnames(res_nb), "psi")])
-  colnames(res_nb)[startsWith(colnames(res_nb), "psi")] <- "abs(psi)"
+  if(random.effects){
+    res_nb[,startsWith(colnames(res_nb), "psi")] <- abs(res_nb[,startsWith(colnames(res_nb), "psi")])
+    colnames(res_nb)[startsWith(colnames(res_nb), "psi")] <- "abs(psi)"
+  }
   res_nb <- coda::mcmc(data = res_nb[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
   hpint_nb <- coda::HPDinterval(res_nb, prob = HPD.coverage)
   mcmcsummary_nb <- cbind(hpint_nb[,"lower"],
@@ -465,11 +487,10 @@ zinbTVP <- function(df,
                           c(apply(res_nb,2,sd))
   )
   colnames(mcmcsummary_nb) <- c("LO", "mean","median","UP","sd")
-  fmean_nb <- f_sum_nb/nmc
 
   # at-risk indicators
-  mcmc_risk <- mcmc_risk[seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin),]
-  Y <- Y[,seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)]
+  mcmc_risk <- mcmc_risk[seq(mcmc.opt$burnin + 1, mcmc.opt$chain.length, by = mcmc.opt$thin),]
+  Y <- Y[, seq(mcmc.opt$burnin + 1, mcmc.opt$chain.length, by = mcmc.opt$thin)]
 
   # computing acceptance rates of Metropolis-based parameters
   acceptance.rates_logit <- matrix(nrow = 1, ncol = 4)
@@ -502,7 +523,7 @@ zinbTVP <- function(df,
               Y = Y,
               mcmc_logit = res_mcmc_logit, mcmc_nb = res_mcmc_nb,
               posterior_logit = mcmcsummary_logit, posterior_nb = mcmcsummary_nb,
-              fmcmc_logit = f_mat_logit[,1:df$n], fmcmc_nb = f_mat_nb[,1:df$n],
+              fmcmc_logit = f_mat_logit, fmcmc_nb = f_mat_nb,
               fmean_logit = fmean_logit, fmean_nb = fmean_nb,
               mcmc_risk = mcmc_risk,
               model = "ZINB",

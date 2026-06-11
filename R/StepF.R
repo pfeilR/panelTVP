@@ -41,14 +41,6 @@ stepF <- function(response,
   alpha_lambda <- load.draws$alpha
   prior.load <- load.draws$pri.lambda
 
-  # Step F3: Identification ----------------------------------------------------
-
-  if(lambda[1] < 0){
-    lambda <- -lambda
-    fi <- -fi
-    alpha_lambda <- -alpha_lambda
-  }
-
   return(list(fi = fi, lambda = lambda, alpha_lambda = alpha_lambda, prior.load = prior.load))
 
 }

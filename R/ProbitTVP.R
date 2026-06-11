@@ -97,7 +97,6 @@ ProbitTVP <- function(df,
         if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
           f_mat[fi.count,] <- fi
           fi.count <- fi.count+1
-          f_sum <- f_sum+fi
         }
         if(!tv.load){
           reff <- lambda*fv
@@ -208,16 +207,30 @@ ProbitTVP <- function(df,
   # remove burnin
   res <- res_frame[res_frame[,"SimNr"] > mcmc.opt$burnin,]
   res <- res[seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin),]
+  if(random.effects){
+    flip.id <- res[,"lambda_t1"] < 0
+    res[flip.id, startsWith(colnames(res), "lambda")] <- -res[flip.id, startsWith(colnames(res), "lambda")]
+    f_mat[flip.id, ] <- -f_mat[flip.id, ]
+    fmean <- colMeans(f_mat)
+    if(prior.load$type %in% c("rw1", "rw2")){
+      res[flip.id, "psi"] <- -res[flip.id, "psi"]
+    }
+  } else{
+    f_mat <- NULL
+    fmean <- NULL
+  }
   idx <- res[,"SimNr"]
   res_mcmc <- coda::mcmc(data = res[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
 
-  #apply the absolute value to theta for the summary
+  # apply the absolute value to theta for the summary
   res[,startsWith(colnames(res), "theta")] <- abs(res[,startsWith(colnames(res), "theta")])
   colnames(res)[startsWith(colnames(res), "theta")] <- paste0("abs(theta", 1:df$d, ")")
 
   # added on 05.08.24: apply the absolute value to psi for the summary
-  res[,startsWith(colnames(res), "psi")] <- abs(res[,startsWith(colnames(res), "psi")])
-  colnames(res)[startsWith(colnames(res), "psi")] <- "abs(psi)"
+  if(random.effects){
+    res[,startsWith(colnames(res), "psi")] <- abs(res[,startsWith(colnames(res), "psi")])
+    colnames(res)[startsWith(colnames(res), "psi")] <- "abs(psi)"
+  }
   res <- coda::mcmc(data = res[,-1], start = mcmc.opt$burnin+1, thin = mcmc.opt$thin)
   hpint <- coda::HPDinterval(res, prob = HPD.coverage)
 
@@ -232,9 +245,7 @@ ProbitTVP <- function(df,
   colnames(mcmcsummary) <- c("LO", "mean","median","UP","sd")
 
   #create return object:
-  nmc <- (mcmc.opt$chain.length-mcmc.opt$burnin)/mcmc.opt$thin
-  fmean <- f_sum/nmc
-  Y <- Y[,seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin)]
+  Y <- Y[, seq(mcmc.opt$burnin + 1, mcmc.opt$chain.length, by = mcmc.opt$thin)]
 
   # computing acceptance rates of Metropolis-based parameters
   if(prior.reg$type != "ind"){
@@ -257,7 +268,7 @@ ProbitTVP <- function(df,
   df$y[miss] <- NA
   ret <- list(data = df, Y = Y, mcmc = res_mcmc[,colnames(res_mcmc) != "sigma2"],
               posterior = mcmcsummary[rownames(mcmcsummary) != "sigma2",],
-              fmean = fmean,fmcmc = f_mat[,1:df$n], model = "Probit", acceptance.rates = acceptance.rates,
+              fmean = fmean, fmcmc = f_mat, model = "Probit", acceptance.rates = acceptance.rates,
               HPD.coverage = HPD.coverage,
               runtime = paste("Total Runtime for Bayesian Probit Model:", round(time[3], 3), "seconds"))
   if(sum(miss) == 0) ret$Y <- NULL

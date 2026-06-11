@@ -134,8 +134,7 @@ fit_panelTVP <- function(formula,
   res_frame <- matrix(0, nrow = mcmc.opt$chain.length, ncol = col_res)
   colnames(res_frame) <- cnames
 
-  f_sum <- rep(0, df$n)
-  f_mat <- matrix(NA, nrow = (mcmc.opt$chain.length-mcmc.opt$burnin)/mcmc.opt$thin, ncol = length(y))
+  f_mat <- matrix(NA, nrow = (mcmc.opt$chain.length-mcmc.opt$burnin)/mcmc.opt$thin, ncol = df$n)
 
   # modification for Negative-Binomial model as we also want chain for r
 
@@ -186,7 +185,6 @@ fit_panelTVP <- function(formula,
                           C0 = C0,
                           tv.load = tv.load,
                           res_frame = res_frame,
-                          f_sum = f_sum,
                           f_mat = f_mat,
                           miss = miss,
                           HPD.coverage = HPD.coverage,
@@ -206,7 +204,6 @@ fit_panelTVP <- function(formula,
                         reff = reff,
                         tv.load = tv.load,
                         res_frame = res_frame,
-                        f_sum = f_sum,
                         f_mat = f_mat,
                         miss = miss,
                         HPD.coverage = HPD.coverage,
@@ -226,7 +223,6 @@ fit_panelTVP <- function(formula,
                        reff = reff,
                        tv.load = tv.load,
                        res_frame = res_frame,
-                       f_sum = f_sum,
                        f_mat = f_mat,
                        miss = miss,
                        HPD.coverage = HPD.coverage,
@@ -247,7 +243,6 @@ fit_panelTVP <- function(formula,
                         reff = reff,
                         tv.load = tv.load,
                         res_frame = res_frame,
-                        f_sum = f_sum,
                         f_mat = f_mat,
                         miss = miss,
                         HPD.coverage = HPD.coverage,

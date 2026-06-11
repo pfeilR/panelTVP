@@ -216,12 +216,10 @@ fit_panelTVP_ZINB <- function(formula,
   res_frame_logit <- matrix(0, nrow = mcmc.opt$chain.length, ncol = col_res_logit)
   colnames(res_frame_logit) <- cnames_logit
 
-  f_sum_nb <- rep(0, df$n)
   f_mat_nb <- matrix(NA, nrow = (mcmc.opt$chain.length-mcmc.opt$burnin)/mcmc.opt$thin,
-                     ncol = length(y))
-  f_sum_logit <- rep(0, df$n)
+                     ncol = df$n)
   f_mat_logit <- matrix(NA, nrow = (mcmc.opt$chain.length-mcmc.opt$burnin)/mcmc.opt$thin,
-                        ncol = length(y))
+                        ncol = df$n)
 
   # initialize acceptance rate for dispersion parameter r
   settings.NegBin$r.accept <- c()
@@ -273,8 +271,6 @@ fit_panelTVP_ZINB <- function(formula,
                     tv.load_logit = tv.load_logit,
                     res_frame_nb = res_frame_nb,
                     res_frame_logit = res_frame_logit,
-                    f_sum_nb = f_sum_nb,
-                    f_sum_logit = f_sum_logit,
                     f_mat_nb = f_mat_nb,
                     f_mat_logit = f_mat_logit,
                     miss = miss,

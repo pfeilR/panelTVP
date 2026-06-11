@@ -41,6 +41,13 @@ stepF <- function(response,
   alpha_lambda <- load.draws$alpha
   prior.load <- load.draws$pri.lambda
 
+  # Step F3: new sign-identification
+
+  u <- sample(c(-1,1), 1)
+  lambda <- lambda * u
+  fi <- fi * u
+  alpha_lambda <- alpha_lambda * u
+
   return(list(fi = fi, lambda = lambda, alpha_lambda = alpha_lambda, prior.load = prior.load))
 
 }

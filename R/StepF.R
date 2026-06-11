@@ -67,7 +67,7 @@ sample.facs <- function(yit, lambda, sigma2){
   }
   mni <- Mni*yh
   fi <- rnorm(n, mean = mni, sd = sqrt(Mni))
-  fi <- fi-mean(fi)
+  fi <- scale(fi)
   return(fi)
 
 }
@@ -84,7 +84,7 @@ sample.facs.PG <- function(zit, lambda, W.dense){
   }
   mni <- Mni*yh
   fi <- rnorm(n, mean = mni, sd = sqrt(Mni))
-  fi <- fi-mean(fi)
+  fi <- scale(fi)
   return(fi)
 
 }

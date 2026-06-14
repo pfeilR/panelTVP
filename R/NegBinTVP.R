@@ -150,7 +150,7 @@ NegBinTVP <- function(df,
         alpha_lambda <- stepF.out$alpha_lambda
         prior.load <- stepF.out$prior.load
         fv <- rep(fi, df$Tmax)
-        if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
+        if(i > mcmc.opt$burnin && (i - (mcmc.opt$burnin + 1)) %% mcmc.opt$thin == 0){
           f_mat[fi.count,] <- fi
           fi.count <- fi.count+1
         }

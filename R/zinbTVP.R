@@ -140,7 +140,7 @@ zinbTVP <- function(df,
         alpha_lambda_logit <- stepF.out_logit$alpha_lambda
         prior.load_logit <- stepF.out_logit$prior.load
         fv_logit <- rep(fi_logit, df.logit$Tmax)
-        if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
+        if(i > mcmc.opt$burnin && (i - (mcmc.opt$burnin + 1)) %% mcmc.opt$thin == 0){
           f_mat_logit[fi.count_logit,] <- fi_logit
           fi.count_logit <- fi.count_logit+1
         }
@@ -232,7 +232,7 @@ zinbTVP <- function(df,
         alpha_lambda_nb <- stepF.out_nb$alpha_lambda
         prior.load_nb <- stepF.out_nb$prior.load
         fv_nb <- rep(fi_nb, df.nb$Tmax)
-        if(i>mcmc.opt$burnin & i%%mcmc.opt$thin==0){
+        if(i > mcmc.opt$burnin && (i - (mcmc.opt$burnin + 1)) %% mcmc.opt$thin == 0){
           f_mat_nb[fi.count_nb,] <- fi_nb
           fi.count_nb <- fi.count_nb+1
         }

@@ -950,6 +950,7 @@ MH_a_double <- function(a, alphapart, iota, prior_hp1, prior_hp2, k, accept, tar
                                            b2 = prior_hp2, # b*nu
                                            k = k)
   u <- runif(1)
+  acc_prob <- safe_acc(acc_prob) # numerical stability (added on 14.06.2026)
 
   if(log(u) < acc_prob){
     res <- proposal
@@ -1019,7 +1020,7 @@ MH_a_triple <- function(a, c, par, iota, prior_hp1, prior_hp2, k, kappa.check, a
                                k = k, kappa.check = kappa.check)
 
   acc_prob <- min(0, log.q.star - log.q.old)
-  acc_prob
+  acc_prob <- safe_acc(acc_prob) # numerical stability (added on 14.06.2026)
 
   u <- runif(1)
 
@@ -1070,6 +1071,7 @@ MH_c_triple <- function(c, a, par, iota, prior_hp1, prior_hp2, k, var.check, acc
                                k = k, var.check = var.check)
 
   acc_prob <- min(0, log.q.star - log.q.old)
+  acc_prob <- safe_acc(acc_prob) # numerical stability (added on 14.06.2026)
 
   u <- runif(1)
 
@@ -1119,7 +1121,7 @@ MH_a_triple_alternative <- function(a, c, iota, prior_hp1, prior_hp2, chi.j, acc
                                            chi.j = chi.j)
 
   acc_prob <- min(0, log.q.star - log.q.old)
-  acc_prob
+  acc_prob <- safe_acc(acc_prob) # numerical stability (added on 14.06.2026)
 
   u <- runif(1)
 
@@ -1169,6 +1171,7 @@ MH_c_triple_alternative <- function(c, a, vari, iota, prior_hp1, prior_hp2, chi.
                                            vari = vari, chi.j = chi.j)
 
   acc_prob <- min(0, log.q.star - log.q.old)
+  acc_prob <- safe_acc(acc_prob) # numerical stability (added on 14.06.2026)
 
   u <- runif(1)
 
@@ -1271,4 +1274,10 @@ sample.beta.ind.PG <- function(z, df, W.sparse, B0){
 
   return(beta.ind)
 
+}
+
+# added on 14.06.2026 to prevent numerical issues in MH-update
+
+safe_acc <- function(x){
+  if(!is.finite(x)) -Inf else x
 }

@@ -158,19 +158,24 @@ zinbTVP <- function(df,
 
       r.prev <- r
 
-      if(settings.NegBin$slice){
+      if(settings.NegBin$Metropolis){
 
-        sample.r.list <- NB.para(y = y.risk,
-                                 eta = matrix(eta_nb[risk,]),
-                                 r.old = r.prev,
-                                 sample.r = TRUE,
-                                 r.alpha = settings.NegBin$alpha.r,
-                                 r.beta = settings.NegBin$beta.r,
-                                 expansion.steps = settings.NegBin$expansion.steps,
-                                 width = settings.NegBin$width,
-                                 p.overrelax = settings.NegBin$p.overrelax,
-                                 accuracy.overrelax = settings.NegBin$accuracy.overrelax)
-        r <- sample.r.list$r
+        sample.r.list <- sample_r_metro(y = y.risk,
+                                        eta = matrix(eta_nb[risk,]),
+                                        r.old = r.prev,
+                                        eps.sd.r = settings.NegBin$eps.sd.r,
+                                        r.alpha = settings.NegBin$alpha.r,
+                                        r.beta = settings.NegBin$beta.r,
+                                        accept = settings.NegBin$r.accept,
+                                        target.rate = settings.NegBin$target.rate.r)
+
+        r <- sample.r.list[[1]]
+        settings.NegBin$eps.sd.r <- sample.r.list[[2]]
+        if(r != r.prev){
+          settings.NegBin$r.accept[i] <- 1
+        } else{
+          settings.NegBin$r.accept[i] <- 0
+        }
 
       } else{
 
@@ -241,6 +246,43 @@ zinbTVP <- function(df,
         }else{
           reff_nb <- c(t(matrix(lambda_nb, ncol=df.nb$n, nrow=df.nb$Tmax)))*fv_nb
         }
+
+      }
+
+      # Step B (blocked sampling of (r, beta1_nb) -> added on 14.07.2026 (must be tested!)
+
+      if(settings.NegBin$blocked){
+
+        eta_nb <- c(linpred_nb) + reff_nb
+        blocki <- sample_r_beta1(y = y.risk,
+                                 eta = matrix(eta_nb[risk,]),
+                                 r = r,
+                                 beta1 = alpha_nb[1],
+                                 eps.sd.blocked = settings.NegBin$eps.sd.blocked,
+                                 r.alpha = settings.NegBin$alpha.r,
+                                 r.beta = settings.NegBin$beta.r,
+                                 tau1 = prior.reg_nb$tau[1],
+                                 accept = settings.NegBin$blocked.accept,
+                                 target.rate = settings.NegBin$target.rate.blocked)
+
+        if(r != blocki$r){
+          settings.NegBin$blocked.accept[i] <- 1
+        } else{
+          settings.NegBin$blocked.accept[i] <- 0
+        }
+
+        r <- blocki$r
+        alpha_nb[1] <- blocki$beta1
+        betat_nb[,1] <- betat_nb[,1] - blocki$eps
+        settings.NegBin$eps.sd.blocked <- blocki$eps.sd.blocked
+
+        linpred_nb <- construct.lp(
+          X = df.nb$X,
+          Time = df.nb$Tmax,
+          timeidx = df.nb$timeidx,
+          betat = betat_nb
+        )
+        eta_nb <- c(linpred_nb) + reff_nb
 
       }
 

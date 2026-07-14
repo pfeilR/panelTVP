@@ -56,21 +56,7 @@ NegBinTVP <- function(df,
 
       r.prev <- r
 
-      if(settings.NegBin$slice){
-
-        sample.r.list <- NB.para(y = df$y,
-                                 eta = eta,
-                                 r.old = r.prev,
-                                 sample.r = TRUE,
-                                 r.alpha = settings.NegBin$alpha.r,
-                                 r.beta = settings.NegBin$beta.r,
-                                 expansion.steps = settings.NegBin$expansion.steps,
-                                 width = settings.NegBin$width,
-                                 p.overrelax = settings.NegBin$p.overrelax,
-                                 accuracy.overrelax = settings.NegBin$accuracy.overrelax)
-        r <- sample.r.list$r
-
-      } else if(settings.NegBin$Metropolis){
+      if(settings.NegBin$Metropolis){
 
           sample.r.list <- sample_r_metro(y = df$y,
                                           eta = eta,

@@ -18,8 +18,8 @@ check_sim <- function(n,
                       lambda.logit = NULL,
                       psi.logit = NULL){
 
-  if(is.null(n) || !is.numeric(n) || length(n) != 1 || n %% 1 != 0 || !is.finite(n)){
-    stop("Argument 'n' must be a single value that represents the number of subjects")
+  if(is.null(n) || !is.numeric(n) || length(n) != 1 || n %% 1 != 0 || n < 10 || !is.finite(n)){
+    stop("Argument 'n' must be a single value that is at least 10")
   }
   if(is.null(Tmax) || !is.numeric(Tmax) || length(Tmax) != 1 || Tmax %% 1 != 0 || !is.finite(Tmax) || Tmax <= 2){
     stop("Argument 'Tmax' must be a single value > 2 that represents the number of repeated measurements")
@@ -86,6 +86,10 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
 
   if(is.null(formula) || is.null(data)) stop("Arguments 'formula' and 'data' are required with no defaults.")
 
+  # checking formula
+  if(!inherits(formula, "formula")){
+    stop("Argument 'formula' must be a formula object.")
+  }
   # intercept must be included
   if(attr(terms(formula), "intercept") == 0){
     stop("An intercept term must be included in the model.")
@@ -94,10 +98,6 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
   # checking model type
   if(is.null(model) || !model %in% c("Gaussian", "Probit", "Logit", "NegBin", "ZINB")){
     stop("Argument 'model' must be either 'Gaussian', 'Probit', 'Logit', 'NegBin' or 'ZINB'.")
-  }
-  # checking formula (together with model)
-  if(!inherits(formula, "formula")){
-    stop("Argument 'formula' must be a formula object.")
   }
   if(model != "ZINB" && any(grepl("\\|", deparse(formula)))){
     stop("The character '|' in argument 'formula' is only valid for Zero-Inflated Negative Binomial regression.")
@@ -153,9 +153,8 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
 
   # check if panel is balanced
   tab <- table(id, t)
-  rS <- rowSums(tab)
-  if(any(rS != max(rS))){
-    stop("Panel must be balanced, i.e., each subject must have the same number of repeated measurements.")
+  if(any(tab != 1L)){
+    stop("Panel must be balanced and time points must be unique within each individual.")
   }
 
   # response variable check
@@ -409,16 +408,17 @@ check.settings.NegBin <- function(settings.NegBin){
   if(is.null(settings.NegBin)) stop("Your Negative Binomial settings are not allowed to be NULL for count models.")
   check.hyper_double.positive(settings.NegBin$alpha.r, "alpha.r in settings.NegBin")
   check.hyper_double.positive(settings.NegBin$beta.r, "beta.r in settings.NegBin")
-  if(is.null(settings.NegBin$expansion.steps) || !is.numeric(settings.NegBin$expansion.steps) ||
-     length(settings.NegBin$expansion.steps) != 1 || settings.NegBin$expansion.steps %% 1 != 0 ||
-     !is.finite(settings.NegBin$expansion.steps) || settings.NegBin$expansion.steps < 1)
-    stop("Argument 'expansion.steps' in settings.NegBin must be a single, positive integer.")
-  check.hyper_double.positive(settings.NegBin$width, "width in settings.NegBin")
-  if(is.null(settings.NegBin$p.overrelax) || !is.numeric(settings.NegBin$p.overrelax) ||
-     settings.NegBin$p.overrelax < 0 || settings.NegBin$p.overrelax > 1)
-    stop("Argument p.overrelax in settings.NegBin must be a valid probability")
-  if(settings.NegBin$p.overrelax > 0){
-    check.hyper_double.positive(settings.NegBin$accuracy.overrelax, "accuracy.overrelax in settings.NegBin")
+  if(!is.logical(settings.NegBin$Metropolis)) stop("Argument 'Metropolis' in 'settings.NegBin' must be logical.")
+  if(!is.logical(settings.NegBin$blocked)) stop("Argument 'blocked' in 'settings.NegBin' must be logical.")
+  if(settings.NegBin$Metropolis){
+    if(is.null(settings.NegBin$target.rate.r) || !is.numeric(settings.NegBin$target.rate.r) ||
+       settings.NegBin$target.rate.r < 0 || settings.NegBin$target.rate.r > 1) stop("Argument target.rate.r in 'settings.NegBin' must be valid probability when Metropolis is used.")
+    check.hyper_double.positive(settings.NegBin$eps.sd.r, "eps.sd.r in settings.NegBin")
+  }
+  if(settings.NegBin$blocked){
+    if(is.null(settings.NegBin$target.rate.blocked) || !is.numeric(settings.NegBin$target.rate.blocked) ||
+       settings.NegBin$target.rate.blocked < 0 || settings.NegBin$target.rate.blocked > 1) stop("Argument target.rate.blocked in 'settings.NegBin' must be valid probability when blocked Metropolis is used.")
+    check.hyper_double.positive(settings.NegBin$eps.sd.blocked, "eps.sd.blocked in settings.NegBin")
   }
 }
 
@@ -436,17 +436,10 @@ check.predict <- function(model, X.new, timepoint, coverage, pop.pred, n.replica
 
   if(is.null(colnames(X.new))){
     warning("Columns of argument 'X.new' are not labelled. This is dangerous as you must make sure that the columns match the columns of the original design matrix.")
-  }
+  } else{
 
-  else{
-
-    if(any(!(colnames(X.new) %in% colnames(model$data$X)))){
-      stop("Variable names of X.new must match the corresponding names from the original design matrix.")
-    }
-
-    if(sum(colnames(X.new) != colnames(model$data$X)) > 0){
-      warning("Column names in 'X.new' were reordered to match the corresponding ones from the original design matrix.")
-      X.new <- X.new[, colnames(model$data$X), drop = FALSE] # reordering variables w.r.t. original design matrix
+    if(any(colnames(X.new) != colnames(model$data$X))){
+      warning("Column names in 'X.new' were reordered to match the original design matrix.")
     }
 
   }
@@ -485,17 +478,10 @@ check.predict_ZINB <- function(model, X_nb.new, X_logit.new, timepoint, coverage
 
   if(is.null(colnames(X_nb.new))){
     warning("Columns of argument 'X_nb.new' are not labelled. This is dangerous as you must make sure that the columns match the columns of the original design matrix.")
-  }
+  } else{
 
-  else{
-
-    if(any(!(colnames(X_nb.new) %in% colnames(model$data$X_nb)))){
-      stop("Variable names of X_nb.new must match the corresponding names from the original design matrix.")
-    }
-
-    if(sum(colnames(X_nb.new) != colnames(model$data$X_nb)) > 0){
-      warning("Column names in 'X_nb.new' were reordered to match the corresponding ones from the original design matrix.")
-      X_nb.new <- X_nb.new[, colnames(model$data$X_nb), drop = FALSE] # reordering variables w.r.t. original design matrix
+    if(any(colnames(X_nb.new) != colnames(model$data$X_nb))){
+      warning("Column names in 'X_nb.new' were reordered to match the original design matrix.")
     }
 
   }
@@ -504,29 +490,30 @@ check.predict_ZINB <- function(model, X_nb.new, X_logit.new, timepoint, coverage
     stop("Argument 'X_logit.new' must be either a matrix or a data frame.")
   }
 
+  if(nrow(X_nb.new) != nrow(X_logit.new)){
+    stop("Arguments 'X_nb.new' and 'X_logit.new' must have the same number of rows.")
+  }
+
   if(ncol(X_logit.new) != ncol(model$data$X_logit)){
     stop("Number of columns in X_logit.new must match number of columns in original design matrix. In case you fitted an intercept, X_logit.new must contain a column of ones.")
   }
 
   if(is.null(colnames(X_logit.new))){
     warning("Columns of argument 'X_logit.new' are not labelled. This is dangerous as you must make sure that the columns match the columns of the original design matrix.")
-  }
+  }  else{
 
-  else{
-
-    if(any(!(colnames(X_logit.new) %in% colnames(model$data$X_logit)))){
-      stop("Variable names of X_logit.new must match the corresponding names from the original design matrix.")
-    }
-
-    if(sum(colnames(X_logit.new) != colnames(model$data$X_logit)) > 0){
-      warning("Column names in 'X_logit.new' were reordered to match the corresponding ones from the original design matrix.")
-      X_logit.new <- X_logit.new[, colnames(model$data$X_logit), drop = FALSE] # reordering variables w.r.t. original design matrix
+    if(any(colnames(X_logit.new) != colnames(model$data$X_logit))){
+      warning("Column names in 'X_logit.new' were reordered to match the original design matrix.")
     }
 
   }
 
   if(is.null(timepoint) || !is.numeric(timepoint) || length(timepoint) != 1 || timepoint %% 1 != 0 || !is.finite(timepoint)){
     stop("Argument 'timepoint' must be a single numeric value. If you want predictions for multiple time points, please call the predict function multiple times.")
+  }
+
+  if (!timepoint %in% unique(model$data$timeidx)) {
+    stop("Argument 'timepoint' must contain a time point for which the parameters were learned.")
   }
 
   if(is.null(coverage) || !is.numeric(coverage) || length(coverage) != 1 || !is.finite(coverage) || coverage < 0 || coverage > 1){

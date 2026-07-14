@@ -97,9 +97,10 @@ panelTVP(formula = NULL,
           chain.length = 12000, burnin = 2000, thin = 10, asis = TRUE
          ),
          settings.NegBin = list(
-          alpha.r = 2, beta.r = 1, expansion.steps = 10,
-          width = 1, p.overrelax = 0, accuracy.overrelax = 10,
-          slice = FALSE
+          alpha.r = 2, beta.r = 1,
+          Metropolis = FALSE, blocked = TRUE,
+          eps.sd.r = 0.25, eps.sd.blocked = 0.25,
+          target.rate.r = 0.44, target.rate.blocked = 0.44
          ),
          HPD.coverage = 0.95,
          R.WAIC = 5,
@@ -575,24 +576,30 @@ is of length \deqn{\frac{\text{chain.length}-\text{burnin}}{\text{thin}}}}
 
 \item{settings.NegBin}{a list containing information for sampling the dispersion
 parameter \eqn{r} in the Negative Binomial and Zero-Inflated Negative Binomial
-model using univariate Slice sampling or conjugate Gibbs updates based on the
-Chinese Restaurant Table (CRT) distribution.
-For other response distributions, this is ignored. The arguments are:
+model using Metropolis-Hastings or conjugate Gibbs updates based on the
+Chinese Restaurant Table (CRT) distribution (Zhou and Carin, 2015).
+To increase sampling efficiency,
+an optional blocked Metropolis-Hastings step after individual updates of the
+fixed intercept and the dispersion parameter can be added, where those parameters
+are resampled jointly. However, this step is only possible under the shrinkage
+prior and not under the independence prior!
+
+The arguments are:
 \itemize{
 \item \code{alpha.r}: shape parameter of Gamma proposal
 \item \code{beta.r}: rate parameter of Gamma proposal
-\item \code{expansion.steps}: number of steps in stepping-out phase
-\item \code{width}: width of the slice interval (on the log-scale of \eqn{r})
-\item \code{p.overrelax}: probability of performing an overrelaxation step;
-performing overrelaxation might increase sampling efficiency; when overrelaxation
-should not be used, set \code{p.overrelax = 0}
-\item \code{accuracy.overrelax}: accuracy in overrelaxation phase
-\item \code{slice}: should Slice sampling or the conjugate sampler based on
-the CRT distribution be used for sampling of r
+\item \code{Metropolis}: should Metropolis or conjugate CRT update be used
+\item \code{blocked}: should the blocked resampling step be added
+\item \code{eps.sd.r}: standard deviation of random walk proposal for \eqn{r}
+(only in Metropolis-Hastings)
+\item \code{eps.sd.blocked}: standard deviation of random walk proposal for
+fixed intercept (only in Metropolis-Hastings)
+\item \code{target.rate.r}: targeted acceptance rate for \eqn{r}
+(only in Metropolis-Hastings)
+\item \code{target.rate.blocked}: targeted acceptance rate for blocked update
+(only in Metropolis-Hastings)
 }
-For more information on overrelaxation and Slice sampling in general,
-see the original paper on Slice sampling by Neal (2003). Information on the
-conjugate updating scheme for r can be found in Zhou and Carin (2015)}
+For other response distributions \code{settings.NegBin} is ignored.}
 
 \item{HPD.coverage}{coverage probability of highest posterior density intervals
 (default yields 95 percent coverage)}
@@ -1066,8 +1073,6 @@ Shrinkage in the Time-Varying Parameter Model Framework using the R Package
 
 Knaus, P. Frühwirth-Schnatter, S. (2025). The Dynamic Triple Gamma as a Shrinkage
 Process for Time-Varying Parameter Models, arXiv preprint arXiv:2312.10487v2.
-
-Neal, R.M. (2003). Slice sampling. In: The Annals of Statistics, 31, 705-767.
 
 Neelon, B. (2019). Bayesian Zero-Inflated Negative Binomial Regression Based
 on Pólya-Gamma Mixtures. In: Bayesian Analysis, 14, 829-855.

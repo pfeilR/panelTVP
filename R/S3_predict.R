@@ -69,6 +69,9 @@ predict.panelTVP.Gaussian <- function(object, X.new, timepoint,
   pop.pred <- !subject.specific.pred
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
                 pop.pred = pop.pred, n.replicates = n.replicates)
+  if(!is.null(colnames(X.new))){
+    X.new <- X.new[, colnames(object$data$X), drop = FALSE]
+  }
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
               coverage = coverage, pop.pred = pop.pred, n.replicates = n.replicates)
 }
@@ -143,6 +146,9 @@ predict.panelTVP.Probit <- function(object, X.new, timepoint,
   pop.pred <- !subject.specific.pred
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
                 pop.pred = pop.pred, n.replicates = n.replicates)
+  if(!is.null(colnames(X.new))){
+    X.new <- X.new[, colnames(object$data$X), drop = FALSE]
+  }
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
               coverage = coverage, pop.pred = pop.pred, n.replicates = n.replicates)
 }
@@ -217,6 +223,9 @@ predict.panelTVP.Logit <- function(object, X.new, timepoint,
   pop.pred <- !subject.specific.pred
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
                 pop.pred = pop.pred, n.replicates = n.replicates)
+  if(!is.null(colnames(X.new))){
+    X.new <- X.new[, colnames(object$data$X), drop = FALSE]
+  }
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
               coverage = coverage, pop.pred = pop.pred, n.replicates = n.replicates)
 }
@@ -291,6 +300,9 @@ predict.panelTVP.NegBin <- function(object, X.new, timepoint,
   pop.pred <- !subject.specific.pred
   check.predict(model = object, X.new = X.new, timepoint = timepoint, coverage = coverage,
                 pop.pred = pop.pred, n.replicates = n.replicates)
+  if(!is.null(colnames(X.new))){
+    X.new <- X.new[, colnames(object$data$X), drop = FALSE]
+  }
   pred.helper(model = object, X.new = X.new, timepoint = timepoint,
               coverage = coverage, pop.pred = pop.pred, n.replicates = n.replicates)
 }
@@ -379,6 +391,13 @@ predict.panelTVP.ZINB <- function(object, X_nb.new, X_logit.new, timepoint,
   check.predict_ZINB(model = object, X_nb.new = X_nb.new, X_logit.new = X_logit.new,
                      timepoint = timepoint, coverage = coverage, pop.pred = pop.pred,
                      n.replicates = n.replicates)
+  if(!is.null(colnames(X_nb.new))){
+    X_nb.new <- X_nb.new[, colnames(object$data$X_nb), drop = FALSE]
+  }
+
+  if(!is.null(colnames(X_logit.new))){
+    X_logit.new <- X_logit.new[, colnames(object$data$X_logit), drop = FALSE]
+  }
   pred.helper_ZINB(model = object, X_nb.new = X_nb.new, X_logit.new = X_logit.new,
                    timepoint = timepoint, coverage = coverage, pop.pred = pop.pred,
                    n.replicates = n.replicates)
@@ -425,7 +444,7 @@ pred.helper <- function(model, X.new, timepoint,
       eta.replicant <- matrix(nrow = n, ncol = n.replicates)
       y.replicant <- matrix(nrow = n, ncol = n.replicates)
       for(replicant in 1:n.replicates){
-        fi <- base::scale(rnorm(n))
+        fi <- rnorm(n)
         eta.replicant[, replicant] <- X.new %*% mcmc.beta[s,] + mcmc.lamb[s] * fi
         if(cla == "panelTVP.Gaussian"){
           y.replicant[, replicant] <- rnorm(n, mean = eta.replicant[, replicant], sd = sqrt(sigma2[s]))
@@ -503,8 +522,8 @@ pred.helper_ZINB <- function(model, X_nb.new, X_logit.new, timepoint,
       eta_logit.replicant <- matrix(nrow = n, ncol = n.replicates)
       y.replicant <- matrix(nrow = n, ncol = n.replicates)
       for(replicant in 1:n.replicates){
-        fi_nb <- base::scale(rnorm(n))
-        fi_logit <- base::scale(rnorm(n))
+        fi_nb <- rnorm(n)
+        fi_logit <- rnorm(n)
         eta_nb.replicant[, replicant] <- X_nb.new %*% mcmc.beta_nb[s,] +
           mcmc.lamb_nb[s] * fi_nb
         eta_logit.replicant[, replicant] <- X_logit.new %*% mcmc.beta_logit[s,] +

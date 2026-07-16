@@ -194,6 +194,8 @@ GaussianTVP <- function(df,
   #remove burnin
   res <- res_frame[res_frame[,"SimNr"] > mcmc.opt$burnin,]
   res <- res[seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin),]
+
+  # new: post-hoc identification
   if(random.effects){
     flip.id <- res[,"lambda_t1"] < 0
     res[flip.id, startsWith(colnames(res), "lambda")] <- -res[flip.id, startsWith(colnames(res), "lambda")]

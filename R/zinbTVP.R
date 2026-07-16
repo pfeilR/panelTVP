@@ -466,6 +466,8 @@ zinbTVP <- function(df,
 
   res_logit <- res_frame_logit[res_frame_logit[,"SimNr"] > mcmc.opt$burnin,]
   res_logit <- res_logit[seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin),]
+
+  # new: post-hoc identification
   if(random.effects){
     flip.id_logit <- res_logit[, "lambda_t1"] < 0
     res_logit[flip.id_logit, startsWith(colnames(res_logit), "lambda")] <-

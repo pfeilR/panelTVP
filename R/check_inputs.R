@@ -278,20 +278,20 @@ check.panelTVP <- function(formula, data, id, t, model, prior.reg, prior.var, pr
       stop("Blocked sampling is only possible under the shrinkage prior.")
     }
 
-    count_formula <- reformulate(
-      termlabels = attr(terms(formula[[3]][[2]]), "term.labels"),
-      intercept = attr(terms(formula[[3]][[2]]), "intercept")
-    )
-
-    X_check <- model.matrix(count_formula, data = data)
-
-    if(ncol(X_check) < 1L ||
-       !all(abs(X_check[, 1L] - 1) < sqrt(.Machine$double.eps))){
-      stop(
-        "Blocked sampling requires an intercept as the first column ",
-        "of the negative binomial part of the ZINB design matrix."
-      )
-    }
+    # count_formula <- reformulate(
+    #   termlabels = attr(terms(formula[[3]][[2]]), "term.labels"),
+    #   intercept = attr(terms(formula[[3]][[2]]), "intercept")
+    # )
+    #
+    # X_check <- model.matrix(count_formula, data = data)
+    #
+    # if(ncol(X_check) < 1L ||
+    #    !all(abs(X_check[, 1L] - 1) < sqrt(.Machine$double.eps))){
+    #   stop(
+    #     "Blocked sampling requires an intercept as the first column ",
+    #     "of the negative binomial part of the ZINB design matrix."
+    #   )
+    # }
 
   }
 

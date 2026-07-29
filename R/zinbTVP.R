@@ -251,7 +251,7 @@ zinbTVP <- function(df,
 
       # Step B (blocked sampling of (r, beta1_nb) -> added on 14.07.2026 (must be tested!)
 
-      if(settings.NegBin$blocked){
+      if(settings.NegBin$blocked && prior.reg_nb$type %in% c("rw1", "rw2")){
 
         eta_nb <- c(linpred_nb) + reff_nb
         blocki <- sample_r_beta1(y = y.risk,

@@ -150,7 +150,7 @@ NegBinTVP <- function(df,
 
       # Step B (blocked sampling of (r, beta1)
 
-      if(settings.NegBin$blocked){
+      if(settings.NegBin$blocked && prior.reg$type %in% c("rw1", "rw2")){
 
         eta <- c(linpred) + reff
         blocki <- sample_r_beta1(y = df$y,

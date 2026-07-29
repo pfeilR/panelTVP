@@ -211,12 +211,18 @@ sample_r_beta1 <- function(y,
                            r.beta,
                            tau1,
                            accept,
-                           target.rate){
+                           target.rate,
+                           iter,
+                           burnin){
 
-  # adaptive step
-  accept.rate <- sum(accept) / length(accept)
-  adapt.factor <- exp(0.01 * (accept.rate - target.rate))
-  eps.sd.blocked <- eps.sd.blocked * adapt.factor
+  # adaptive step -> only during burn-in period!
+  if(iter <= burnin) {
+
+    accept.rate <- sum(accept) / length(accept)
+    adapt.factor <- exp(0.01 * (accept.rate - target.rate))
+    eps.sd.blocked <- eps.sd.blocked * adapt.factor
+
+  }
 
   # old values
   log.r_old <- log(r)

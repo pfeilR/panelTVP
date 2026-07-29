@@ -223,6 +223,9 @@ fit_panelTVP_ZINB <- function(formula,
 
   # initialize acceptance rate for dispersion parameter r
   settings.NegBin$r.accept <- c()
+  settings.NegBin$r.accept[1] <- 1 # we let metropolis start in 2nd iteration
+  settings.NegBin$blocked.accept <- c()
+  settings.NegBin$blocked.accept[1] <- 1
 
   ## regression part
   if(prior.reg_nb$type != "ind"){

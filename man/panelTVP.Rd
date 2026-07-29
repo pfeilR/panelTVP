@@ -98,9 +98,9 @@ panelTVP(formula = NULL,
          ),
          settings.NegBin = list(
           alpha.r = 2, beta.r = 1,
-          Metropolis = FALSE, blocked = TRUE,
-          eps.sd.r = 0.25, eps.sd.blocked = 0.25,
-          target.rate.r = 0.44, target.rate.blocked = 0.44
+          Metropolis = FALSE, boost = TRUE,
+          eps.sd.r = 0.25, eps.sd.boost = 0.25,
+          target.rate.r = 0.44, target.rate.boost = 0.44
          ),
          HPD.coverage = 0.95,
          R.WAIC = 5,
@@ -579,7 +579,7 @@ parameter \eqn{r} in the Negative Binomial and Zero-Inflated Negative Binomial
 model using Metropolis-Hastings or conjugate Gibbs updates based on the
 Chinese Restaurant Table (CRT) distribution (Zhou and Carin, 2015).
 To increase sampling efficiency,
-an optional blocked Metropolis-Hastings step after individual updates of the
+an optional boosting Metropolis-Hastings step after individual updates of the
 fixed intercept and the dispersion parameter can be added, where those parameters
 are resampled jointly. However, this step is only possible under the shrinkage
 prior and not under the independence prior!
@@ -589,14 +589,14 @@ The arguments are:
 \item \code{alpha.r}: shape parameter of Gamma proposal
 \item \code{beta.r}: rate parameter of Gamma proposal
 \item \code{Metropolis}: should Metropolis or conjugate CRT update be used
-\item \code{blocked}: should the blocked resampling step be added
+\item \code{boost}: should the boosted resampling step be added
 \item \code{eps.sd.r}: standard deviation of random walk proposal for \eqn{r}
 (only in Metropolis-Hastings)
-\item \code{eps.sd.blocked}: standard deviation of random walk proposal for
+\item \code{eps.sd.boost}: standard deviation of random walk proposal for
 fixed intercept (only in Metropolis-Hastings)
 \item \code{target.rate.r}: targeted acceptance rate for \eqn{r}
 (only in Metropolis-Hastings)
-\item \code{target.rate.blocked}: targeted acceptance rate for blocked update
+\item \code{target.rate.boost}: targeted acceptance rate for boosting update
 (only in Metropolis-Hastings)
 }
 For other response distributions \code{settings.NegBin} is ignored.}

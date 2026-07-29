@@ -255,7 +255,7 @@ zinbTVP <- function(df,
 
         eta_nb <- c(linpred_nb) + reff_nb
         blocki <- sample_r_beta1(y = y.risk,
-                                 eta = matrix(eta_nb[risk,]),
+                                 eta = matrix(eta_nb[risk]),
                                  r = r,
                                  beta1 = alpha_nb[1],
                                  eps.sd.blocked = settings.NegBin$eps.sd.blocked,
@@ -263,7 +263,9 @@ zinbTVP <- function(df,
                                  r.beta = settings.NegBin$beta.r,
                                  tau1 = prior.reg_nb$tau[1],
                                  accept = settings.NegBin$blocked.accept,
-                                 target.rate = settings.NegBin$target.rate.blocked)
+                                 target.rate = settings.NegBin$target.rate.blocked,
+                                 iter = i,
+                                 burnin = mcmc.opt$burnin)
 
         if(r != blocki$r){
           settings.NegBin$blocked.accept[i] <- 1
@@ -561,6 +563,13 @@ zinbTVP <- function(df,
                                   "a.xi (nb)", "a.tau (nb)", "c.xi (nb)", "c.tau (nb)")
   if(sum(is.na(acceptance.rates)) == 8) acceptance.rates <- NULL
 
+  if(settings.NegBin$blocked){
+    acceptance.rate.boost <- accept.rate(accept = settings.NegBin$blocked.accept,
+                                         mcmc.opt = mcmc.opt)
+  } else{
+    acceptance.rate.boost <- NA
+  }
+
   # return
   df$y[miss] <- NA
   ret <- list(data = df,
@@ -571,7 +580,7 @@ zinbTVP <- function(df,
               fmean_logit = fmean_logit, fmean_nb = fmean_nb,
               mcmc_risk = mcmc_risk,
               model = "ZINB",
-              acceptance.rates = acceptance.rates,
+              acceptance.rates = acceptance.rates, acceptance.rate.boost = acceptance.rate.boost,
               HPD.coverage = HPD.coverage,
               runtime = paste("Total Runtime for Bayesian Zero-Inflated Negative Binomial Model:",
                               round(time[3], 3), "seconds"))

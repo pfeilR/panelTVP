@@ -611,6 +611,9 @@ the latent factors are integrated out}
 based on the training data is computed and returned as a list object by the function.
 Setting it to FALSE is usually only done for saving memory}
 
+\item{save.factors}{if TRUE the factor scores are stored, otherwise they are deleted
+to save memory}
+
 \item{random.effects}{if TRUE (= default) a factor model is included for estimating
 random effects, if FALSE the model does not contain random effects and, consequently,
 priors on the parameters of the factor model are ignored}

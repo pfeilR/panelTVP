@@ -590,6 +590,8 @@
 #' @param posterior.predictive.matrix if TRUE (= default) the posterior predictive distribution
 #'  based on the training data is computed and returned as a list object by the function.
 #'  Setting it to FALSE is usually only done for saving memory
+#' @param save.factors if TRUE the factor scores are stored, otherwise they are deleted
+#'  to save memory
 #' @param random.effects if TRUE (= default) a factor model is included for estimating
 #'  random effects, if FALSE the model does not contain random effects and, consequently,
 #'  priors on the parameters of the factor model are ignored
@@ -1173,6 +1175,7 @@ panelTVP <- function(formula = NULL,
                      HPD.coverage = 0.95,
                      R.WAIC = 5,
                      posterior.predictive.matrix = FALSE,
+                     save.factors = FALSE,
                      random.effects = TRUE,
                      progress.bar = FALSE
 ){
@@ -1256,7 +1259,7 @@ panelTVP <- function(formula = NULL,
         result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin_no.fac(result)
       }
     }
-    result$fmcmc <- NULL
+    if(!save.factors) result$fmcmc <- NULL
 
     # adding learning settings to output
     hyperpara <- c("a.xi", "a.tau", "c.xi", "c.tau", "kappa.xi", "kappa.tau", "kappa.zeta", "kappa.phi")
@@ -1346,8 +1349,10 @@ panelTVP <- function(formula = NULL,
         result$posterior.predictive <- compute_fitted_ZINB_no.fac(result)
       }
     }
-    result$fmcmc_logit <- NULL
-    result$fmcmc_nb <- NULL
+    if(!save.factors){
+      result$fmcmc_logit <- NULL
+      result$fmcmc_nb <- NULL
+    }
     result$mcmc_risk <- NULL
 
     # adding learning settings to output

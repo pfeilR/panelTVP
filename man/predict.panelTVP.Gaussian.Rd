@@ -30,11 +30,11 @@ function}
 
 \item{subject.specific.pred}{logical value, if FALSE global predictions are made,
 that ignore the random effects structure, if TRUE the random effects structure
-is included as well where the unknown factor scores are sampled from their
+is included as well where the unknown random intercepts are sampled from their
 standard Normal prior - defaults to FALSE}
 
 \item{n.replicates}{number of replicates within each Monte Carlo draw and for each subject
-for integrating over the unknown subject-specific factors (ignored when \code{pop.pred = TRUE})}
+for integrating over the unknown random intercepts (ignored when \code{pop.pred = TRUE})}
 
 \item{...}{optional arguments passed to the function (those are ignored)}
 }
@@ -45,7 +45,7 @@ a list containing the following elements
 from the posterior predictive distribution for the corresponding observation.
 The number of columns equals the number of MCMC draws when \code{pop.pred = TRUE}
 and otherwise is multiplied by \code{n.replicates}, i.e., for each MCMC draw
-we have replication draws for marginalizing over the unknown random factors
+we have replication draws for marginalizing over the unknown random intercepts
 \item \code{predictive.summary}: posterior mean as well as HPD interval based on
 posterior predictive distribution for each new observation
 }

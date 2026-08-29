@@ -231,9 +231,9 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
   }
   if(randoms){
     index_df <- matrix(nrow = (ncol(X)+1)*Tmax, ncol = 2)
-    index_df[,1] <- c(rep(paste0("x",1:ncol(X)), each = Tmax), rep("Factor Loading", Tmax))
+    index_df[,1] <- c(rep(paste0("x",1:ncol(X)), each = Tmax), rep("Random Intercept Weight", Tmax))
     index_df[,2] <- rep(1:Tmax, ncol(X)+1)
-    true_names <- c(colnames(X), "Factor Loading")
+    true_names <- c(colnames(X), "Random Intercept Weight")
   } else{
     index_df <- matrix(nrow = ncol(X)*Tmax, ncol = 2)
     index_df[,1] <- c(rep(paste0("x",1:ncol(X)), each = Tmax))
@@ -255,8 +255,8 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
   plot_list <- plot_list[order(
     sapply(plot_list, function(x){
       v <- x$var[1]
-      if(v == "Factor Loading"){
-        return(-Inf)  # plotting of factor loading at the beginning
+      if(v == "Random Intercept Weight"){
+        return(-Inf)  # plotting of Random Intercept Weight at the beginning
       } else{
         return(as.numeric(sub("x", "", v)))
       }

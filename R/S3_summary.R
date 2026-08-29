@@ -520,7 +520,7 @@ crafti <- function(X, posterior, by = NULL, ntime){
   namesbeta <- colnames(X)
   if(by == "timepoint"){
     if(randoms){
-      cnames <- rep(c(namesbeta, "Factor Loading"), times = ntime)
+      cnames <- rep(c(namesbeta, "Random Intercept Weight"), times = ntime)
     } else{
       cnames <- rep(namesbeta, times = ntime)
     }
@@ -538,14 +538,14 @@ crafti <- function(X, posterior, by = NULL, ntime){
     for(t in 1:ntime){
       res[[t]] <- d[d[,"time"] == t, 1:4]
       if(randoms){
-        names(res)[t] <- paste("Regression Effects and Factor Loading at Time", t)
+        names(res)[t] <- paste("Regression Effects and Random Intercept Weight at Time", t)
       } else{
         names(res)[t] <- paste("Regression Effects at Time", t)
       }
     }
   } else{
     if(randoms){
-      covnames <- c(namesbeta, "Factor Loading")
+      covnames <- c(namesbeta, "Random Intercept Weight")
       for(i in 1:(ncov+1)){
         res[[i]] <- d[d[,"cov"] == i, 1:4]
         names(res)[i] <- covnames[i]

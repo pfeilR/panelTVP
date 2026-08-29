@@ -34,7 +34,7 @@ print.panelTVP.Gaussian <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Gaussian. It contains:\n
   - learning.settings: Information on learning status of hyperparameters. \n
   - data: Input data and additional context information derived from the data.\n
-  - mcmc: Markov Chains for every parameter except for the factor scores.\n
+  - mcmc: Markov Chains for every parameter except for the random intercepts.\n
   - posterior: Posterior summary. \n
   - fmean: Posterior means of random intercepts.\n
   - model: The model you have fitted.\n
@@ -86,7 +86,7 @@ print.panelTVP.Probit <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Probit. It contains:\n
   - learning.settings: Information on learning status of hyperparameters. \n
   - data: Input data and additional context information derived from the data.\n
-  - mcmc: Markov Chains for every parameter except for the factor scores.\n
+  - mcmc: Markov Chains for every parameter except for the random intercepts.\n
   - posterior: Posterior summary. \n
   - fmean: Posterior means of random intercepts.\n
   - model: The model you have fitted.\n
@@ -138,7 +138,7 @@ print.panelTVP.Logit <- function(x, ...){
   cat("\nThis is an object of class panelTVP.Logit. It contains:\n
   - learning.settings: Information on learning status of hyperparameters. \n
   - data: Input data and additional context information derived from the data.\n
-  - mcmc: Markov Chains for every parameter except for the factor scores.\n
+  - mcmc: Markov Chains for every parameter except for the random intercepts.\n
   - posterior: Posterior summary. \n
   - fmean: Posterior means of random intercepts.\n
   - model: The model you have fitted.\n
@@ -191,7 +191,7 @@ print.panelTVP.NegBin <- function(x, ...){
   cat("\nThis is an object of class panelTVP.NegBin. It contains:\n
   - learning.settings: Information on learning status of hyperparameters. \n
   - data: Input data and additional context information derived from the data.\n
-  - mcmc: Markov Chains for every parameter except for the factor scores.\n
+  - mcmc: Markov Chains for every parameter except for the random intercepts.\n
   - posterior: Posterior summary. \n
   - fmean: Posterior means of random intercepts.\n
   - model: The model you have fitted.\n
@@ -249,8 +249,8 @@ print.panelTVP.ZINB <- function(x, ...){
   - learning.settings_logit: Information on learning status of hyperparameters. (zero-inflation component) \n
   - learning.settings_nb: Information on learning status of hyperparameters. (count component) \n
   - data: Input data and additional context information derived from the data.\n
-  - mcmc_logit: Markov Chains for every parameter except for the factor scores. (zero-inflation component) \n
-  - mcmc_nb: Markov Chains for every parameter except for the factor scores. (count component) \n
+  - mcmc_logit: Markov Chains for every parameter except for the random intercepts. (zero-inflation component) \n
+  - mcmc_nb: Markov Chains for every parameter except for the random intercepts. (count component) \n
   - posterior_logit: Posterior summary. (zero-inflation component) \n
   - posterior_nb: Posterior summary. (count component) \n
   - fmean_logit: Posterior means of random intercepts. (zero-inflation component) \n

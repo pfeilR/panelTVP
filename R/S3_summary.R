@@ -302,6 +302,8 @@ craft.summary <- function(x, by = by){
     } else{
       if(i == 1){
         MESSAGE <- center_text(paste("Estimated Intercept"))
+      } else if(nami[i] == "Random Intercept Weight"){
+        MESSAGE <- center_text(paste("Estimated Random Intercept Weight"))
       } else{
         MESSAGE <- center_text(paste("Estimated Effect of", nami[i]))
       }
@@ -376,8 +378,10 @@ craft.summary_zinb_by_covariate <- function(x){
     # Header
     if(i == 1){
       MESSAGE <- center_text(paste("Estimated Intercept"))
+    } else if(nami_nb[i] == "Random Intercept Weight"){
+      MESSAGE <- center_text(paste("Estimated Random Intercept Weight"))
     } else{
-      MESSAGE <- center_text(paste("Estimated Effect of", nami[i]))
+      MESSAGE <- center_text(paste("Estimated Effect of", nami_nb[i]))
     }
     output_lines <- c(
       output_lines,
@@ -398,8 +402,10 @@ craft.summary_zinb_by_covariate <- function(x){
     # Header
     if(i == 1){
       MESSAGE <- center_text(paste("Estimated Intercept"))
+    } else if(nami_logit[i] == "Random Intercept Weight"){
+      MESSAGE <- center_text(paste("Estimated Random Intercept Weight"))
     } else{
-      MESSAGE <- center_text(paste("Estimated Effect of", nami[i]))
+      MESSAGE <- center_text(paste("Estimated Effect of", nami_logit[i]))
     }
     output_lines <- c(
       output_lines,

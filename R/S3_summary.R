@@ -300,10 +300,15 @@ craft.summary <- function(x, by = by){
         ""
       )
     } else{
+      if(i == 1){
+        MESSAGE <- center_text(paste("Estimated Intercept"))
+      } else{
+        MESSAGE <- center_text(paste("Estimated Effect of", nami[i]))
+      }
       output_lines <- c(
         output_lines,
         strrep("=", 50),
-        center_text(paste("Estimates for", nami[i])),
+        MESSAGE,
         strrep("=", 50),
         ""
       )
@@ -369,10 +374,15 @@ craft.summary_zinb_by_covariate <- function(x){
     nb <- round(res_nb[[i]], 4)
 
     # Header
+    if(i == 1){
+      MESSAGE <- center_text(paste("Estimated Intercept"))
+    } else{
+      MESSAGE <- center_text(paste("Estimated Effect of", nami[i]))
+    }
     output_lines <- c(
       output_lines,
       strrep("=", 50),
-      center_text(paste("Estimates for", nami_nb[i])),
+      MESSAGE,
       strrep("=", 50),
       ""
     )
@@ -386,98 +396,19 @@ craft.summary_zinb_by_covariate <- function(x){
     logit <- round(res_logit[[i]], 4)
 
     # Header
+    if(i == 1){
+      MESSAGE <- center_text(paste("Estimated Intercept"))
+    } else{
+      MESSAGE <- center_text(paste("Estimated Effect of", nami[i]))
+    }
     output_lines <- c(
       output_lines,
       strrep("=", 50),
-      center_text(paste("Estimates for", nami_logit[i])),
+      MESSAGE,
       strrep("=", 50),
       ""
     )
     output_lines <- c(output_lines, utils::capture.output(print(logit)), "")
-
-  }
-
-  # Combine into a single string if needed
-  output_string <- paste(output_lines, collapse = "\n")
-  return(output_string)
-
-}
-
-craft.summary_iv <- function(x){
-
-  res_stage1 <- crafti(X = x$data$X_stage1, posterior = x$posterior_stage1, by = "timepoint",
-                   ntime = x$data$Tmax)
-  res_stage2 <- crafti(X = x$data$X_stage2, posterior = x$posterior_stage2, by = "timepoint",
-                      ntime = x$data$Tmax)
-
-  output_lines <- c()
-  for (i in 1:length(res_stage2)) {
-    s1 <- round(res_stage1[[i]], 4)
-    s2 <- round(res_stage2[[i]], 4)
-
-    # Header
-    output_lines <- c(
-      output_lines,
-      strrep("=", 50),
-      center_text(paste("Estimates: Timepoint", i)),
-      strrep("=", 50),
-      ""
-    )
-
-    # Probit model (1st stage)
-    output_lines <- c(output_lines, center_text("---- Stage 1 (Probit Model) ----"), "")
-    output_lines <- c(output_lines, utils::capture.output(print(s1)), "")
-
-    # Gaussian model (2nd stage)
-    output_lines <- c(output_lines, center_text("---- Stage 2 (Gaussian Model) ----"), "")
-    output_lines <- c(output_lines, utils::capture.output(print(s2)), "", "")
-  }
-
-  # Combine into a single string if needed
-  output_string <- paste(output_lines, collapse = "\n")
-  return(output_string)
-
-}
-
-craft.summary_iv_by_covariate <- function(x){
-
-  res_stage1 <- crafti(X = x$data$X_stage1, posterior = x$posterior_stage1, by = "covariate",
-                       ntime = x$data$Tmax)
-  res_stage2 <- crafti(X = x$data$X_stage2, posterior = x$posterior_stage2, by = "covariate",
-                       ntime = x$data$Tmax)
-  nami_stage1 <- names(res_stage1)
-  nami_stage2 <- names(res_stage2)
-
-  output_lines <- c()
-  for (i in 1:length(res_stage1)) {
-    s1 <- round(res_stage1[[i]], 4)
-
-    # Header
-    output_lines <- c(
-      output_lines,
-      strrep("=", 50),
-      center_text(paste("Estimates for", nami_stage1[i])),
-      strrep("=", 50),
-      ""
-    )
-    output_lines <- c(output_lines, utils::capture.output(print(s1)), "")
-
-  }
-  output_lines <- c(strrep("-", 50), center_text("Stage 1 (Probit Model)"), strrep("-", 50),
-                    output_lines, strrep("-", 50), center_text("Stage 2 (Gaussian Model)"), strrep("-", 50))
-
-  for (i in 1:length(res_stage2)) {
-    s2 <- round(res_stage2[[i]], 4)
-
-    # Header
-    output_lines <- c(
-      output_lines,
-      strrep("=", 50),
-      center_text(paste("Estimates for", nami_stage2[i])),
-      strrep("=", 50),
-      ""
-    )
-    output_lines <- c(output_lines, utils::capture.output(print(s2)), "")
 
   }
 

@@ -162,9 +162,7 @@ NegBinTVP <- function(df,
                                  r.beta = settings.NegBin$beta.r,
                                  tau1 = prior.reg$tau[1],
                                  accept = settings.NegBin$blocked.accept,
-                                 target.rate = settings.NegBin$target.rate.blocked,
-                                 iter = i,
-                                 burnin = mcmc.opt$burnin)
+                                 target.rate = settings.NegBin$target.rate.blocked)
 
         if(r != blocki$r){
           settings.NegBin$blocked.accept[i] <- 1

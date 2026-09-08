@@ -170,7 +170,7 @@ efficient_PG_sampling <- function(h, z){
 
   # Standard hybrid rpg for h < 1 or h > 50
   if(any(idx_NOsp)){
-    PG[idx_NOsp] <- BayesLogit::rpg(sum(idx_NOsp), h = h[idx_NOsp], z = z[idx_NOsp])
+    PG[idx_NOsp] <- BayesLogit::rpg.gamma(sum(idx_NOsp), h = h[idx_NOsp], z = z[idx_NOsp])
   }
 
   return(PG)

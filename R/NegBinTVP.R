@@ -272,6 +272,9 @@ NegBinTVP <- function(df,
 
       }
 
+      # briefly
+      print(r)
+
       res.i <- c(res.i, r)
 
       res_frame[i,] <- res.i

@@ -21,8 +21,6 @@ NegBinTVP <- function(df,
 
   r <- 1
 
-  print(r)
-
   X.t <- cbind(df$X, t = df$timeidx)
   fi.count <- 1
 

@@ -160,10 +160,10 @@ efficient_PG_sampling <- function(h, z){
 
   n <- length(h)
   PG <- numeric(n)
-  idx_sp <- h >= 1 & h <= 50
+  idx_sp <- h > 1 & h <= 50
   idx_NOsp <- !idx_sp
 
-  # Saddlepoint approximation for h >= 1 and h <= 50
+  # Saddlepoint approximation for h > 1 and h <= 50
   if(any(idx_sp)){
     PG[idx_sp] <- BayesLogit::rpg.sp(sum(idx_sp), h = h[idx_sp], z = z[idx_sp])
   }

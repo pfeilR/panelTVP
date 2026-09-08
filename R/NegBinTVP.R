@@ -43,7 +43,7 @@ NegBinTVP <- function(df,
       # Step U + W
 
       if(i == 1){
-        betat <- matrix(rnorm(df$d*df$Tmax), nrow = df$Tmax, ncol = df$d)
+        betat <- matrix(0, nrow = df$Tmax, ncol = df$d)
       }
       reff.t <- cbind(reff, t = X.t[,"t"])
       b.t <- cbind(c(t(betat)), rep(1:df$Tmax, each = df$d))

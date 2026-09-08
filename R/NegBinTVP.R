@@ -58,6 +58,8 @@ NegBinTVP <- function(df,
 
       r.prev <- r
 
+      if(i > 1){
+
       if(settings.NegBin$Metropolis){
 
           sample.r.list <- sample_r_metro(y = df$y,
@@ -84,6 +86,8 @@ NegBinTVP <- function(df,
                           r.old = r.prev,
                           r.alpha = settings.NegBin$alpha.r,
                           r.beta = settings.NegBin$beta.r)
+
+        }
 
       }
 

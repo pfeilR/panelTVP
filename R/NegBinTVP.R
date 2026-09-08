@@ -157,6 +157,9 @@ NegBinTVP <- function(df,
       if(settings.NegBin$blocked && prior.reg$type %in% c("rw1", "rw2")){
 
         eta <- c(linpred) + reff
+
+        print("ich blocke")
+
         blocki <- sample_r_beta1(y = df$y,
                                  eta = eta,
                                  r = r,

@@ -158,8 +158,6 @@ NegBinTVP <- function(df,
 
         eta <- c(linpred) + reff
 
-        print("ich blocke")
-
         blocki <- sample_r_beta1(y = df$y,
                                  eta = eta,
                                  r = r,

@@ -19,7 +19,7 @@ NegBinTVP <- function(df,
                       random.effects,
                       progress.bar){
 
-  r <- 1
+  r <- 3
 
   X.t <- cbind(df$X, t = df$timeidx)
   fi.count <- 1

@@ -301,7 +301,7 @@ make_plot <- function(df){
   y_max <- max(df$upper, na.rm = TRUE) + y_pad
   ggplot2::ggplot(df, ggplot2::aes(x = time, y = mean)) +
     ggplot2::geom_ribbon(ggplot2::aes(ymin = lower, ymax = upper),
-                         fill = "#A6CEE3", alpha = 1.5) +
+                         fill = "#A6CEE3", alpha = 0.8) +
     ggplot2::geom_line(color = "black") +
     ggplot2::geom_point(color = "black", size = 2) +
     ggplot2::scale_x_continuous(breaks = df$time) +

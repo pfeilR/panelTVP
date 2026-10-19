@@ -41,14 +41,12 @@ print.panelTVP.Gaussian <- function(x, ...){
   - acceptance.rates: The achieved acceptance rates of Metropolis-Hastings.\n
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
-  - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
   - mcmc.settings: Details on MCMC sampler. \n
   - variable.codes: Information on which variable is associated with which regression parameter. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
-  - plot(): This will give you plots of the coefficient estimates.\n
-  - predict(): This will give you the posterior predictive distribution of new data.\n
+  - plot(): This will give you plots of the coefficient estimates.
 ")
   invisible(x)
 }
@@ -93,14 +91,12 @@ print.panelTVP.Probit <- function(x, ...){
   - acceptance.rates: The achieved acceptance rates of Metropolis-Hastings.\n
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
-  - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
   - mcmc.settings: Details on MCMC sampler. \n
   - variable.codes: Information on which variable is associated with which regression parameter. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
-  - plot(): This will give you plots of the coefficient estimates.\n
-  - predict(): This will give you the posterior predictive distribution of new data.\n
+  - plot(): This will give you plots of the coefficient estimates.
 ")
   invisible(x)
 }
@@ -145,14 +141,12 @@ print.panelTVP.Logit <- function(x, ...){
   - acceptance.rates: The achieved acceptance rates of Metropolis-Hastings.\n
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
-  - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
   - mcmc.settings: Details on MCMC sampler. \n
   - variable.codes: Information on which variable is associated with which regression parameter. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
-  - plot(): This will give you plots of the coefficient estimates.\n
-  - predict(): This will give you the posterior predictive distribution of new data.\n
+  - plot(): This will give you plots of the coefficient estimates.
 ")
   invisible(x)
 }
@@ -198,14 +192,12 @@ print.panelTVP.NegBin <- function(x, ...){
   - acceptance.rates: The achieved acceptance rates of Metropolis-Hastings.\n
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
-  - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
   - mcmc.settings: Details on MCMC sampler. \n
   - variable.codes: Information on which variable is associated with which regression parameter. \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
-  - plot(): This will give you plots of the coefficient estimates.\n
-  - predict(): This will give you the posterior predictive distribution of new data.\n
+  - plot(): This will give you plots of the coefficient estimates.
 ")
   invisible(x)
 }
@@ -259,15 +251,13 @@ print.panelTVP.ZINB <- function(x, ...){
   - acceptance.rates: The achieved acceptance rates of Metropolis-Hastings.\n
   - HPD.coverage: Coverage probability of Highest Posterior Density Intervals. \n
   - runtime: The total time for fitting the model (measured in seconds).\n
-  - WAIC: The Widely Applicable Information Criterion (or Watanabe's AIC).\n
   - posterior.predictive: Posterior predictive distribution of training data (rows = observations, columns = MCMC draws). \n
   - mcmc.settings: Details on MCMC sampler. \n
   - variable.codes_logit: Information on which variable is associated with which regression parameter. (zero-inflation component) \n
   - variable.codes_nb: Information on which variable is associated with which regression parameter. (count component) \n
 You may use the following functions to get additional information:\n
   - summary(): This will give you a formatted summary of the most important parameters.\n
-  - plot(): This will give you plots of the coefficient estimates.\n
-  - predict(): This will give you the posterior predictive distribution of new data.\n
+  - plot(): This will give you plots of the coefficient estimates.
 ")
   invisible(x)
 }

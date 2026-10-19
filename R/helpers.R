@@ -1,12 +1,9 @@
-# compute acceptance rates for parameters sampled with Metropolis-Hastings
 accept.rate <- function(accept, mcmc.opt){
   accept_burn <- accept[(mcmc.opt$burnin+1):mcmc.opt$chain.length]
-  accept_burn_thin <- accept_burn[seq(1,length(accept_burn),by = mcmc.opt$thin)]
   final.accept.rate <- paste("Acceptance Rate =",
-                             sum(accept_burn_thin) / length(accept_burn_thin))
+                             mean(accept_burn))
   return(final.accept.rate)
 }
-
 
 # preparation of response for R2-step. However, scaling is not done here!
 prep_y <- function(y, Time, n){

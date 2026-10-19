@@ -197,7 +197,8 @@ GaussianTVP <- function(df,
 
   # new: post-hoc identification
   if(random.effects){
-    flip.id <- res[,"lambda_t1"] < 0
+    lambda.col <- if(tv.load) "lambda_t1" else "lambda_t" # accounts for cps prior
+    flip.id <- res[, lambda.col] < 0
     res[flip.id, startsWith(colnames(res), "lambda")] <- -res[flip.id, startsWith(colnames(res), "lambda")]
     f_mat[flip.id, ] <- -f_mat[flip.id, ]
     fmean <- colMeans(f_mat)

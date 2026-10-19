@@ -57,6 +57,8 @@ zinbTVP <- function(df,
 
     for(i in 1:mcmc.opt$chain.length){
 
+      adapt <- (i <= mcmc.opt$burnin)
+
       # Compute Linear Predictors for both Components --------------------------
 
       ## negative binomial
@@ -167,7 +169,8 @@ zinbTVP <- function(df,
                                         r.alpha = settings.NegBin$alpha.r,
                                         r.beta = settings.NegBin$beta.r,
                                         accept = settings.NegBin$r.accept,
-                                        target.rate = settings.NegBin$target.rate.r)
+                                        target.rate = settings.NegBin$target.rate.r,
+                                        adapt = adapt)
 
         r <- sample.r.list[[1]]
         settings.NegBin$eps.sd.r <- sample.r.list[[2]]
@@ -192,7 +195,7 @@ zinbTVP <- function(df,
       # Step U
 
       omega_nb <- vector(mode = "numeric", length = length(df$y))
-      omega_nb[risk] <- efficient_PG_sampling(h = y.risk + r, z = c(eta_nb[risk,]))
+      omega_nb[risk] <- BayesLogit::rpg(num = length(y.risk), h = y.risk + r, z = c(eta_nb[risk,]))
       W.sparse_nb <- Matrix::Diagonal(n = length(omega_nb), x = omega_nb)
       W.dense_nb <- matrix(omega_nb, nrow = df$n, ncol = df$Tmax)
       z_nb <- vector(mode = "numeric", length = length(df$y))
@@ -263,7 +266,8 @@ zinbTVP <- function(df,
                                  r.beta = settings.NegBin$beta.r,
                                  tau1 = prior.reg_nb$tau[1],
                                  accept = settings.NegBin$blocked.accept,
-                                 target.rate = settings.NegBin$target.rate.blocked)
+                                 target.rate = settings.NegBin$target.rate.blocked,
+                                 adapt = adapt)
 
         if(r != blocki$r){
           settings.NegBin$blocked.accept[i] <- 1
@@ -469,7 +473,8 @@ zinbTVP <- function(df,
 
   # new: post-hoc identification
   if(random.effects){
-    flip.id_logit <- res_logit[, "lambda_t1"] < 0
+    lambda.col_logit <- if(tv.load_logit) "lambda_t1" else "lambda_t"
+    flip.id_logit <- res_logit[, lambda.col_logit] < 0
     res_logit[flip.id_logit, startsWith(colnames(res_logit), "lambda")] <-
       -res_logit[flip.id_logit, startsWith(colnames(res_logit), "lambda")]
     f_mat_logit[flip.id_logit, ] <- -f_mat_logit[flip.id_logit, ]
@@ -503,7 +508,8 @@ zinbTVP <- function(df,
   res_nb <- res_frame_nb[res_frame_nb[,"SimNr"] > mcmc.opt$burnin,]
   res_nb <- res_nb[seq(1, mcmc.opt$chain.length-mcmc.opt$burnin, by = mcmc.opt$thin),]
   if(random.effects){
-    flip.id_nb <- res_nb[, "lambda_t1"] < 0
+    lambda.col_nb <- if(tv.load_nb) "lambda_t1" else "lambda_t"
+    flip.id_nb <- res_nb[, lambda.col_nb] < 0
     res_nb[flip.id_nb, startsWith(colnames(res_nb), "lambda")] <-
       -res_nb[flip.id_nb, startsWith(colnames(res_nb), "lambda")]
     f_mat_nb[flip.id_nb, ] <- -f_mat_nb[flip.id_nb, ]

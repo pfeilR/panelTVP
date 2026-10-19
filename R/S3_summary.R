@@ -436,9 +436,9 @@ crafti <- function(X, posterior, by = NULL, ntime){
   }
   ncov <- sum(startsWith(rownames(d), "beta_t"))/ntime
   d <- as.data.frame(d)
-  if(nrow(d[startsWith(rownames(d), "lambda_t"),]) == 1){ # cps prior
+  if(sum(startsWith(rownames(d), "lambda_t")) == 1){ # cps prior
     mat <- as.matrix(d[startsWith(rownames(d), "lambda_t"),])
-    mat <- mat[rep(1,ntime),]
+    mat <- mat[rep(1, ntime), , drop = FALSE]
     rownames(mat) <- paste0("lambda_t", 1:ntime)
     d <- rbind(d[!startsWith(rownames(d), "lambda_t"),], mat)
   }

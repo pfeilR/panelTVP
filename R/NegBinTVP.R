@@ -38,6 +38,8 @@ NegBinTVP <- function(df,
 
     for(i in 1:mcmc.opt$chain.length){
 
+      adapt <- (i <= mcmc.opt$burnin)
+
       # Step U + W
 
       if(i == 1){
@@ -67,7 +69,8 @@ NegBinTVP <- function(df,
                                           r.alpha = settings.NegBin$alpha.r,
                                           r.beta = settings.NegBin$beta.r,
                                           accept = settings.NegBin$r.accept,
-                                          target.rate = settings.NegBin$target.rate.r)
+                                          target.rate = settings.NegBin$target.rate.r,
+                                          adapt = adapt)
 
           r <- sample.r.list[[1]]
           settings.NegBin$eps.sd.r <- sample.r.list[[2]]
@@ -93,13 +96,13 @@ NegBinTVP <- function(df,
       if(i == 1){
         omega <- rep(1, length(df$y))
       } else{
-        omega <- efficient_PG_sampling(h = df$y + r, z = c(eta))
+        omega <- BayesLogit::rpg(num = length(df$y), h = df$y + r, z = c(eta))
       }
       W.sparse <- Matrix::Diagonal(n = length(omega), x = omega)
       W.dense <- matrix(omega, nrow = df$n, ncol = df$Tmax)
 
       # update z deterministically
-      z <- NB.para(y = df$y, r.old = r, omega.old = omega, compute.z = TRUE)
+      z <- (df$y - r)/(2*omega)
 
       # Step R
 
@@ -167,7 +170,8 @@ NegBinTVP <- function(df,
                                  r.beta = settings.NegBin$beta.r,
                                  tau1 = prior.reg$tau[1],
                                  accept = settings.NegBin$blocked.accept,
-                                 target.rate = settings.NegBin$target.rate.blocked)
+                                 target.rate = settings.NegBin$target.rate.blocked,
+                                 adapt = adapt)
 
         if(r != blocki$r){
           settings.NegBin$blocked.accept[i] <- 1
@@ -297,7 +301,8 @@ NegBinTVP <- function(df,
 
   # new: post-hoc identification
   if(random.effects){
-    flip.id <- res[,"lambda_t1"] < 0
+    lambda.col <- if(tv.load) "lambda_t1" else "lambda_t"
+    flip.id <- res[, lambda.col] < 0
     res[flip.id, startsWith(colnames(res), "lambda")] <- -res[flip.id, startsWith(colnames(res), "lambda")]
     f_mat[flip.id, ] <- -f_mat[flip.id, ]
     fmean <- colMeans(f_mat)
@@ -359,7 +364,7 @@ NegBinTVP <- function(df,
 
   # return
   df$y[miss] <- NA
-  ret <- list(data = df, mcmc = res_mcmc[,colnames(res_mcmc) != "sigma2"],
+  ret <- list(data = df, Y = Y, mcmc = res_mcmc[,colnames(res_mcmc) != "sigma2"],
               posterior = mcmcsummary[rownames(mcmcsummary) != "sigma2",],
               fmcmc = f_mat,
               fmean = fmean, model = "NegBin",

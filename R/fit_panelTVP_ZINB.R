@@ -25,9 +25,10 @@ fit_panelTVP_ZINB <- function(formula,
   }
 
   resp <- all.vars(formula)[1]
-  miss <- ifelse(is.na(data[,resp]), TRUE, FALSE)
+  miss <- is.na(data[[resp]])
   N.miss <- sum(miss)
   data[miss, resp] <- MASS::rnegbin(N.miss, mu = 1, theta = 2)
+  miss <- miss[order(data$t, data$id)]
 
   if(any(colnames(data) == "t")) dat <- data[,names(data) != "t"]
   if(any(colnames(dat) == "id")) dat <- dat[,names(dat) != "id"]

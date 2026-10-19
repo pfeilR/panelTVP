@@ -216,18 +216,20 @@ plot_effects <- function(summary_table, Tmax, X, nplots = 4){
 
   beta_lambda_rows <- c(grep("^beta_t\\d+", rownames(summary_table), value = TRUE),
                         grep("^lambda_t[0-9]+", rownames(summary_table), value = TRUE))
-  if(any(startsWith(beta_lambda_rows, "lambda"))){
-    randoms <- TRUE
-  } else{
-    randoms <- FALSE
-  }
+  randoms <- any(startsWith(rownames(summary_table), "lambda_t"))
   beta_lambda_data <- summary_table[beta_lambda_rows, , drop = FALSE]
   if(sum(startsWith(rownames(summary_table), "lambda_t")) == 1){ # cps
-    beta_lambda_rows <- c(beta_lambda_rows, paste0("lambda_t",1:Tmax))
-    mat <- matrix(summary_table[startsWith(rownames(summary_table), "lambda_t"),], nrow = 1)
-    mat <- mat[rep(1,Tmax),]
+    mat <- matrix(
+      summary_table[startsWith(rownames(summary_table), "lambda_t"), ],
+      nrow = 1
+    )
+    mat <- mat[rep(1, Tmax), , drop = FALSE]
     rownames(mat) <- paste0("lambda_t", 1:Tmax)
-    beta_lambda_data <- rbind(beta_lambda_data, mat)
+    beta_lambda_data <- rbind(
+      beta_lambda_data[!startsWith(rownames(beta_lambda_data), "lambda_t"), , drop = FALSE],
+      mat
+    )
+    beta_lambda_rows <- rownames(beta_lambda_data)
   }
   if(randoms){
     index_df <- matrix(nrow = (ncol(X)+1)*Tmax, ncol = 2)

@@ -90,7 +90,7 @@
 #'           type = "rw-t1", c = 1, L0 = 1
 #'          ),
 #'          mcmc.opt = list(
-#'           chain.length = 12000, burnin = 2000, thin = 10, asis = TRUE
+#'           chain.length = 12000, burnin = 2000, thin = 1, asis = TRUE
 #'          ),
 #'          settings.NegBin = list(
 #'           alpha.r = 2, beta.r = 1,
@@ -99,8 +99,8 @@
 #'           target.rate.r = 0.44, target.rate.boost = 0.44
 #'          ),
 #'          HPD.coverage = 0.95,
-#'          R.WAIC = 5,
-#'          posterior.predictive.matrix = FALSE,
+#'          posterior.predictive.matrix = TRUE,
+#'          save.factors = FALSE,
 #'          random.effects = TRUE,
 #'          progress.bar = FALSE)
 #'
@@ -172,9 +172,9 @@
 #'     \item \code{beta.c.xi}: hyperparameter for learning \eqn{c^\xi}
 #'      (argument is ignored when \code{learn.c.xi = FALSE})
 #'    \item \code{iota.c.tau}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{c^\tau}
+#'     updating of \eqn{c^\tau} (argument is ignored when \code{learn.c.tau = FALSE})
 #'    \item \code{iota.c.xi}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{c^\xi}
+#'     updating of \eqn{c^\xi} (argument is ignored when \code{learn.c.xi = FALSE})
 #'    \item \code{target.rate.c.tau}: desired acceptance rate when updating
 #'     \eqn{c^\tau} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.c.tau = FALSE})
@@ -318,9 +318,9 @@
 #'     \item \code{beta.c.xi}: hyperparameter for learning \eqn{c^\xi}
 #'      (argument is ignored when \code{learn.c.xi = FALSE}) (count component)
 #'    \item \code{iota.c.tau}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{c^\tau} (count component)
+#'     updating of \eqn{c^\tau} (argument is ignored when \code{learn.c.tau = FALSE}) (count component)
 #'    \item \code{iota.c.xi}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{c^\xi} (count component)
+#'     updating of \eqn{c^\xi} (argument is ignored when \code{learn.c.xi = FALSE}) (count component)
 #'    \item \code{target.rate.c.tau}: desired acceptance rate when updating
 #'     \eqn{c^\tau} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.c.tau = FALSE}) (count component)
@@ -459,9 +459,9 @@
 #'     \item \code{beta.c.xi}: hyperparameter for learning \eqn{c^\xi}
 #'      (argument is ignored when \code{learn.c.xi = FALSE}) (inflation component)
 #'    \item \code{iota.c.tau}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{c^\tau} (inflation component)
+#'     updating of \eqn{c^\tau} (argument is ignored when \code{learn.c.tau = FALSE}) (inflation component)
 #'    \item \code{iota.c.xi}: proposal standard deviation for Metropolis-Hastings
-#'     updating of \eqn{c^\xi} (inflation component)
+#'     updating of \eqn{c^\xi} (argument is ignored when \code{learn.c.xi = FALSE}) (inflation component)
 #'    \item \code{target.rate.c.tau}: desired acceptance rate when updating
 #'     \eqn{c^\tau} using Metropolis-Hastings (argument is ignored when
 #'     \code{learn.c.tau = FALSE}) (inflation component)
@@ -585,8 +585,6 @@
 #'
 #' @param HPD.coverage coverage probability of highest posterior density intervals
 #'  (default yields 95 percent coverage)
-#' @param R.WAIC number of replications for computing the marginal WAIC, where
-#'  the latent factors are integrated out
 #' @param posterior.predictive.matrix if TRUE (= default) the posterior predictive distribution
 #'  based on the training data is computed and returned as a list object by the function.
 #'  Setting it to FALSE is usually only done for saving memory
@@ -827,7 +825,7 @@
 #'  \code{panelTVP.ZINB}
 #'  depending on whether a Gaussian, Probit, Logit, Negative Binomial or
 #'  Zero-Inflated Negative Binomial model was
-#'  fitted. When either a Gaussian, Probit, Logit or Negative Binomial model was fitted,
+#'  estimated. When either a Gaussian, Probit, Logit or Negative Binomial model was estimated,
 #'  the returned object contains a list of the following elements:
 #'  \describe{
 #'    \item{learning.settings}{information on which parameters have been learned}
@@ -838,18 +836,16 @@
 #'    were present and imputed via data augmentation. Each row of \code{Y} contains
 #'    the sampled values of a specific observation. For observed data, the corresponding
 #'    rows are essentially replicates of the same value. For missing data, the
-#'    corresponding rows contain the imputed values of every iteration.}
+#'    corresponding rows contain the imputed values of every iteration}
 #'    \item{mcmc}{Markov Chains for every parameter except for the factor scores
 #'     (to save memory)}
 #'    \item{posterior}{preliminary summary of posterior results}
 #'    \item{fmean}{posterior means of factor scores (only when random effects are estimated)}
 #'    \item{model}{the fitted model}
-#'    \item{acceptance.rates}{the achieved acceptance rates when using Metropolis-Hastings}
+#'    \item{acceptance.rates}{the achieved acceptance rates for the hyperparameters when using Metropolis-Hastings}
+#'    \item{acceptance.rate.boost}{the achieved acceptance rate for the boosting step (only Negative Binomial model)}
 #'    \item{HPD.coverage}{coverage probability of HPD intervals (based on input)}
 #'    \item{runtime}{total runtime of the sampler (measured in seconds)}
-#'    \item{WAIC}{the Widely Applicable Information Criterion for model comparison
-#'     (note that the WAIC is only computed from the actually observed data,
-#'     i.e., missing data are fully ignored when computing WAIC)}
 #'    \item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 #'     predictive distribution for each observation (rows) and each MCMC draw (columns)}
 #'    \item{mcmc.settings}{details on the MCMC sampler}
@@ -887,13 +883,11 @@
 #'    \item{fmean_nb}{posterior means of factor scores for the
 #'      count component of the model (only when random effects are estimated)}
 #'    \item{model}{the fitted model}
-#'    \item{acceptance.rates}{the achieved acceptance rates when using
+#'    \item{acceptance.rates}{the achieved acceptance rates for the hyperparameters when using
 #'       Metropolis-Hastings for both components of the model}
+#'    \item{acceptance.rate.boost}{the achieved acceptance rate for the boosting step}
 #'    \item{HPD.coverage}{coverage probability of HPD intervals (based on input)}
 #'    \item{runtime}{total runtime of the sampler (measured in seconds)}
-#'    \item{WAIC}{the Widely Applicable Information Criterion for model comparison
-#'     (note that the WAIC is only computed from the actually observed data,
-#'     i.e., missing data are fully ignored when computing WAIC)}
 #'    \item{posterior.predictive}{the \eqn{Tn \times M} matrix that contains the posterior
 #'     predictive distribution for each observation (rows) and each MCMC draw (columns)}
 #'    \item{mcmc.settings}{details on the MCMC sampler}
@@ -1164,7 +1158,7 @@ panelTVP <- function(formula = NULL,
                        type = "rw-t1", c = 1, L0 = 1
                      ),
                      mcmc.opt = list(
-                       chain.length = 12000, burnin = 2000, thin = 10, asis = TRUE
+                       chain.length = 12000, burnin = 2000, thin = 1, asis = TRUE
                      ),
                      settings.NegBin = list(
                        alpha.r = 2, beta.r = 1,
@@ -1173,8 +1167,7 @@ panelTVP <- function(formula = NULL,
                        target.rate.r = 0.44, target.rate.boost = 0.44
                      ),
                      HPD.coverage = 0.95,
-                     R.WAIC = 5,
-                     posterior.predictive.matrix = FALSE,
+                     posterior.predictive.matrix = TRUE,
                      save.factors = FALSE,
                      random.effects = TRUE,
                      progress.bar = FALSE
@@ -1205,7 +1198,7 @@ panelTVP <- function(formula = NULL,
   # input checks
   # check.panelTVP(formula, data, id, t, model, prior.reg, prior.var, prior.load,
   #                prior.reg_nb, prior.load_nb, prior.reg_logit, prior.load_logit,
-  #                mcmc.opt, settings.NegBin, HPD.coverage, R.WAIC, posterior.predictive.matrix,
+  #                mcmc.opt, settings.NegBin, HPD.coverage, posterior.predictive.matrix,
   #                random.effects, progress.bar)
 
   # ordering dataset and removing gaps in id
@@ -1249,9 +1242,6 @@ panelTVP <- function(formula = NULL,
                                                "a.phi", "kappa.phi",
                                                "a.zeta", "kappa.zeta")),]
     }
-    # add WAIC, compute posterior predictive and remove chain of factor scores to save memory
-    #cat(" Computing WAIC ...")
-    #result$WAIC <- compute_waic(result, random.effects, R.WAIC)
     if(posterior.predictive.matrix){
       if(random.effects){
         result$posterior.predictive <- compute_fitted_Gaussian_Probit_Logit_NegBin(result)
@@ -1339,9 +1329,6 @@ panelTVP <- function(formula = NULL,
                                                        "a.phi", "kappa.phi",
                                                        "a.zeta", "kappa.zeta")),]
     }
-    # add WAIC, compute posterior predictive and remove chain of factor scores and risk-indicators to save memory
-    #cat(" Computing WAIC ...")
-    #result$WAIC <- compute_waic(result, random.effects, R.WAIC)
     if(posterior.predictive.matrix){
       if(random.effects){
         result$posterior.predictive <- compute_fitted_ZINB(result)

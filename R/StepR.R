@@ -10,6 +10,8 @@ stepR <- function(response,
 
   # Shrinkage prior ------------------------------------------------------------
 
+  adapt <- (i <= mcmc.opt$burnin)
+
   if(prior.reg$type %in% c("rw1", "rw2")){
 
     ## Step DR-1: sample beta_tilde using AWOL ---------------------------------
@@ -92,7 +94,8 @@ stepR <- function(response,
                                     prior_hp2 = prior.reg$alpha.a.xi*prior.reg$beta.a.xi, # Gamma prior
                                     k = prior.reg$kappa.xi,
                                     accept = prior.reg$a.xi.accept,
-                                    target.rate = prior.reg$target.rate.a.xi)
+                                    target.rate = prior.reg$target.rate.a.xi,
+                                    adapt = adapt)
 
           if(a_xi_state[[1]] != prior.reg$a.xi){
             prior.reg$a.xi.accept[i] <- 1
@@ -121,7 +124,8 @@ stepR <- function(response,
                                      prior_hp2 = prior.reg$alpha.a.tau*prior.reg$beta.a.tau,
                                      k = prior.reg$kappa.tau,
                                      accept = prior.reg$a.tau.accept,
-                                     target.rate = prior.reg$target.rate.a.tau)
+                                     target.rate = prior.reg$target.rate.a.tau,
+                                     adapt = adapt)
 
           if(a_tau_state[[1]] != prior.reg$a.tau){
             prior.reg$a.tau.accept[i] <- 1
@@ -190,7 +194,8 @@ stepR <- function(response,
                                     k = prior.reg$kappa.xi,
                                     kappa.check = prior.reg$kappa.xi.check,
                                     accept = prior.reg$a.xi.accept,
-                                    target.rate = prior.reg$target.rate.a.xi)
+                                    target.rate = prior.reg$target.rate.a.xi,
+                                    adapt = adapt)
 
           if(a_xi_state[[1]] != prior.reg$a.xi){
             prior.reg$a.xi.accept[i] <- 1
@@ -226,7 +231,8 @@ stepR <- function(response,
                                      k = prior.reg$kappa.tau,
                                      kappa.check = prior.reg$kappa.tau.check,
                                      accept = prior.reg$a.tau.accept,
-                                     target.rate = prior.reg$target.rate.a.tau)
+                                     target.rate = prior.reg$target.rate.a.tau,
+                                     adapt = adapt)
 
           if(a_tau_state[[1]] != prior.reg$a.tau){
             prior.reg$a.tau.accept[i] <- 1
@@ -281,7 +287,8 @@ stepR <- function(response,
                                    k = prior.reg$kappa.xi,
                                    var.check = prior.reg$xi.check,
                                    accept = prior.reg$c.xi.accept,
-                                   target.rate = prior.reg$target.rate.c.xi)
+                                   target.rate = prior.reg$target.rate.c.xi,
+                                   adapt = adapt)
 
          if(c_xi_state[[1]] != prior.reg$c.xi){
            prior.reg$c.xi.accept[i] <- 1
@@ -317,7 +324,8 @@ stepR <- function(response,
                                     k = prior.reg$kappa.tau,
                                     var.check = prior.reg$tau.check,
                                     accept = prior.reg$c.tau.accept,
-                                    target.rate = prior.reg$target.rate.c.tau)
+                                    target.rate = prior.reg$target.rate.c.tau,
+                                    adapt = adapt)
 
          if(c_tau_state[[1]] != prior.reg$c.tau){
            prior.reg$c.tau.accept[i] <- 1
@@ -414,7 +422,8 @@ stepR <- function(response,
                                                 prior_hp2 = prior.reg$beta.a.xi, # scaled Beta prior
                                                 chi.j = prior.reg$chi.xi.j,
                                                 accept = prior.reg$a.xi.accept,
-                                                target.rate = prior.reg$target.rate.a.xi)
+                                                target.rate = prior.reg$target.rate.a.xi,
+                                                adapt = adapt)
 
           if(a_xi_state[[1]] != prior.reg$a.xi){
             prior.reg$a.xi.accept[i] <- 1
@@ -443,7 +452,8 @@ stepR <- function(response,
                                                  prior_hp2 = prior.reg$beta.a.tau, # scaled Beta prior
                                                  chi.j = prior.reg$chi.tau.j,
                                                  accept = prior.reg$a.tau.accept,
-                                                 target.rate = prior.reg$target.rate.a.tau)
+                                                 target.rate = prior.reg$target.rate.a.tau,
+                                                 adapt = adapt)
 
           if(a_tau_state[[1]] != prior.reg$a.tau){
             prior.reg$a.tau.accept[i] <- 1
@@ -475,7 +485,8 @@ stepR <- function(response,
                                                 prior_hp2 = prior.reg$beta.c.xi, # scaled Beta prior
                                                 chi.j = prior.reg$chi.xi.j,
                                                 accept = prior.reg$c.xi.accept,
-                                                target.rate = prior.reg$target.rate.c.xi)
+                                                target.rate = prior.reg$target.rate.c.xi,
+                                                adapt = adapt)
 
           if(c_xi_state[[1]] != prior.reg$c.xi){
             prior.reg$c.xi.accept[i] <- 1
@@ -505,7 +516,8 @@ stepR <- function(response,
                                                  prior_hp2 = prior.reg$beta.c.tau, # scaled Beta prior
                                                  chi.j = prior.reg$chi.tau.j,
                                                  accept = prior.reg$c.tau.accept,
-                                                 target.rate = prior.reg$target.rate.c.tau)
+                                                 target.rate = prior.reg$target.rate.c.tau,
+                                                 adapt = adapt)
 
           if(c_tau_state[[1]] != prior.reg$c.tau){
             prior.reg$c.tau.accept[i] <- 1
@@ -927,9 +939,9 @@ log_acceptance_prob_a_double <- function(a_new, a, alphapart, b1, b2, k){
 
   return(res)
 }
-MH_a_double <- function(a, alphapart, iota, prior_hp1, prior_hp2, k, accept, target.rate){
+MH_a_double <- function(a, alphapart, iota, prior_hp1, prior_hp2, k, accept, target.rate, adapt){
 
-  if(!is.na(target.rate)){
+  if(adapt && !is.na(target.rate)){
 
     # adaptive step
     accept.rate <- sum(accept) / length(accept)
@@ -995,9 +1007,9 @@ log_q_a_triple <- function(a, c, par, b1, b2, k, kappa.check){
 
   return(log.q)
 }
-MH_a_triple <- function(a, c, par, iota, prior_hp1, prior_hp2, k, kappa.check, accept, target.rate){
+MH_a_triple <- function(a, c, par, iota, prior_hp1, prior_hp2, k, kappa.check, accept, target.rate, adapt){
 
-  if(!is.na(target.rate)){
+  if(adapt && !is.na(target.rate)){
 
     # adaptive step
     accept.rate <- sum(accept) / length(accept)
@@ -1039,16 +1051,16 @@ log_q_c_triple <- function(c, a, k, var.check, par, b1, b2){
   partA <- d*lgamma(c+0.5)-d*lgamma(c+1)+(d/2)*log(c)
   partB <- -(c+0.5)*(sum(log(4*c*var.check+par2*k*a))-sum(log(4*c*var.check)))
   partC <- -lbeta(a,c)-(a-1)*log(c)-(a+c)*log(1+(a*k)/(2*c))
-  partD <- (b1-1)*log(2*c)+(b2-1)*(1-2*c)
+  partD <- (b1-1)*log(2*c)+(b2-1)*log(1-2*c)
   partE <- log(c)+log(0.5-c)
   log.q <- partA + partB + partC + partD + partE
 
   return(log.q)
 
 }
-MH_c_triple <- function(c, a, par, iota, prior_hp1, prior_hp2, k, var.check, accept, target.rate){
+MH_c_triple <- function(c, a, par, iota, prior_hp1, prior_hp2, k, var.check, accept, target.rate, adapt){
 
-  if(!is.na(target.rate)){
+  if(adapt && !is.na(target.rate)){
 
     # adaptive step
     accept.rate <- sum(accept) / length(accept)
@@ -1094,9 +1106,9 @@ log_q_a_triple_alternative <- function(a, c, b1, b2, chi.j){
   return(log.q)
 
 }
-MH_a_triple_alternative <- function(a, c, iota, prior_hp1, prior_hp2, chi.j, accept, target.rate){
+MH_a_triple_alternative <- function(a, c, iota, prior_hp1, prior_hp2, chi.j, accept, target.rate, adapt){
 
-  if(!is.na(target.rate)){
+  if(adapt && !is.na(target.rate)){
 
     # adaptive step
     accept.rate <- sum(accept) / length(accept)
@@ -1144,9 +1156,9 @@ log_q_c_triple_alternative <- function(c, a, b1, b2, vari, chi.j){
   return(log.q)
 
 }
-MH_c_triple_alternative <- function(c, a, vari, iota, prior_hp1, prior_hp2, chi.j, accept, target.rate){
+MH_c_triple_alternative <- function(c, a, vari, iota, prior_hp1, prior_hp2, chi.j, accept, target.rate, adapt){
 
-  if(!is.na(target.rate)){
+  if(adapt && !is.na(target.rate)){
 
     # adaptive step
     accept.rate <- sum(accept) / length(accept)

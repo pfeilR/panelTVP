@@ -15,8 +15,8 @@ LogitTVP <- function(df,
                      progress.bar){
 
   X.t <- cbind(df$X, t = df$timeidx)
-  delta <- df$y - 1/2
   fi.count <- 1
+  df$y[miss] <- 0
 
   Y <- matrix(nrow = length(df$y), ncol = mcmc.opt$chain.length)
 
@@ -31,6 +31,8 @@ LogitTVP <- function(df,
   time <- system.time({
 
     for(i in 1:mcmc.opt$chain.length){
+
+      delta <- df$y - 1/2
 
       # Step U + W
 
@@ -205,7 +207,8 @@ LogitTVP <- function(df,
 
   # new: post-hoc identification
   if(random.effects){
-    flip.id <- res[,"lambda_t1"] < 0
+    lambda.col <- if(tv.load) "lambda_t1" else "lambda_t" # accounts for cps prior
+    flip.id <- res[, lambda.col] < 0
     res[flip.id, startsWith(colnames(res), "lambda")] <- -res[flip.id, startsWith(colnames(res), "lambda")]
     f_mat[flip.id, ] <- -f_mat[flip.id, ]
     fmean <- colMeans(f_mat)
